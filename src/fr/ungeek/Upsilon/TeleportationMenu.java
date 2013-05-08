@@ -31,6 +31,7 @@ public class TeleportationMenu implements Listener {
 	@EventHandler
 	public void onMenuOpen(ChangeMenuEvent e) {
 		if (!e.getNew_menu().equals(getSelfMenuType())) return;
+		m.current_menu.put(e.getPlayer().getName(), getSelfMenuType());
 		boolean show_event_kynset = false;
 		show_event_kynset = !m.isBefore(11, 5, 2013);
 		Inventory inv = Bukkit.createInventory(null, 9 * (show_event_kynset ? 2 : 1), "Menu > Téléportation");
@@ -48,8 +49,6 @@ public class TeleportationMenu implements Listener {
 
 			}
 		}
-
-		e.getPlayer().closeInventory();
 		e.getPlayer().openInventory(inv);
 	}
 

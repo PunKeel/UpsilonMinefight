@@ -6,14 +6,13 @@ import fr.ungeek.Upsilon.events.MenuClickEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -40,7 +39,7 @@ public class MenuInventory implements Listener {
 		Inventory inv = Bukkit.createInventory(null, 9, "Menu");
 		m.current_menu.put(p.getName(), Main.Menus.MAIN);
 		inv.setItem(2, m.nameItem(new ItemStack(Material.EMPTY_MAP), ChatColor.DARK_GREEN + "Menu de ouesh téléportation"));
-		if (!(p.isOp() || p.getName().equalsIgnoreCase("dleot")))
+		if (p.isOp() || p.getName().equalsIgnoreCase("dleot"))
 			inv.setItem(6, m.nameItem(new ItemStack(Material.SMOOTH_STAIRS), ChatColor.DARK_AQUA + "Menu de boutique de zAchats", "HT & VAN D D OBJ"));
 		else
 			inv.setItem(6, m.nameItem(new ItemStack(Material.SMOOTH_STAIRS), ChatColor.DARK_AQUA + "Magagin", ChatColor.DARK_RED + "Bientôt disponible"));
@@ -52,28 +51,17 @@ public class MenuInventory implements Listener {
 	@EventHandler
 	public void onInventoryClose(InventoryCloseEvent e) {
 		Player p = (Player) e.getPlayer();
+		p.sendMessage(m.current_menu.toString());
 		if (m.current_menu.containsKey(p.getName())) {
-
 			Main.Menus current = m.current_menu.get(p.getName());
-			p.sendMessage(m.current_menu.toString());
 			CloseMenuEvent event = new CloseMenuEvent(current, p);
 			Bukkit.getServer().getPluginManager().callEvent(event);
 			m.current_menu.remove(p.getName());
 		}
 	}
 
-	@EventHandler
-	public void OnInventoryClick(InventoryEvent e) {
-		for (HumanEntity HE : e.getViewers()) {
-			((Player) HE).sendMessage("." + e.toString());
-		}
-
-	}
-
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGH)
 	public void OnInventoryClick(InventoryClickEvent e) {
-		m.print(1);
-		if (!(e.getWhoClicked() instanceof Player)) return;
 		Player p = (Player) e.getWhoClicked();
 		p.sendMessage(m.current_menu.toString());
 		if (!m.current_menu.containsKey(p.getName())) return;
@@ -81,7 +69,6 @@ public class MenuInventory implements Listener {
 		Main.Menus current = m.current_menu.get(p.getName());
 		if (current.equals(Main.Menus.MAIN)) {
 			if (e.getSlot() == 2) {
-				m.current_menu.put(p.getName(), Main.Menus.TELEPORTATION);
 				ChangeMenuEvent event = new ChangeMenuEvent(Main.Menus.TELEPORTATION, p);
 				Bukkit.getServer().getPluginManager().callEvent(event);
 			} else if (e.getSlot() == 6) {
