@@ -1,5 +1,7 @@
-package fr.ungeek.Upsilon;
+package fr.ungeek.Upsilon.Menus;
 
+import fr.ungeek.Upsilon.Main;
+import fr.ungeek.Upsilon.MenuManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -27,7 +29,7 @@ public class ShopMenu implements Listener {
 	ArrayList<String> viewing = new ArrayList<String>();
 	ArrayList<ItemStack> items_list = new ArrayList<ItemStack>();
 
-	public ShopMenu(Main main) {
+	public ShopMenu(Main main, MenuManager MM) {
 		p = main;
 		items_list.add(nameItem(new ItemStack(Material.DIAMOND_PICKAXE), "Pioche", "10$", "ou plus"));
 	}

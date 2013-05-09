@@ -1,16 +1,17 @@
 package fr.ungeek.Upsilon.events;
 
 import fr.ungeek.Upsilon.Main;
+import fr.ungeek.Upsilon.MenuManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 public class CloseMenuEvent extends Event {
 	private static final HandlerList handlers = new HandlerList();
-	private Main.Menus closed_menu;
+	private MenuManager.Menus closed_menu;
 	private Player p;
 
-	public CloseMenuEvent(Main.Menus cm, Player player) {
+	public CloseMenuEvent(MenuManager.Menus cm, Player player) {
 		closed_menu = cm;
 		p = player;
 	}
@@ -27,7 +28,7 @@ public class CloseMenuEvent extends Event {
 		return p;
 	}
 
-	public Main.Menus getClosed_menu() {
+	public MenuManager.Menus getClosed_menu() {
 		return closed_menu;
 	}
 }

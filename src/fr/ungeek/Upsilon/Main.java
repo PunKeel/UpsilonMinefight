@@ -1,16 +1,18 @@
 package fr.ungeek.Upsilon;
 
+//import fr.ungeek.Upsilon.Menus.EventMenu;
+
+import fr.ungeek.Upsilon.Menus.EventMenu;
+import fr.ungeek.Upsilon.Menus.MainMenu;
+import fr.ungeek.Upsilon.Menus.TeleportationMenu;
 import net.milkbowl.vault.economy.Economy;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -18,7 +20,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
+
+//import fr.ungeek.Upsilon.Menus.ShopMenu;
 
 /**
  * User: PunKeel
@@ -26,24 +29,29 @@ import java.util.List;
  * Time: 8:53 PM
  * May be open-source & be sold (by PunKeel, of course !)
  */
-public class Main extends JavaPlugin implements Listener {
+public class Main extends JavaPlugin {
 	public Economy econ;
-	HashMap<String, Menus> current_menu = new HashMap<String, Menus>();
-	EventMenu EM = new EventMenu(this);
-	ShopMenu SM = new ShopMenu(this);
-	TeleportationMenu TM = new TeleportationMenu(this);
-	MenuInventory MI = new MenuInventory(this);
+	MenuManager menu_manager = new MenuManager(this);
+	MainMenu main_menu = new MainMenu(this, menu_manager);
+	TeleportationMenu teleportation_menu = new TeleportationMenu(this, menu_manager);
+	EventMenu event_menu = new EventMenu(this, menu_manager);
+	DailyGift daily_gift = new DailyGift(this);
 
 	public void onEnable() {
-		Bukkit.getPluginManager().registerEvents(this, this);
-
-		//Bukkit.getPluginManager().registerEvents(EM, this);
-		Bukkit.getPluginManager().registerEvents(TM, this);
-
-		//Bukkit.getPluginManager().registerEvents(SM, this);
-
-		Bukkit.getPluginManager().registerEvents(MI, this);
+		if (getConfig().contains("events"))
+			event_menu.loadWarps();
+		Bukkit.getPluginManager().registerEvents(daily_gift, this);
+		Bukkit.getPluginManager().registerEvents(teleportation_menu, this);
+		Bukkit.getPluginManager().registerEvents(main_menu, this);
+		Bukkit.getPluginManager().registerEvents(event_menu, this);
+		Bukkit.getPluginManager().registerEvents(menu_manager, this);
+		getCommand("upsilon").setExecutor(this);
 		setupEconomy();
+	}
+
+	public void onDisable() {
+		getConfig().set("events", event_menu.getWarps());
+		saveConfig();
 	}
 
 	private boolean setupEconomy() {
@@ -86,58 +94,15 @@ public class Main extends JavaPlugin implements Listener {
 		return getDate(0);
 	}
 
-	@EventHandler()
-	public void onJoin(PlayerJoinEvent e) {
-		final Player p = e.getPlayer();
-		String today = getDate();
-		String yesterday = getDate(-1);
-		final String message;
-		if (p.hasMetadata("ups_lastjoin")) {
-			List<MetadataValue> ups_lastjoin = p.getMetadata("ups_lastjoin");
-			String LastJoin = "";
-			if (ups_lastjoin.size() != 0) {
-				LastJoin = p.getMetadata("ups_lastjoin").get(0).asString();
-			}
-			if (!LastJoin.equals(today)) {
-				int jours = 1;
-				p.setMetadata("ups_lastjoin", new FixedMetadataValue(this, today));
-				if (LastJoin.equals(yesterday)) {
-					// consecutif
-					jours = p.getMetadata("ups_follow").get(0).asInt() + 1;
-					int gain = (jours > 5) ? 50 : jours * 10;
-					p.setMetadata("ups_follow", new FixedMetadataValue(this, jours));
-					message = (ChatColor.DARK_GREEN + "[" + ChatColor.WHITE + "Minefight" + ChatColor.DARK_GREEN + "] " + ChatColor.WHITE + "Tu as reçu " + gain + " ƒ pour tes " + jours + " jours de présence à la suite !");
-					econ.depositPlayer(p.getName(), gain);
-				} else {
-					// pas consecutif
-					p.setMetadata("ups_follow", new FixedMetadataValue(this, jours));
-					message = (ChatColor.DARK_GREEN + "[" + ChatColor.WHITE + "Minefight" + ChatColor.DARK_GREEN + "] " + ChatColor.WHITE + "Tu as reçu 10 ƒ pour ton premier jour de présence consécutif!");
-					econ.depositPlayer(p.getName(), 10);
-				}
-				if (!message.isEmpty()) {
-					Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-						public void run() {
-							p.sendMessage(message);
-						}
-					}, 20);
-				}
-			}
-
-		} else {
-			p.setMetadata("ups_lastjoin", new FixedMetadataValue(this, today));
-			p.setMetadata("ups_follow", new FixedMetadataValue(this, 1));
-		}
-	}
-
-	ItemStack nameItem(ItemStack i, String name, String lore1) {
+	public ItemStack nameItem(ItemStack i, String name, String lore1) {
 		return nameItem(i, name, lore1, null);
 	}
 
-	ItemStack nameItem(ItemStack i, String name) {
+	public ItemStack nameItem(ItemStack i, String name) {
 		return nameItem(i, name, null);
 	}
 
-	ItemStack nameItem(ItemStack i) {
+	public ItemStack nameItem(ItemStack i) {
 		return nameItem(i, null);
 	}
 
@@ -165,6 +130,70 @@ public class Main extends JavaPlugin implements Listener {
 		return i;
 	}
 
-	public enum Menus {MAIN, TELEPORTATION, SHOP, EVENTS}
+	@Override
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		Player p = null;
+		Boolean usage = false;
+		if (sender instanceof Player) {
+			p = (Player) sender;
+		}
+		if (args.length == 0) {
+			sender.sendMessage("Usage : /" + label + " [events,open]");
+			return true;
+		}
+		if (args[0].equalsIgnoreCase("events")) {
+			if (args.length != 3) {
+				sender.sendMessage("Usage : /" + label + " events <on,off> <event>");
+				HashMap<String, Boolean> events = event_menu.getWarps();
+				for (String n : events.keySet()) {
+					sender.sendMessage(n + " : " + events.get(n).toString());
+				}
+			} else {
+				Boolean enable = (args[1].equalsIgnoreCase("off")) ? false : true;
+				String event = args[2];
+				Boolean success = event_menu.changeState(event, enable);
+				if (!success) {
+					sender.sendMessage("Event inexistant, sale noob");
+				} else {
+					sender.sendMessage("État changé :)");
+				}
+			}
+		} else if (args[0].equalsIgnoreCase("open")) {
+			if (args.length == 2) {
+				Player cible = Bukkit.getPlayer(args[1]);
+				if (cible != null) {
+					menu_manager.openInventory(cible, MenuManager.Menus.MAIN);
+				} else if (MenuManager.Menus.contains(args[1].toUpperCase())) {
+					if (p != null) {
+						menu_manager.openInventory(p, MenuManager.Menus.valueOf(args[1].toUpperCase()));
+					} else {
+						sender.sendMessage("Tu dois être un joueur pour faire ça.");
+					}
+				} else {
+					usage = true;
+				}
+			} else if (args.length == 3) {
+				Player cible = Bukkit.getPlayer(args[2]);
+				if (cible == null) {
+					sender.sendMessage("Joueur introuvable");
+				} else {
+					if (!MenuManager.Menus.contains(args[1].toUpperCase())) {
+						sender.sendMessage("Menu introuvable");
+						usage = true;
+					} else {
+						menu_manager.openInventory(cible, MenuManager.Menus.valueOf(args[1].toUpperCase()));
+						sender.sendMessage("Menu " + args[1].toUpperCase() + "ouvert pour " + cible.getDisplayName());
+					}
+				}
+			} else {
+				usage = true;
+			}
+			if (usage) {
+				sender.sendMessage("Usage /" + label + " open <menu> [pseudo]");
+				sender.sendMessage("Menus : " + StringUtils.join(MenuManager.Menus.values(), ", "));
+			}
 
+		}
+		return true;
+	}
 }

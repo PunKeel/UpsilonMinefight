@@ -1,5 +1,7 @@
-package fr.ungeek.Upsilon;
+package fr.ungeek.Upsilon.Menus;
 
+import fr.ungeek.Upsilon.Main;
+import fr.ungeek.Upsilon.MenuManager;
 import fr.ungeek.Upsilon.events.ChangeMenuEvent;
 import fr.ungeek.Upsilon.events.MenuClickEvent;
 import org.bukkit.Bukkit;
@@ -19,20 +21,22 @@ import org.bukkit.inventory.ItemStack;
  */
 public class TeleportationMenu implements Listener {
 	Main m;
+	MenuManager MM;
 
-	public TeleportationMenu(Main main) {
+	public TeleportationMenu(Main main, MenuManager MM) {
 		m = main;
+		this.MM = MM;
 	}
 
-	public Main.Menus getSelfMenuType() {
-		return Main.Menus.TELEPORTATION;
+	public MenuManager.Menus getSelfMenuType() {
+		return MenuManager.Menus.TELEPORTATION;
 	}
 
 	@EventHandler
 	public void onMenuOpen(ChangeMenuEvent e) {
 		if (!e.getNew_menu().equals(getSelfMenuType())) return;
-		m.current_menu.put(e.getPlayer().getName(), getSelfMenuType());
-		boolean show_event_kynset = false;
+		MM.current_menu.put(e.getPlayer().getName(), getSelfMenuType());
+		boolean show_event_kynset;
 		show_event_kynset = !m.isBefore(11, 5, 2013);
 		Inventory inv = Bukkit.createInventory(null, 9 * (show_event_kynset ? 2 : 1), "Menu > Téléportation");
 
@@ -53,7 +57,7 @@ public class TeleportationMenu implements Listener {
 	}
 
 	@EventHandler
-	public void OnInventoryClick(MenuClickEvent e) {
+	public void onMenuClick(MenuClickEvent e) {
 		Player p = e.getPlayer();
 		if (!e.getCurrent_menu().equals(getSelfMenuType())) return;
 		String warp = "";
@@ -68,8 +72,8 @@ public class TeleportationMenu implements Listener {
 				warp = "nether";
 				break;
 			case 7:
-				warp = "event";
-				break;
+				MM.openInventory(p, MenuManager.Menus.EVENTS);
+				return;
 			case 13:
 				if (m.isToday(11, 5, 2013)) {
 					warp = "kynset";
@@ -84,7 +88,7 @@ public class TeleportationMenu implements Listener {
 		}
 		p.closeInventory();
 		if (warp.equalsIgnoreCase("event")) {
-			ChangeMenuEvent event = new ChangeMenuEvent(Main.Menus.EVENTS, p);
+			ChangeMenuEvent event = new ChangeMenuEvent(MenuManager.Menus.EVENTS, p);
 			Bukkit.getServer().getPluginManager().callEvent(event);
 		} else {
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), String.format("warp %s %s", warp, p.getName()));
