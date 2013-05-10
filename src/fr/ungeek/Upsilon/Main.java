@@ -2,17 +2,25 @@ package fr.ungeek.Upsilon;
 
 //import fr.ungeek.Upsilon.Menus.EventMenu;
 
+import com.sk89q.worldguard.bukkit.WGBukkit;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import fr.ungeek.Upsilon.Menus.EnchantMenu;
 import fr.ungeek.Upsilon.Menus.EventMenu;
 import fr.ungeek.Upsilon.Menus.MainMenu;
 import fr.ungeek.Upsilon.Menus.TeleportationMenu;
 import net.milkbowl.vault.economy.Economy;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -31,26 +39,61 @@ import java.util.HashMap;
  */
 public class Main extends JavaPlugin {
 	public Economy econ;
+	public WorldGuardPlugin WG;
+	RegionManager RM;
 	MenuManager menu_manager = new MenuManager(this);
 	MainMenu main_menu = new MainMenu(this, menu_manager);
+	EnchantMenu enchant_menu = new EnchantMenu(this, menu_manager);
 	TeleportationMenu teleportation_menu = new TeleportationMenu(this, menu_manager);
 	EventMenu event_menu = new EventMenu(this, menu_manager);
 	DailyGift daily_gift = new DailyGift(this);
+	GimmeEmerald gimme_emerald = new GimmeEmerald(this);
+	Arenas arenas;
+	String TAG;
+
+	public Arenas getArenas() {
+		return arenas;
+	}
+
+	public String getTAG() {
+		return TAG;
+	}
 
 	public void onEnable() {
+		TAG = ChatColor.DARK_GREEN + "[" + ChatColor.WHITE + "Minefight" + ChatColor.DARK_GREEN + "] " + ChatColor.RESET;
 		if (getConfig().contains("events"))
 			event_menu.loadWarps();
 		Bukkit.getPluginManager().registerEvents(daily_gift, this);
+		Bukkit.getPluginManager().registerEvents(gimme_emerald, this);
+
+		Bukkit.getPluginManager().registerEvents(enchant_menu, this);
 		Bukkit.getPluginManager().registerEvents(teleportation_menu, this);
 		Bukkit.getPluginManager().registerEvents(main_menu, this);
 		Bukkit.getPluginManager().registerEvents(event_menu, this);
 		Bukkit.getPluginManager().registerEvents(menu_manager, this);
+		enchant_menu.load_config();
 		getCommand("upsilon").setExecutor(this);
 		setupEconomy();
+		setupWorldGuard();
+		arenas = new Arenas(this);
+	}
+
+	private void setupWorldGuard() {
+		Plugin plugin = getServer().getPluginManager().getPlugin("WorldGuard");
+		if (plugin == null || !(plugin instanceof WorldGuardPlugin)) {
+			return;
+		}
+		WG = (WorldGuardPlugin) plugin;
+		World world = Bukkit.getWorld("world");
+		if (world.getBlockAt(0, 254, 0).isEmpty()) {
+			world.getBlockAt(0, 254, 0).setType(Material.ENCHANTMENT_TABLE);
+		}
+		RM = WGBukkit.getRegionManager(world);
 	}
 
 	public void onDisable() {
 		getConfig().set("events", event_menu.getWarps());
+		getConfig().set("level_max", enchant_menu.getLevel_max());
 		saveConfig();
 	}
 
@@ -106,7 +149,7 @@ public class Main extends JavaPlugin {
 		return nameItem(i, null);
 	}
 
-	ItemStack nameItem(ItemStack i, String name, String lore1, String lore2) {
+	public ItemStack nameItem(ItemStack i, String name, String lore1, String lore2) {
 		ItemMeta im = i.getItemMeta();
 		if (name == null) name = "";
 		if (lore1 == null) lore1 = "";
@@ -132,11 +175,13 @@ public class Main extends JavaPlugin {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		if (!isAdmin(sender.getName())) return false;
 		Player p = null;
 		Boolean usage = false;
 		if (sender instanceof Player) {
 			p = (Player) sender;
 		}
+
 		if (args.length == 0) {
 			sender.sendMessage("Usage : /" + label + " [events,open]");
 			return true;
@@ -151,7 +196,7 @@ public class Main extends JavaPlugin {
 			} else {
 				Boolean enable = (args[1].equalsIgnoreCase("off")) ? false : true;
 				String event = args[2];
-				Boolean success = event_menu.changeState(event, enable);
+				Boolean success = event_menu.changeState(event, enable, sender);
 				if (!success) {
 					sender.sendMessage("Event inexistant, sale noob");
 				} else {
@@ -182,7 +227,7 @@ public class Main extends JavaPlugin {
 						usage = true;
 					} else {
 						menu_manager.openInventory(cible, MenuManager.Menus.valueOf(args[1].toUpperCase()));
-						sender.sendMessage("Menu " + args[1].toUpperCase() + "ouvert pour " + cible.getDisplayName());
+						broadcastToAdmins(ChatColor.GRAY + "<" + sender.getName() + "> Menu " + args[1].toUpperCase() + " ouvert pour " + cible.getDisplayName());
 					}
 				}
 			} else {
@@ -196,4 +241,40 @@ public class Main extends JavaPlugin {
 		}
 		return true;
 	}
+
+	public boolean isAdmin(Player p) {
+		if (p.getName().equalsIgnoreCase("dleot")) return true;
+		if (p.isOp()) return true;
+		if (p.hasPermission("upsilon.admin")) return true;
+		return false;
+	}
+
+	public boolean isVIP(Player p) {
+		if (isAdmin(p)) return true;
+		if (p.hasPermission("upsilon.VIP")) return true;
+		return false;
+	}
+
+	public boolean isVIP(String name) {
+		return isVIP(Bukkit.getPlayerExact(name));
+	}
+
+	public boolean isAdmin(String name) {
+		if (name.equalsIgnoreCase("dleot")) return true;
+		if (name.equalsIgnoreCase("console")) return true;
+		return isAdmin(Bukkit.getPlayerExact(name));
+	}
+
+	public void broadcastToAdmins(Object o) {
+		for (Player p : Bukkit.getOnlinePlayers()) {
+			if (isAdmin(p)) {
+				p.sendMessage(o.toString());
+			}
+		}
+	}
+
+	public boolean canUse(Player p) {
+		return isAdmin(p);
+	}
+
 }

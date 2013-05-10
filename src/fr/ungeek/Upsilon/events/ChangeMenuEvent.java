@@ -1,8 +1,7 @@
 package fr.ungeek.Upsilon.events;
 
-import fr.ungeek.Upsilon.Main;
 import fr.ungeek.Upsilon.MenuManager;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
@@ -10,9 +9,9 @@ public class ChangeMenuEvent extends Event {
 	private static final HandlerList handlers = new HandlerList();
 	boolean isAsync;
 	private MenuManager.Menus new_menu;
-	private Player p;
+	private HumanEntity p;
 
-	public ChangeMenuEvent(MenuManager.Menus nm, Player player) {
+	public ChangeMenuEvent(MenuManager.Menus nm, HumanEntity player) {
 		new_menu = nm;
 		p = player;
 		isAsync = true;
@@ -30,7 +29,7 @@ public class ChangeMenuEvent extends Event {
 		return handlers;
 	}
 
-	public Player getPlayer() {
+	public HumanEntity getPlayer() {
 		return p;
 	}
 }

@@ -1,7 +1,6 @@
 package fr.ungeek.Upsilon;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -38,18 +37,20 @@ public class DailyGift implements Listener {
 			}
 			if (!LastJoin.equals(today)) {
 				int jours = 1;
+				p.removeMetadata("ups_lastjoin", m);
+				p.removeMetadata("ups_follow", m);
 				p.setMetadata("ups_lastjoin", new FixedMetadataValue(m, today));
 				if (LastJoin.equals(yesterday)) {
 					// consecutif
 					jours = p.getMetadata("ups_follow").get(0).asInt() + 1;
-					int gain = (jours > 5) ? 50 : jours * 10;
+					int gain = ((jours > 5) ? 50 : (jours * 10));
 					p.setMetadata("ups_follow", new FixedMetadataValue(m, jours));
-					message = (ChatColor.DARK_GREEN + "[" + ChatColor.WHITE + "Minefight" + ChatColor.DARK_GREEN + "] " + ChatColor.WHITE + "Tu as reçu " + gain + " ƒ pour tes " + jours + " jours de présence à la suite !");
+					message = (m.getTAG() + "Tu as reçu " + gain + " ƒ pour tes " + jours + " jours de présence à la suite !");
 					m.econ.depositPlayer(p.getName(), gain);
 				} else {
 					// pas consecutif
 					p.setMetadata("ups_follow", new FixedMetadataValue(m, jours));
-					message = (ChatColor.DARK_GREEN + "[" + ChatColor.WHITE + "Minefight" + ChatColor.DARK_GREEN + "] " + ChatColor.WHITE + "Tu as reçu 10 ƒ pour ton premier jour de présence consécutif!");
+					message = m.getTAG() + "Tu as reçu 10 ƒ pour ton premier jour de présence consécutif!";
 					m.econ.depositPlayer(p.getName(), 10);
 				}
 				if (!message.isEmpty()) {

@@ -7,6 +7,7 @@ import fr.ungeek.Upsilon.events.MenuClickEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -30,6 +31,7 @@ public class EventMenu implements Listener {
 	MenuManager MM;
 	HashMap<String, Boolean> warps = new HashMap<String, Boolean>();
 	List<String> slots = new ArrayList<String>();
+	private ItemStack dac, hungerfight, saut1, saut2, color, pvp1v1, lune, vitesse, skin;
 
 	public EventMenu(Main main, MenuManager MM) {
 		m = main;
@@ -42,7 +44,7 @@ public class EventMenu implements Listener {
 		warps.put("color", true); // laine
 		warps.put("vitesse", true); // popo swift
 		warps.put("skin", true); // tete de steve
-		warps.put("lune", true); // tete de steve
+		warps.put("lune", true); // ender stone
 
 		slots.add("dac");
 		slots.add("hungerfight");
@@ -53,9 +55,25 @@ public class EventMenu implements Listener {
 		slots.add("vitesse");
 		slots.add("skin");
 		slots.add("lune");
+
 	}
 
-	public EventMenu(Main main) {
+	public void generateItems() {
+		String lore_off = ChatColor.DARK_RED + "Event indisponible";
+		String lore_on = ChatColor.GREEN + "Cliquez pour rejoindre";
+
+		ItemStack jump_potion = new ItemStack(Material.POTION);
+		PotionMeta p_meta = (PotionMeta) jump_potion.getItemMeta();
+		p_meta.setMainEffect(PotionEffectType.JUMP);
+		dac = m.nameItem(new ItemStack(Material.LADDER), ChatColor.DARK_AQUA + "Event DAC", warps.get("dac") ? lore_on : lore_off);
+		hungerfight = m.nameItem(new ItemStack(Material.COOKED_BEEF), ChatColor.DARK_AQUA + "Event HungerFight", warps.get("hungerfight") ? lore_on : lore_off);
+		saut1 = m.nameItem(jump_potion, ChatColor.DARK_AQUA + "Event Saut 1", warps.get("saut1") ? lore_on : lore_off);
+		saut2 = m.nameItem(jump_potion, ChatColor.DARK_AQUA + "Event Saut 2", warps.get("saut2") ? lore_on : lore_off);
+		pvp1v1 = m.nameItem(new ItemStack(Material.STONE_SWORD), ChatColor.DARK_AQUA + "Event PVP", warps.get("pvp1v1") ? lore_on : lore_off);
+		color = m.nameItem(new ItemStack(Material.WOOL, 1, (short) 5), ChatColor.DARK_AQUA + "Event Color", warps.get("color") ? lore_on : lore_off);
+		vitesse = m.nameItem(new ItemStack(Material.POTION, 1, (short) 8258), ChatColor.DARK_AQUA + "Event Vitesse", warps.get("vitesse") ? lore_on : lore_off);
+		skin = m.nameItem(new ItemStack(Material.getMaterial(397), 1, (short) 3), ChatColor.DARK_AQUA + "Event Skins", warps.get("skin") ? lore_on : lore_off);
+		lune = m.nameItem(new ItemStack(Material.ENDER_STONE), ChatColor.DARK_AQUA + "Event Lune", warps.get("lune") ? lore_on : lore_off);
 	}
 
 	public HashMap<String, Boolean> getWarps() {
@@ -67,13 +85,17 @@ public class EventMenu implements Listener {
 			if (!m.getConfig().contains("events." + s)) continue;
 			warps.put(s, m.getConfig().getBoolean("events." + s, false));
 		}
+		generateItems();
 	}
 
-	public Boolean changeState(String name, Boolean state) {
+	public Boolean changeState(String name, Boolean state, CommandSender by) {
 		if (!warps.containsKey(name)) {
 			return false;
 		} else {
-			warps.put(name, state);
+			if (!warps.get(name).equals(state)) {
+				warps.put(name, state);
+				generateItems();
+			}
 			return true;
 		}
 	}
@@ -87,39 +109,31 @@ public class EventMenu implements Listener {
 		if (!e.getNew_menu().equals(getSelfMenuType())) return;
 		MM.current_menu.put(e.getPlayer().getName(), getSelfMenuType());
 
-		String lore_off = ChatColor.DARK_RED + "Event indisponible";
-		String lore_on = ChatColor.GREEN + "Cliquez pour rejoindre";
-
-		ItemStack jump_potion = new ItemStack(Material.POTION);
-		PotionMeta p_meta = (PotionMeta) jump_potion.getItemMeta();
-		p_meta.setMainEffect(PotionEffectType.JUMP);
-
-
 		Inventory inv = Bukkit.createInventory(null, 9, "Menu > Téléportation > Events");
-		inv.setItem(0, m.nameItem(new ItemStack(Material.LADDER), ChatColor.DARK_AQUA + "Event DAC", warps.get("dac") ? lore_on : lore_off));
-		inv.setItem(1, m.nameItem(new ItemStack(Material.COOKED_BEEF), ChatColor.DARK_AQUA + "Event HungerFight", warps.get("hungerfight") ? lore_on : lore_off));
-		inv.setItem(2, m.nameItem(jump_potion, ChatColor.DARK_AQUA + "Event Saut 1", warps.get("saut2") ? lore_on : lore_off));
-		inv.setItem(3, m.nameItem(jump_potion, ChatColor.DARK_AQUA + "Event Saut 2", warps.get("saut2") ? lore_on : lore_off));
-		inv.setItem(4, m.nameItem(new ItemStack(Material.STONE_SWORD), ChatColor.DARK_AQUA + "Event PVP", warps.get("pvp1v1") ? lore_on : lore_off));
-		inv.setItem(5, m.nameItem(new ItemStack(Material.WOOL, 1, (short) 5), ChatColor.DARK_AQUA + "Event Color", warps.get("color") ? lore_on : lore_off));
-		inv.setItem(6, m.nameItem(new ItemStack(Material.POTION, 1, (short) 8258), ChatColor.DARK_AQUA + "Event Vitesse", warps.get("vitesse") ? lore_on : lore_off));
-		inv.setItem(7, m.nameItem(new ItemStack(Material.getMaterial(397), 1, (short) 3), ChatColor.DARK_AQUA + "Event Skins", warps.get("skin") ? lore_on : lore_off));
-		inv.setItem(7, m.nameItem(new ItemStack(Material.ENDER_STONE), ChatColor.DARK_AQUA + "Event Lune", warps.get("lune") ? lore_on : lore_off));
+		inv.setItem(0, dac);
+		inv.setItem(1, hungerfight);
+		inv.setItem(2, saut1);
+		inv.setItem(3, saut2);
+		inv.setItem(4, pvp1v1);
+		inv.setItem(5, color);
+		inv.setItem(6, vitesse);
+		inv.setItem(7, skin);
+		inv.setItem(8, lune);
 
 		e.getPlayer().openInventory(inv);
 	}
 
 	@EventHandler
 	public void onMenuClick(MenuClickEvent e) {
-		Player p = e.getPlayer();
 		if (!e.getCurrent_menu().equals(getSelfMenuType())) return;
 		String warp = String.valueOf(slots.get(e.getEvent().getSlot()));
 		if (warp.isEmpty()) return;
+		Player p = (Player) e.getEvent().getWhoClicked();
 		if (warps.get(warp)) {
+			MM.closeInventory(this.getSelfMenuType(), p);
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), String.format("warp %s %s", warp, p.getName()));
-			p.closeInventory();
 		} else {
-			p.sendMessage("Cet évènement est fermé pour le moment");
+			p.sendMessage(m.getTAG() + "Cet événement est fermé pour le moment");
 			return;
 		}
 
