@@ -14,6 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.HashMap;
@@ -49,7 +50,7 @@ public class MenuManager implements Listener {
 		if (e.getView().getTopInventory().getTitle().equalsIgnoreCase("poubelle publique")) {
 			e.getView().getTopInventory().clear();
 		}
-		Player p = (Player) e.getPlayer();
+		HumanEntity p = e.getPlayer();
 		if (current_menu.containsKey(p.getName())) {
 			Menus current = current_menu.get(p.getName());
 			CloseMenuEvent event = new CloseMenuEvent(current, p);
@@ -57,14 +58,12 @@ public class MenuManager implements Listener {
 		}
 	}
 
-	public void closeInventory(Menus current, HumanEntity p) {
-		CloseMenuEvent event = new CloseMenuEvent(current, p);
-		Bukkit.getServer().getPluginManager().callEvent(event);
+	public void closeInventory(final Menus current, final HumanEntity p) {
+		p.closeInventory();
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onClose(CloseMenuEvent e) {
-		e.getPlayer().closeInventory();
 		current_menu.remove(e.getPlayer().getName());
 	}
 
@@ -78,26 +77,32 @@ public class MenuManager implements Listener {
 				ChangeMenuEvent event = new ChangeMenuEvent(kind, p);
 				Bukkit.getServer().getPluginManager().callEvent(event);
 			}
-		}, 2);
+		}, 1);
 	}
 
 	@EventHandler
-	public void OnInventoryClick(InventoryClickEvent e) {
+	public void OnInventoryClick(final InventoryClickEvent e) {
+		if (!e.getInventory().getType().equals(InventoryType.CHEST)) return;
 		if (e.getSlot() == -999) return;
 		Player p = (Player) e.getWhoClicked();
 		if (!current_menu.containsKey(p.getName())) return;
-		Menus current = current_menu.get(p.getName());
-		e.setCancelled(true);
-		if (current.equals(Menus.ENCHANTING)) {
-			e.setCancelled(false);
+		final Menus current = current_menu.get(p.getName());
+		if (!current.equals(Menus.ENCHANTING) && !current.equals(Menus.KYNSET)) {
+			e.setCancelled(true);
+
+			p.playEffect(p.getLocation(), Effect.CLICK1, 1);
+			Bukkit.getScheduler().scheduleAsyncDelayedTask(m, new Runnable() {
+				@Override
+				public void run() {
+					MenuClickEvent event = new MenuClickEvent(current, e);
+					Bukkit.getServer().getPluginManager().callEvent(event);
+				}
+			}, 0);
 		}
-		p.playEffect(p.getLocation(), Effect.CLICK1, 1);
-		MenuClickEvent event = new MenuClickEvent(current, e);
-		Bukkit.getServer().getPluginManager().callEvent(event);
 	}
 
 	public enum Menus {
-		MAIN, TELEPORTATION, SHOP, EVENTS, ENCHANTING;
+		MAIN, TELEPORTATION, SHOP, EVENTS, ENCHANTING, KYNSET;
 
 		public static boolean contains(String s) {
 			for (Menus choix : values())

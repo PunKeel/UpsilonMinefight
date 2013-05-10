@@ -60,17 +60,20 @@ public class MainMenu implements Listener {
 				if (m.isAdmin(p)) {
 					MM.openInventory(p, MenuManager.Menus.SHOP);
 				} else {
-					p.sendMessage(m.getTAG() + "La boutique est fermée pour le moment.");
+					p.sendMessage(m.getTAG() + "Le gestionnaire d'amis est fermé pour le moment.");
 				}
 				return;
 			case 4:
 				if (m.isAdmin(p)) {
 					MM.openInventory(p, MenuManager.Menus.SHOP);
 				} else {
-					p.sendMessage(m.getTAG() + "Le gestionnaire d'amis est fermé pour le moment.");
+					p.sendMessage(m.getTAG() + "La boutique est fermée pour le moment.");
 				}
 				return;
-
+			case 8:
+				if (m.isAdmin(p))
+					if (e.getEvent().isRightClick())
+						MM.openInventory(p, MenuManager.Menus.KYNSET);
 			default:
 				return;
 

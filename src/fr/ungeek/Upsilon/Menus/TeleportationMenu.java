@@ -32,7 +32,7 @@ public class TeleportationMenu implements Listener {
 		events = m.nameItem(new ItemStack(Material.COMPASS), ChatColor.DARK_AQUA + "Events");
 		enchant_notvip = m.nameItem(new ItemStack(Material.ENCHANTMENT_TABLE), ChatColor.GOLD + "Salle d'enchantements", ChatColor.DARK_RED + "VIP seulement !");
 		enchant_vip = m.nameItem(new ItemStack(Material.ENCHANTMENT_TABLE), ChatColor.GOLD + "Salle d'enchantements", ChatColor.DARK_GREEN + "Cliquez pour accéder !");
-		kynset_today = m.nameItem(new ItemStack(Material.NETHER_STAR), ChatColor.DARK_AQUA + "Event avec Kynset", ChatColor.DARK_GREEN + "C'est aujourd'hui !");
+		kynset_today = m.nameItem(new ItemStack(Material.NETHER_STAR), ChatColor.DARK_AQUA + "Event avec Kynset", ChatColor.RESET + "C'est aujourd'hui à " + ChatColor.DARK_GREEN + "21 heures" + ChatColor.RESET + " !");
 		kynset_bientot = m.nameItem(new ItemStack(Material.NETHER_STAR), ChatColor.DARK_AQUA + "Event avec Kynset", ChatColor.DARK_RED + "Ouverture le Samedi 11 Mai");
 	}
 

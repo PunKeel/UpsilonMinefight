@@ -46,7 +46,7 @@ public class GimmeEmerald implements Listener {
 	@EventHandler
 	public void onDrop(PlayerDropItemEvent e) {
 		Player p = e.getPlayer();
-		//if (main.isAdmin(p)) return;
+		if (main.isAdmin(p)) return;
 		if (e.getItemDrop().getItemStack().isSimilar(emerald)) e.setCancelled(true);
 	}
 }

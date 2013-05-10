@@ -5,10 +5,7 @@ package fr.ungeek.Upsilon;
 import com.sk89q.worldguard.bukkit.WGBukkit;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import fr.ungeek.Upsilon.Menus.EnchantMenu;
-import fr.ungeek.Upsilon.Menus.EventMenu;
-import fr.ungeek.Upsilon.Menus.MainMenu;
-import fr.ungeek.Upsilon.Menus.TeleportationMenu;
+import fr.ungeek.Upsilon.Menus.*;
 import net.milkbowl.vault.economy.Economy;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -46,6 +43,7 @@ public class Main extends JavaPlugin {
 	EnchantMenu enchant_menu = new EnchantMenu(this, menu_manager);
 	TeleportationMenu teleportation_menu = new TeleportationMenu(this, menu_manager);
 	EventMenu event_menu = new EventMenu(this, menu_manager);
+	KynsetTempMenu KTM = new KynsetTempMenu(this, menu_manager);
 	DailyGift daily_gift = new DailyGift(this);
 	GimmeEmerald gimme_emerald = new GimmeEmerald(this);
 	Arenas arenas;
@@ -67,6 +65,7 @@ public class Main extends JavaPlugin {
 		Bukkit.getPluginManager().registerEvents(gimme_emerald, this);
 
 		Bukkit.getPluginManager().registerEvents(enchant_menu, this);
+		Bukkit.getPluginManager().registerEvents(KTM, this);
 		Bukkit.getPluginManager().registerEvents(teleportation_menu, this);
 		Bukkit.getPluginManager().registerEvents(main_menu, this);
 		Bukkit.getPluginManager().registerEvents(event_menu, this);
@@ -137,6 +136,10 @@ public class Main extends JavaPlugin {
 		return getDate(0);
 	}
 
+	public ItemStack nameItem(ItemStack i, String name, String lore1, String lore2) {
+		return nameItem(i, name, lore1, lore2, null);
+	}
+
 	public ItemStack nameItem(ItemStack i, String name, String lore1) {
 		return nameItem(i, name, lore1, null);
 	}
@@ -149,11 +152,12 @@ public class Main extends JavaPlugin {
 		return nameItem(i, null);
 	}
 
-	public ItemStack nameItem(ItemStack i, String name, String lore1, String lore2) {
+	public ItemStack nameItem(ItemStack i, String name, String lore1, String lore2, String lore3) {
 		ItemMeta im = i.getItemMeta();
 		if (name == null) name = "";
 		if (lore1 == null) lore1 = "";
 		if (lore2 == null) lore2 = "";
+		if (lore3 == null) lore3 = "";
 
 		if (name.isEmpty()) {
 			im.setDisplayName("");
@@ -166,6 +170,9 @@ public class Main extends JavaPlugin {
 			lore.add(lore1);
 			if (!lore2.isEmpty()) {
 				lore.add(lore2);
+			}
+			if (!lore3.isEmpty()) {
+				lore.add(lore3);
 			}
 			im.setLore(lore);
 		}
@@ -274,7 +281,7 @@ public class Main extends JavaPlugin {
 	}
 
 	public boolean canUse(Player p) {
-		return isAdmin(p);
+		return true;
 	}
 
 }

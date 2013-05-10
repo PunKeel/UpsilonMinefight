@@ -12,6 +12,8 @@ public class ChangeMenuEvent extends Event {
 	private HumanEntity p;
 
 	public ChangeMenuEvent(MenuManager.Menus nm, HumanEntity player) {
+
+		super(true);
 		new_menu = nm;
 		p = player;
 		isAsync = true;

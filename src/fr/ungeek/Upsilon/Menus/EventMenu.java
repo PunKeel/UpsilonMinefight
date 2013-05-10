@@ -31,7 +31,7 @@ public class EventMenu implements Listener {
 	MenuManager MM;
 	HashMap<String, Boolean> warps = new HashMap<String, Boolean>();
 	List<String> slots = new ArrayList<String>();
-	private ItemStack dac, hungerfight, saut1, saut2, color, pvp1v1, lune, vitesse, skin;
+	private ItemStack dac, hungerfight, sauta, sautb, color, pvp1v1, lune, vitesse, skin;
 
 	public EventMenu(Main main, MenuManager MM) {
 		m = main;
@@ -67,8 +67,8 @@ public class EventMenu implements Listener {
 		p_meta.setMainEffect(PotionEffectType.JUMP);
 		dac = m.nameItem(new ItemStack(Material.LADDER), ChatColor.DARK_AQUA + "Event DAC", warps.get("dac") ? lore_on : lore_off);
 		hungerfight = m.nameItem(new ItemStack(Material.COOKED_BEEF), ChatColor.DARK_AQUA + "Event HungerFight", warps.get("hungerfight") ? lore_on : lore_off);
-		saut1 = m.nameItem(jump_potion, ChatColor.DARK_AQUA + "Event Saut 1", warps.get("saut1") ? lore_on : lore_off);
-		saut2 = m.nameItem(jump_potion, ChatColor.DARK_AQUA + "Event Saut 2", warps.get("saut2") ? lore_on : lore_off);
+		sauta = m.nameItem(jump_potion.clone(), ChatColor.DARK_AQUA + "Event Saut 1", warps.get("saut1") ? lore_on : lore_off);
+		sautb = m.nameItem(jump_potion.clone(), ChatColor.DARK_AQUA + "Event Saut 2", warps.get("saut2") ? lore_on : lore_off);
 		pvp1v1 = m.nameItem(new ItemStack(Material.STONE_SWORD), ChatColor.DARK_AQUA + "Event PVP", warps.get("pvp1v1") ? lore_on : lore_off);
 		color = m.nameItem(new ItemStack(Material.WOOL, 1, (short) 5), ChatColor.DARK_AQUA + "Event Color", warps.get("color") ? lore_on : lore_off);
 		vitesse = m.nameItem(new ItemStack(Material.POTION, 1, (short) 8258), ChatColor.DARK_AQUA + "Event Vitesse", warps.get("vitesse") ? lore_on : lore_off);
@@ -112,8 +112,8 @@ public class EventMenu implements Listener {
 		Inventory inv = Bukkit.createInventory(null, 9, "Menu > Téléportation > Events");
 		inv.setItem(0, dac);
 		inv.setItem(1, hungerfight);
-		inv.setItem(2, saut1);
-		inv.setItem(3, saut2);
+		inv.setItem(2, sauta);
+		inv.setItem(3, sautb);
 		inv.setItem(4, pvp1v1);
 		inv.setItem(5, color);
 		inv.setItem(6, vitesse);

@@ -11,6 +11,7 @@ public class MenuClickEvent extends Event {
 	private InventoryClickEvent event;
 
 	public MenuClickEvent(MenuManager.Menus cm, InventoryClickEvent e) {
+		super(true);
 		current_menu = cm;
 		event = e;
 	}
