@@ -1,9 +1,10 @@
 package fr.ungeek.Upsilon;
 
-import fr.ungeek.Upsilon.events.ChangeMenuEvent;
-import fr.ungeek.Upsilon.events.CloseMenuEvent;
+import fr.ungeek.Upsilon.events.MenuChangeEvent;
 import fr.ungeek.Upsilon.events.MenuClickEvent;
+import fr.ungeek.Upsilon.events.MenuCloseEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
@@ -53,28 +54,34 @@ public class MenuManager implements Listener {
 		HumanEntity p = e.getPlayer();
 		if (current_menu.containsKey(p.getName())) {
 			Menus current = current_menu.get(p.getName());
-			CloseMenuEvent event = new CloseMenuEvent(current, p);
+			MenuCloseEvent event = new MenuCloseEvent(current, p);
 			Bukkit.getServer().getPluginManager().callEvent(event);
 		}
 	}
 
-	public void closeInventory(final Menus current, final HumanEntity p) {
+	public void closeInventory(final HumanEntity p) {
 		p.closeInventory();
 	}
 
+	public void closeAll() {
+		for (String p : current_menu.keySet()) {
+			Bukkit.getPlayerExact(p).closeInventory();
+		}
+	}
+
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void onClose(CloseMenuEvent e) {
+	public void onClose(MenuCloseEvent e) {
 		current_menu.remove(e.getPlayer().getName());
 	}
 
 	public void openInventory(final HumanEntity p, final Menus kind) {
 		if (current_menu.containsKey(p.getName()))
-			closeInventory(current_menu.get(p.getName()), p);
+			closeInventory(p);
 		current_menu.put(p.getName(), kind);
 		Bukkit.getScheduler().scheduleAsyncDelayedTask(m, new Runnable() {
 			@Override
 			public void run() {
-				ChangeMenuEvent event = new ChangeMenuEvent(kind, p);
+				MenuChangeEvent event = new MenuChangeEvent(kind, p);
 				Bukkit.getServer().getPluginManager().callEvent(event);
 			}
 		}, 1);
@@ -82,6 +89,12 @@ public class MenuManager implements Listener {
 
 	@EventHandler
 	public void OnInventoryClick(final InventoryClickEvent e) {
+		try {
+			if (e.getInventory().getType().equals(InventoryType.PLAYER) && e.getCurrentItem().getItemMeta().getDisplayName().startsWith(ChatColor.MAGIC + "" + ChatColor.MAGIC) && !e.getCurrentItem().getItemMeta().getDisplayName().contains("Menu principal"))
+				e.setCurrentItem(null);
+		} catch (NullPointerException e1) {
+
+		}
 		if (!e.getInventory().getType().equals(InventoryType.CHEST)) return;
 		if (e.getSlot() == -999) return;
 		Player p = (Player) e.getWhoClicked();
@@ -101,8 +114,17 @@ public class MenuManager implements Listener {
 		}
 	}
 
+	public void openEnderChest(final HumanEntity p) {
+		Bukkit.getScheduler().scheduleAsyncDelayedTask(m, new Runnable() {
+			@Override
+			public void run() {
+				p.openInventory(p.getEnderChest());
+			}
+		}, 0);
+	}
+
 	public enum Menus {
-		MAIN, TELEPORTATION, SHOP, EVENTS, ENCHANTING, KYNSET;
+		MAIN, TELEPORTATION, SHOP, EVENTS, ENCHANTING, KYNSET, ANVIL;
 
 		public static boolean contains(String s) {
 			for (Menus choix : values())

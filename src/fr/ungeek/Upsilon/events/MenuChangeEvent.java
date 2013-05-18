@@ -5,13 +5,13 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class ChangeMenuEvent extends Event {
+public class MenuChangeEvent extends Event {
 	private static final HandlerList handlers = new HandlerList();
 	boolean isAsync;
 	private MenuManager.Menus new_menu;
 	private HumanEntity p;
 
-	public ChangeMenuEvent(MenuManager.Menus nm, HumanEntity player) {
+	public MenuChangeEvent(MenuManager.Menus nm, HumanEntity player) {
 
 		super(true);
 		new_menu = nm;

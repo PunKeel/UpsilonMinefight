@@ -1,19 +1,17 @@
 package fr.ungeek.Upsilon;
 
-//import fr.ungeek.Upsilon.Menus.EventMenu;
-
+import com.earth2me.essentials.Essentials;
 import com.sk89q.worldguard.bukkit.WGBukkit;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import fr.ungeek.Upsilon.Games.RoiAuSommet;
 import fr.ungeek.Upsilon.Menus.*;
 import net.milkbowl.vault.economy.Economy;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -24,7 +22,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 
 //import fr.ungeek.Upsilon.Menus.ShopMenu;
 
@@ -37,15 +34,17 @@ import java.util.HashMap;
 public class Main extends JavaPlugin {
 	public Economy econ;
 	public WorldGuardPlugin WG;
+	public Essentials ess;
 	RegionManager RM;
 	MenuManager menu_manager = new MenuManager(this);
 	MainMenu main_menu = new MainMenu(this, menu_manager);
 	EnchantMenu enchant_menu = new EnchantMenu(this, menu_manager);
 	TeleportationMenu teleportation_menu = new TeleportationMenu(this, menu_manager);
 	EventMenu event_menu = new EventMenu(this, menu_manager);
-	KynsetTempMenu KTM = new KynsetTempMenu(this, menu_manager);
-	DailyGift daily_gift = new DailyGift(this);
-	GimmeEmerald gimme_emerald = new GimmeEmerald(this);
+	AnvilMenu anvil_menu = new AnvilMenu(this, menu_manager);
+	MoneyListener gimme_emerald = new MoneyListener(this);
+	RoiAuSommet roi = new RoiAuSommet(this);
+	Commandes commandes = new Commandes(this);
 	Arenas arenas;
 	String TAG;
 
@@ -61,20 +60,37 @@ public class Main extends JavaPlugin {
 		TAG = ChatColor.DARK_GREEN + "[" + ChatColor.WHITE + "Minefight" + ChatColor.DARK_GREEN + "] " + ChatColor.RESET;
 		if (getConfig().contains("events"))
 			event_menu.loadWarps();
-		Bukkit.getPluginManager().registerEvents(daily_gift, this);
 		Bukkit.getPluginManager().registerEvents(gimme_emerald, this);
-
 		Bukkit.getPluginManager().registerEvents(enchant_menu, this);
-		Bukkit.getPluginManager().registerEvents(KTM, this);
 		Bukkit.getPluginManager().registerEvents(teleportation_menu, this);
 		Bukkit.getPluginManager().registerEvents(main_menu, this);
 		Bukkit.getPluginManager().registerEvents(event_menu, this);
+		Bukkit.getPluginManager().registerEvents(anvil_menu, this);
 		Bukkit.getPluginManager().registerEvents(menu_manager, this);
+		Bukkit.getPluginManager().registerEvents(roi, this);
 		enchant_menu.load_config();
-		getCommand("upsilon").setExecutor(this);
+		CommandController.registerCommands(this, commandes);
+		getCommand("roi").setExecutor(roi);
 		setupEconomy();
 		setupWorldGuard();
+		setupEssentials();
 		arenas = new Arenas(this);
+	}
+
+	public void teleportToWarp(String warp, HumanEntity p) {
+		Location warp_loc;
+		try {
+			warp_loc = ess.getWarps().getWarp(warp);
+		} catch (Exception e) {
+			warp_loc = null;
+		}
+		if (warp_loc == null) {
+			broadcastToAdmins(TAG + "Warp inexistant (" + warp + ")");
+			if (p instanceof Player)
+				((Player) p).sendMessage(TAG + "Une erreur est survenue");
+			return;
+		}
+		p.teleport(warp_loc);
 	}
 
 	private void setupWorldGuard() {
@@ -84,13 +100,20 @@ public class Main extends JavaPlugin {
 		}
 		WG = (WorldGuardPlugin) plugin;
 		World world = Bukkit.getWorld("world");
-		if (world.getBlockAt(0, 254, 0).isEmpty()) {
-			world.getBlockAt(0, 254, 0).setType(Material.ENCHANTMENT_TABLE);
-		}
 		RM = WGBukkit.getRegionManager(world);
 	}
 
+	private void setupEssentials() {
+
+		Plugin plugin = getServer().getPluginManager().getPlugin("Essentials");
+		if (plugin == null || !(plugin instanceof Essentials)) {
+			return;
+		}
+		ess = (Essentials) plugin;
+	}
+
 	public void onDisable() {
+		menu_manager.closeAll();
 		getConfig().set("events", event_menu.getWarps());
 		getConfig().set("level_max", enchant_menu.getLevel_max());
 		saveConfig();
@@ -162,7 +185,7 @@ public class Main extends JavaPlugin {
 		if (name.isEmpty()) {
 			im.setDisplayName("");
 		} else {
-			im.setDisplayName(name);
+			im.setDisplayName(ChatColor.MAGIC + "" + ChatColor.RESET + name);
 		}
 		if (!lore1.isEmpty()) {
 			ArrayList<String> lore = new ArrayList<String>();
@@ -177,80 +200,12 @@ public class Main extends JavaPlugin {
 			im.setLore(lore);
 		}
 		i.setItemMeta(im);
+
 		return i;
 	}
 
-	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if (!isAdmin(sender.getName())) return false;
-		Player p = null;
-		Boolean usage = false;
-		if (sender instanceof Player) {
-			p = (Player) sender;
-		}
-
-		if (args.length == 0) {
-			sender.sendMessage("Usage : /" + label + " [events,open]");
-			return true;
-		}
-		if (args[0].equalsIgnoreCase("events")) {
-			if (args.length != 3) {
-				sender.sendMessage("Usage : /" + label + " events <on,off> <event>");
-				HashMap<String, Boolean> events = event_menu.getWarps();
-				for (String n : events.keySet()) {
-					sender.sendMessage(n + " : " + events.get(n).toString());
-				}
-			} else {
-				Boolean enable = (args[1].equalsIgnoreCase("off")) ? false : true;
-				String event = args[2];
-				Boolean success = event_menu.changeState(event, enable, sender);
-				if (!success) {
-					sender.sendMessage("Event inexistant, sale noob");
-				} else {
-					sender.sendMessage("État changé :)");
-				}
-			}
-		} else if (args[0].equalsIgnoreCase("open")) {
-			if (args.length == 2) {
-				Player cible = Bukkit.getPlayer(args[1]);
-				if (cible != null) {
-					menu_manager.openInventory(cible, MenuManager.Menus.MAIN);
-				} else if (MenuManager.Menus.contains(args[1].toUpperCase())) {
-					if (p != null) {
-						menu_manager.openInventory(p, MenuManager.Menus.valueOf(args[1].toUpperCase()));
-					} else {
-						sender.sendMessage("Tu dois être un joueur pour faire ça.");
-					}
-				} else {
-					usage = true;
-				}
-			} else if (args.length == 3) {
-				Player cible = Bukkit.getPlayer(args[2]);
-				if (cible == null) {
-					sender.sendMessage("Joueur introuvable");
-				} else {
-					if (!MenuManager.Menus.contains(args[1].toUpperCase())) {
-						sender.sendMessage("Menu introuvable");
-						usage = true;
-					} else {
-						menu_manager.openInventory(cible, MenuManager.Menus.valueOf(args[1].toUpperCase()));
-						broadcastToAdmins(ChatColor.GRAY + "<" + sender.getName() + "> Menu " + args[1].toUpperCase() + " ouvert pour " + cible.getDisplayName());
-					}
-				}
-			} else {
-				usage = true;
-			}
-			if (usage) {
-				sender.sendMessage("Usage /" + label + " open <menu> [pseudo]");
-				sender.sendMessage("Menus : " + StringUtils.join(MenuManager.Menus.values(), ", "));
-			}
-
-		}
-		return true;
-	}
-
 	public boolean isAdmin(Player p) {
-		if (p.getName().equalsIgnoreCase("dleot")) return true;
+		if (isAdmin(p.getName(), false)) return true;
 		if (p.isOp()) return true;
 		if (p.hasPermission("upsilon.admin")) return true;
 		return false;
@@ -266,15 +221,19 @@ public class Main extends JavaPlugin {
 		return isVIP(Bukkit.getPlayerExact(name));
 	}
 
-	public boolean isAdmin(String name) {
+	public boolean isAdmin(String name, boolean checkPlayer) {
 		if (name.equalsIgnoreCase("dleot")) return true;
 		if (name.equalsIgnoreCase("console")) return true;
-		return isAdmin(Bukkit.getPlayerExact(name));
+		if (name.equalsIgnoreCase("server")) return true;
+		if (checkPlayer)
+			return isAdmin(Bukkit.getPlayerExact(name));
+		else
+			return false;
 	}
 
 	public void broadcastToAdmins(Object o) {
 		for (Player p : Bukkit.getOnlinePlayers()) {
-			if (isAdmin(p)) {
+			if (p.hasPermission("upsilon.admin.see")) {
 				p.sendMessage(o.toString());
 			}
 		}
@@ -284,4 +243,7 @@ public class Main extends JavaPlugin {
 		return true;
 	}
 
+	public Integer getTimestamp() {
+		return (int) (System.nanoTime() / 1000000000);
+	}
 }

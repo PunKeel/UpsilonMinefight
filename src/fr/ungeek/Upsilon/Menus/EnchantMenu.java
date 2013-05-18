@@ -2,7 +2,7 @@ package fr.ungeek.Upsilon.Menus;
 
 import fr.ungeek.Upsilon.Main;
 import fr.ungeek.Upsilon.MenuManager;
-import fr.ungeek.Upsilon.events.ChangeMenuEvent;
+import fr.ungeek.Upsilon.events.MenuChangeEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -44,7 +44,7 @@ public class EnchantMenu implements Listener {
 	}
 
 	@EventHandler
-	public void onMenuOpen(ChangeMenuEvent e) {
+	public void onMenuOpen(MenuChangeEvent e) {
 		if (!e.getNew_menu().equals(getSelfMenuType())) return;
 		MM.current_menu.put(e.getPlayer().getName(), getSelfMenuType());
 		e.getPlayer().openEnchanting(null, true);

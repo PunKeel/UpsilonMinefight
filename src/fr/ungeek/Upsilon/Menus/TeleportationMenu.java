@@ -2,7 +2,7 @@ package fr.ungeek.Upsilon.Menus;
 
 import fr.ungeek.Upsilon.Main;
 import fr.ungeek.Upsilon.MenuManager;
-import fr.ungeek.Upsilon.events.ChangeMenuEvent;
+import fr.ungeek.Upsilon.events.MenuChangeEvent;
 import fr.ungeek.Upsilon.events.MenuClickEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -23,17 +23,18 @@ import org.bukkit.inventory.ItemStack;
 public class TeleportationMenu implements Listener {
 	Main m;
 	MenuManager MM;
-	ItemStack spawn, events, enchant_vip, enchant_notvip, kynset_today, kynset_bientot;
+	ItemStack spawn, events, enchant_vip, enchant_notvip, enderchest_notvip, enderchest_vip;
 
 	public TeleportationMenu(Main main, MenuManager MM) {
 		m = main;
 		this.MM = MM;
 		spawn = m.nameItem(new ItemStack(Material.getMaterial(155)), ChatColor.DARK_PURPLE + "Spawn");
 		events = m.nameItem(new ItemStack(Material.COMPASS), ChatColor.DARK_AQUA + "Events");
-		enchant_notvip = m.nameItem(new ItemStack(Material.ENCHANTMENT_TABLE), ChatColor.GOLD + "Salle d'enchantements", ChatColor.DARK_RED + "VIP seulement !");
-		enchant_vip = m.nameItem(new ItemStack(Material.ENCHANTMENT_TABLE), ChatColor.GOLD + "Salle d'enchantements", ChatColor.DARK_GREEN + "Cliquez pour accéder !");
-		kynset_today = m.nameItem(new ItemStack(Material.NETHER_STAR), ChatColor.DARK_AQUA + "Event avec Kynset", ChatColor.RESET + "C'est aujourd'hui à " + ChatColor.DARK_GREEN + "21 heures" + ChatColor.RESET + " !");
-		kynset_bientot = m.nameItem(new ItemStack(Material.NETHER_STAR), ChatColor.DARK_AQUA + "Event avec Kynset", ChatColor.DARK_RED + "Ouverture le Samedi 11 Mai");
+		enchant_notvip = m.nameItem(new ItemStack(Material.ENCHANTMENT_TABLE), ChatColor.GOLD + "Table d'enchantements", ChatColor.DARK_RED + "VIP seulement !");
+		enchant_vip = m.nameItem(new ItemStack(Material.ENCHANTMENT_TABLE), ChatColor.GOLD + "Table d'enchantements", ChatColor.DARK_GREEN + "Cliquez pour accéder !");
+		enderchest_notvip = m.nameItem(new ItemStack(Material.ENDER_CHEST), ChatColor.GOLD + "Ender Chest", ChatColor.DARK_RED + "VIP seulement !");
+		enderchest_vip = m.nameItem(new ItemStack(Material.ENDER_CHEST), ChatColor.GOLD + "Ender Chest", ChatColor.DARK_GREEN + "Cliquez pour accéder !");
+
 	}
 
 	public MenuManager.Menus getSelfMenuType() {
@@ -41,13 +42,11 @@ public class TeleportationMenu implements Listener {
 	}
 
 	@EventHandler
-	public void onMenuOpen(ChangeMenuEvent e) {
+	public void onMenuOpen(MenuChangeEvent e) {
 		if (!e.getNew_menu().equals(getSelfMenuType())) return;
 		MM.current_menu.put(e.getPlayer().getName(), getSelfMenuType());
-		boolean show_event_kynset;
 		HumanEntity p = e.getPlayer();
-		show_event_kynset = !m.isBefore(11, 5, 2013);
-		Inventory inv = Bukkit.createInventory(null, 9 * (show_event_kynset ? 2 : 1), "Menu > Téléportation");
+		Inventory inv = Bukkit.createInventory(null, 9, "Menu > Téléportation");
 
 		inv.setItem(0, spawn);
 		inv.setItem(2, m.nameItem(new ItemStack(Material.GRASS), ChatColor.BLUE + "Map normale", m.getArenas().getIn_normal() + " joueur" + ((m.getArenas().getIn_normal() > 1) ? "s" : "")));
@@ -55,17 +54,10 @@ public class TeleportationMenu implements Listener {
 		inv.setItem(6, events);
 		if (m.isVIP(p.getName())) {
 			inv.setItem(8, enchant_vip);
+			inv.setItem(7, enderchest_vip);
 		} else {
 			inv.setItem(8, enchant_notvip);
-		}
-
-		if (show_event_kynset) {
-			if (m.isToday(11, 5, 2013)) {
-				inv.setItem(13, kynset_today);
-			} else {
-				inv.setItem(13, kynset_bientot);
-
-			}
+			inv.setItem(7, enderchest_notvip);
 		}
 		e.getPlayer().openInventory(inv);
 	}
@@ -74,7 +66,7 @@ public class TeleportationMenu implements Listener {
 	public void onMenuClick(MenuClickEvent e) {
 		if (!e.getCurrent_menu().equals(getSelfMenuType())) return;
 		HumanEntity p = e.getEvent().getWhoClicked();
-		String warp = "";
+		String warp;
 		switch (e.getEvent().getSlot()) {
 			case 0:
 				warp = "spawn";
@@ -88,6 +80,14 @@ public class TeleportationMenu implements Listener {
 			case 6:
 				MM.openInventory(p, MenuManager.Menus.EVENTS);
 				return;
+			case 7:
+				if (m.isVIP(p.getName())) {
+					MM.openEnderChest(p);
+					return;
+				} else {
+					((Player) p).sendMessage(m.getTAG() + "Il faut être VIP pour l'utiliser !");
+					return;
+				}
 			case 8:
 				if (m.isVIP(p.getName())) {
 					warp = "enchant";
@@ -96,25 +96,17 @@ public class TeleportationMenu implements Listener {
 					return;
 				}
 				break;
-			case 13:
-				if (m.isToday(11, 5, 2013)) {
-					warp = "kynset";
-				} else {
-					((Player) p).sendMessage(m.getTAG() + "L'événement a lieu le samedi 11 Mai !");
-					return;
-				}
-				break;
 			default:
 				return;
 
 		}
-		MM.closeInventory(this.getSelfMenuType(), p);
+		MM.closeInventory(p);
 		if (warp.equalsIgnoreCase("event")) {
 			MM.openInventory(p, MenuManager.Menus.EVENTS);
 		} else if (warp.equalsIgnoreCase("enchant")) {
 			MM.openInventory(p, MenuManager.Menus.ENCHANTING);
 		} else {
-			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), String.format("warp %s %s", warp, p.getName()));
+			m.teleportToWarp(warp, p);
 		}
 	}
 }

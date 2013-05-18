@@ -5,12 +5,12 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class CloseMenuEvent extends Event {
+public class MenuCloseEvent extends Event {
 	private static final HandlerList handlers = new HandlerList();
 	private MenuManager.Menus closed_menu;
 	private HumanEntity p;
 
-	public CloseMenuEvent(MenuManager.Menus cm, HumanEntity player) {
+	public MenuCloseEvent(MenuManager.Menus cm, HumanEntity player) {
 		closed_menu = cm;
 		p = player;
 	}

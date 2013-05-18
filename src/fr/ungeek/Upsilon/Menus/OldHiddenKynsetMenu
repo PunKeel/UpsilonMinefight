@@ -2,7 +2,7 @@ package fr.ungeek.Upsilon.Menus;
 
 import fr.ungeek.Upsilon.Main;
 import fr.ungeek.Upsilon.MenuManager;
-import fr.ungeek.Upsilon.events.ChangeMenuEvent;
+import fr.ungeek.Upsilon.events.MenuChangeEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -29,7 +29,7 @@ public class KynsetTempMenu implements Listener {
 		m = main;
 		this.MM = MM;
 
-		items.add(nameItem("GTA III", "ufpop5"));
+		items.add(nameItem("GTA San Andreas", "ufpop5"));
 		items.add(nameItem("Civilization III Complete Edition", "9usb98"));
 		items.add(nameItem("Ace of Spades", "3xt5ku"));
 		items.add(nameItem("Mirror's Edge", "9fvt5b"));
@@ -61,10 +61,12 @@ public class KynsetTempMenu implements Listener {
 		items.add(nameItem("Code Minefight", "8QI7L5"));
 		items.add(nameItem("Code Minefight", "YPHG2E"));
 
+		items.add(nameItem("CounterStrike:Source", "CSSG7V"));
+
 	}
 
 	public ItemStack nameItem(String name, String cle) {
-		return m.nameItem(new ItemStack(Material.NETHER_STAR), name, ChatColor.RESET + "Vous avez gagné " + name, ChatColor.RESET + "Entrez le code " + ChatColor.DARK_GREEN + cle.toUpperCase() + ChatColor.RESET + " sur", ChatColor.DARK_AQUA + "http://minefight.fr/event.php" + ChatColor.RESET + "  pour recevoir le lot !");
+		return m.nameItem(new ItemStack(Material.NETHER_STAR), name, ChatColor.RESET + "Vous avez gagné " + name, ChatColor.RESET + "Entrez le code " + ChatColor.DARK_GREEN + cle.toUpperCase() + ChatColor.RESET + " sur", ChatColor.DARK_AQUA + "minefight.fr/kynset" + ChatColor.RESET + "  pour recevoir le lot !");
 	}
 
 	public MenuManager.Menus getSelfMenuType() {
