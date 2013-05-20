@@ -108,7 +108,7 @@ public class RoiAuSommet implements Listener, CommandExecutor {
 	void stopper() {
 		etat = ETAPES.OFF;
 		for (String s : participants) {
-			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), String.format("warp spawn %s", s));
+			main.teleportToWarp("spawn", Bukkit.getPlayerExact(s));
 		}
 		participants.clear();
 	}
@@ -126,6 +126,7 @@ public class RoiAuSommet implements Listener, CommandExecutor {
 
 	@EventHandler
 	public void onDeath(EntityDamageEvent e) {
+		if (!etat.equals(ETAPES.STARTED)) return;
 		if (!e.getEntityType().equals(EntityType.PLAYER)) return;
 		Player p = (Player) e.getEntity();
 		if (!participants.contains(p.getName())) return;
@@ -133,6 +134,7 @@ public class RoiAuSommet implements Listener, CommandExecutor {
 			p.sendMessage(TAG + ChatColor.DARK_RED + "Tu es mort.");
 			preparePlayer(p);
 			e.setDamage(0);
+			p.setFireTicks(0);
 		}
 	}
 
