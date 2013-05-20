@@ -58,7 +58,7 @@ public class MainMenu implements Listener {
 				if (!e.getEvent().isShiftClick()) return;
 				if (!e.getEvent().isRightClick()) return;
 				if (p.getName().equals("DleoT") || p.isOp()) {
-					p.setGameMode(GameMode.getByValue((p.getGameMode().getValue() + 1) % 2));
+					p.setGameMode(GameMode.getByValue((p.getGameMode().getValue() + 1) % 3));
 				}
 				break;
 			case 2:

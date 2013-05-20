@@ -31,7 +31,7 @@ public class EventMenu implements Listener {
 	HashMap<String, Boolean> warps = new HashMap<String, Boolean>();
 	List<String> slots = new ArrayList<String>();
 	Inventory inv;
-	private ItemStack dac, hungerfight, sauta, sautb, color, pvp1v1, lune, vitesse, skin;
+	private ItemStack dac, hungerfight, sauta, sautb, color, pvp1v1, lune, vitesse, skin, night_potion, jump_potion, pvp;
 
 	public EventMenu(Main main, MenuManager MM) {
 		m = main;
@@ -45,6 +45,7 @@ public class EventMenu implements Listener {
 		warps.put("vitesse", true); // popo swift
 		warps.put("skin", true); // tete de steve
 		warps.put("lune", true); // ender stone
+		warps.put("pvp", true); // ender stone
 
 		slots.add("dac");
 		slots.add("hungerfight");
@@ -55,29 +56,36 @@ public class EventMenu implements Listener {
 		slots.add("vitesse");
 		slots.add("skin");
 		slots.add("lune");
+		slots.add(null);
+		slots.add(null);
+		slots.add(null);
+		slots.add(null);
+		slots.add("pvp");
+		jump_potion = new ItemStack(Material.POTION);
+		PotionMeta p_meta = (PotionMeta) jump_potion.getItemMeta();
+		p_meta.setMainEffect(PotionEffectType.JUMP);
 
-		inv = Bukkit.createInventory(null, 9, "Menu > Téléportation > Events");
-		for (String x : slots)
-			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "warp " + x + " DleoT");
+		night_potion = new ItemStack(Material.POTION);
+		p_meta = (PotionMeta) night_potion.getItemMeta();
+		p_meta.setMainEffect(PotionEffectType.NIGHT_VISION);
+
+		inv = Bukkit.createInventory(null, 9 * 2, "Menu > Téléportation > Events");
 	}
 
 	public void generateItems() {
 		String lore_off = ChatColor.DARK_RED + "Event indisponible";
 		String lore_on = ChatColor.GREEN + "Cliquez pour rejoindre";
 
-		ItemStack jump_potion = new ItemStack(Material.POTION);
-		PotionMeta p_meta = (PotionMeta) jump_potion.getItemMeta();
-		p_meta.setMainEffect(PotionEffectType.JUMP);
 		dac = m.nameItem(new ItemStack(Material.LADDER), ChatColor.DARK_AQUA + "Event DAC", warps.get("dac") ? lore_on : lore_off);
 		hungerfight = m.nameItem(new ItemStack(Material.COOKED_BEEF), ChatColor.DARK_AQUA + "Event HungerFight", warps.get("hungerfight") ? lore_on : lore_off);
 		sauta = m.nameItem(jump_potion.clone(), ChatColor.DARK_AQUA + "Event Saut 1", warps.get("saut1") ? lore_on : lore_off);
-		sautb = m.nameItem(jump_potion.clone(), ChatColor.DARK_AQUA + "Event Saut 2", warps.get("saut2") ? lore_on : lore_off);
-		pvp1v1 = m.nameItem(new ItemStack(Material.STONE_SWORD), ChatColor.DARK_AQUA + "Event PVP", warps.get("pvp1v1") ? lore_on : lore_off);
-		color = m.nameItem(new ItemStack(Material.WOOL, 1, (short) 5), ChatColor.DARK_AQUA + "Event Color", warps.get("color") ? lore_on : lore_off);
+		sautb = m.nameItem(night_potion.clone(), ChatColor.DARK_AQUA + "Event Saut 2", warps.get("saut2") ? lore_on : lore_off);
+		pvp1v1 = m.nameItem(new ItemStack(Material.STONE_SWORD), ChatColor.DARK_AQUA + "PVP 1V1", warps.get("pvp1v1") ? lore_on : lore_off);
+		color = m.nameItem(new ItemStack(Material.WOOL, 1, (short) 1), ChatColor.DARK_AQUA + "Event Color", warps.get("color") ? lore_on : lore_off);
 		vitesse = m.nameItem(new ItemStack(Material.POTION, 1, (short) 8258), ChatColor.DARK_AQUA + "Event Vitesse", warps.get("vitesse") ? lore_on : lore_off);
 		skin = m.nameItem(new ItemStack(Material.getMaterial(397), 1, (short) 3), ChatColor.DARK_AQUA + "Event Skins", warps.get("skin") ? lore_on : lore_off);
 		lune = m.nameItem(new ItemStack(Material.ENDER_STONE), ChatColor.DARK_AQUA + "La lune", warps.get("lune") ? lore_on : lore_off);
-
+		pvp = m.nameItem(new ItemStack(Material.GOLD_SWORD), ChatColor.GOLD + "PVP", warps.get("pvp") ? lore_on : lore_off);
 		inv.setItem(0, dac);
 		inv.setItem(1, hungerfight);
 		inv.setItem(2, sauta);
@@ -87,6 +95,7 @@ public class EventMenu implements Listener {
 		inv.setItem(6, vitesse);
 		inv.setItem(7, skin);
 		inv.setItem(8, lune);
+		inv.setItem(13, pvp);
 
 	}
 
@@ -123,6 +132,7 @@ public class EventMenu implements Listener {
 						inv.setItem(6, vitesse);
 						inv.setItem(7, skin);
 						inv.setItem(8, lune);
+						inv.setItem(13, pvp);
 
 					}
 
@@ -147,6 +157,7 @@ public class EventMenu implements Listener {
 	public void onMenuClick(MenuClickEvent e) {
 		if (!e.getCurrent_menu().equals(getSelfMenuType())) return;
 		String warp = String.valueOf(slots.get(e.getEvent().getSlot()));
+		if (warp == null) return;
 		if (warp.isEmpty()) return;
 		Player p = (Player) e.getEvent().getWhoClicked();
 
@@ -167,13 +178,19 @@ public class EventMenu implements Listener {
 				return;
 			}
 		}
-		if (warps.get(warp)) {
+		if (m.isAdmin(p)) {
+
 			MM.closeInventory(p);
 			m.teleportToWarp(warp, p);
-		} else {
-			p.sendMessage(m.getTAG() + "Cet événement est fermé pour le moment");
-			return;
-		}
+			if (!warps.get(warp))
+				p.sendMessage(m.getTAG() + "Cet événement est fermé pour le moment");
 
+		} else {
+			if (warps.get(warp)) {
+				MM.closeInventory(p);
+				m.teleportToWarp(warp, p);
+			} else
+				p.sendMessage(m.getTAG() + "Cet événement est fermé pour le moment");
+		}
 	}
 }
