@@ -6,11 +6,14 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import fr.ungeek.Upsilon.Games.RoiAuSommet;
 import fr.ungeek.Upsilon.Menus.*;
+import me.games647.scoreboardstats.ScoreboardStats;
+import me.games647.scoreboardstats.api.pvpstats.Database;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.libs.com.google.gson.Gson;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -18,10 +21,13 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import ru.tehkode.permissions.PermissionManager;
+import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Random;
 
 //import fr.ungeek.Upsilon.Menus.ShopMenu;
 
@@ -35,18 +41,28 @@ public class Main extends JavaPlugin {
 	public Economy econ;
 	public WorldGuardPlugin WG;
 	public Essentials ess;
-	RegionManager RM;
-	MenuManager menu_manager = new MenuManager(this);
-	MainMenu main_menu = new MainMenu(this, menu_manager);
-	EnchantMenu enchant_menu = new EnchantMenu(this, menu_manager);
-	TeleportationMenu teleportation_menu = new TeleportationMenu(this, menu_manager);
-	EventMenu event_menu = new EventMenu(this, menu_manager);
-	AnvilMenu anvil_menu = new AnvilMenu(this, menu_manager);
-	MoneyListener gimme_emerald = new MoneyListener(this);
-	RoiAuSommet roi = new RoiAuSommet(this);
-	Commandes commandes = new Commandes(this);
-	Arenas arenas;
-	String TAG;
+	public RegionManager RM;
+	// Own classes
+	public MenuManager menu_manager = new MenuManager(this);
+	public MainMenu main_menu = new MainMenu(this, menu_manager);
+	public EnchantMenu enchant_menu = new EnchantMenu(this, menu_manager);
+	public TeleportationMenu teleportation_menu = new TeleportationMenu(this, menu_manager);
+	public EventMenu event_menu = new EventMenu(this, menu_manager);
+	public AnvilMenu anvil_menu = new AnvilMenu(this, menu_manager);
+	public MoneyListener gimme_emerald = new MoneyListener(this);
+	public RoiAuSommet roi = new RoiAuSommet(this);
+	public Commandes commandes = new Commandes(this);
+	public Arenas arenas;
+	// Variables
+	public String TAG;
+	public SpawnManager SM;
+	public PermissionManager PEX;
+	public Gson gson = new Gson();
+
+	public static <T> T getRandom(T[] array) {
+		int rnd = new Random().nextInt(array.length);
+		return array[rnd];
+	}
 
 	public Arenas getArenas() {
 		return arenas;
@@ -57,6 +73,7 @@ public class Main extends JavaPlugin {
 	}
 
 	public void onEnable() {
+		SM = gson.fromJson(getConfig().getString("spawn_locations"), SpawnManager.class);
 		TAG = ChatColor.DARK_GREEN + "[" + ChatColor.WHITE + "Minefight" + ChatColor.DARK_GREEN + "] " + ChatColor.RESET;
 		if (getConfig().contains("events"))
 			event_menu.loadWarps();
@@ -74,10 +91,17 @@ public class Main extends JavaPlugin {
 		setupEconomy();
 		setupWorldGuard();
 		setupEssentials();
+		setupScoreBoardStats();
+		PEX = PermissionsEx.getPermissionManager();
+
 		arenas = new Arenas(this);
+		gimme_emerald.loadAmelioration();
+
+
 	}
 
 	public void teleportToWarp(String warp, HumanEntity p) {
+		if (p == null) return;
 		Location warp_loc;
 		try {
 			warp_loc = ess.getWarps().getWarp(warp);
@@ -103,6 +127,15 @@ public class Main extends JavaPlugin {
 		RM = WGBukkit.getRegionManager(world);
 	}
 
+	private void setupScoreBoardStats() {
+		Plugin plugin = getServer().getPluginManager().getPlugin("ScoreboardStats");
+		if (plugin == null || !(plugin instanceof ScoreboardStats)) {
+			return;
+		}
+		ScoreboardStats SbS = (ScoreboardStats) plugin;
+		Database.setDatabase(SbS.getDatabase());
+	}
+
 	private void setupEssentials() {
 
 		Plugin plugin = getServer().getPluginManager().getPlugin("Essentials");
@@ -116,6 +149,7 @@ public class Main extends JavaPlugin {
 		menu_manager.closeAll();
 		getConfig().set("events", event_menu.getWarps());
 		getConfig().set("level_max", enchant_menu.getLevel_max());
+		getConfig().set("spawn_locations", gson.toJson(SM));
 		saveConfig();
 	}
 
@@ -123,11 +157,11 @@ public class Main extends JavaPlugin {
 		if (this.getServer().getPluginManager().getPlugin("Vault") == null) {
 			return false;
 		}
-		RegisteredServiceProvider rsp = this.getServer().getServicesManager().getRegistration(Economy.class);
+		RegisteredServiceProvider<Economy> rsp = this.getServer().getServicesManager().getRegistration(Economy.class);
 		if (rsp == null) {
 			return false;
 		}
-		econ = (Economy) rsp.getProvider();
+		econ = rsp.getProvider();
 		return econ != null;
 	}
 

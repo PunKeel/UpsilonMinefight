@@ -1,18 +1,27 @@
 package fr.ungeek.Upsilon;
 
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import me.games647.scoreboardstats.api.pvpstats.Cache;
+import me.games647.scoreboardstats.api.pvpstats.Database;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
+import org.kitteh.tag.PlayerReceiveNameTagEvent;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,11 +36,20 @@ public class MoneyListener implements Listener {
 	Main main;
 	ItemStack emerald;
 	HashMap<String, Integer> selling = new HashMap<String, Integer>();
+	String[] morts;
+	ProtectedRegion ameliorations;
+	HashMap<String, Integer> kill_en_boucle = new HashMap<String, Integer>();
+	HashMap<String, String> victime_en_boucle = new HashMap<String, String>();
 
 	public MoneyListener(Main m) {
 		main = m;
 		emerald = m.nameItem(new ItemStack(Material.EMERALD), ChatColor.GREEN + "Menu principal", ChatColor.GRAY + "(Clic droit pour ouvrir)");
+		morts = new String[]{"%s t'a tué", "Tu es mort de la main de %s", "%s est ton assassin", "%s est un meurtrier !", "%s a réussi à te tuer !", "Si tu veux te venger, c'est %s que tu dois tuer !"};
 
+	}
+
+	public void loadAmelioration() {
+		ameliorations = main.RM.getRegion("amelioration");
 	}
 
 	@EventHandler()
@@ -123,11 +141,72 @@ public class MoneyListener implements Listener {
 		}
 	}
 
+	@EventHandler
+	public void onKill(PlayerDeathEvent e) {
+		Player v = e.getEntity();
+		Player d = v.getKiller();
+		if (d.getName().equals(v.getName())) return;
+		if (d == null) return;
+		if (!d.isOnline()) return;
+		Location loc = d.getLocation();
+		boolean in_nether, in_normal;
+		in_nether = main.getArenas().isInNether(loc);
+		if (!in_nether) {
+			in_normal = main.getArenas().isInNormal(loc);
+			if (!in_normal) return;
+		}
+		e.setDeathMessage("");
+		int success;
+		if (kill_en_boucle.containsKey(d.getName())) {
+			success = kill_en_boucle.get(d.getName());
+			if (victime_en_boucle.get(d.getName()).equals(v.getName())) {
+				success++;
+			} else {
+				success = 1;
+			}
+		} else {
+			success = 1;
+		}
+		kill_en_boucle.put(d.getName(), success);
+		victime_en_boucle.put(d.getName(), v.getName());
+		if (success > 3) {
+			d.sendMessage(main.getTAG() + ChatColor.DARK_RED + "Pas de gain car kill répété sur " + ChatColor.RESET + v.getDisplayName());
+		} else {
+			Cache stats = Database.getCache(v.getName());
+			int gain = (int) (Math.sqrt(stats.getKills() ^ 2 / (stats.getDeaths() + 1)) / 2) + 1;
+			if (gain > 25) gain = 25;
+			d.sendMessage(main.getTAG() + ChatColor.DARK_GREEN + "+ " + ChatColor.GOLD + gain + ChatColor.RESET + "ƒ pour le kill de " + v.getDisplayName());
+			main.econ.depositPlayer(d.getName(), gain);
+		}
+		v.sendMessage(main.getTAG() + Main.getRandom(morts).replaceAll("%s", d.getDisplayName()));
+	}
+
 	public boolean isSelling(String name) {
 		if (!selling.containsKey(name))
 			return false;
 		if (main.getTimestamp() - selling.get(name) > 10)
 			return false;
 		return true;
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onAmelioration(BlockPlaceEvent e) {
+		if (e.isCancelled()) return;
+		Block b = e.getBlock();
+		if (b.getType().equals(Material.WALL_SIGN)) {
+			Location loc = b.getLocation();
+			if (ameliorations.contains(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ())) {
+				main.broadcastToAdmins(main.getTAG() + ChatColor.DARK_GRAY + e.getPlayer().getDisplayName() + " a proposé une amélioration");
+			}
+
+
+		}
+	}
+
+	@EventHandler
+	public void onNameTag(PlayerReceiveNameTagEvent e) {
+		if (e.getPlayer().hasPermission("upsilon.admin.nick")) {
+			e.setTag(ChatColor.DARK_RED + e.getNamedPlayer().getName());
+		}
 	}
 }
