@@ -1,0 +1,11 @@
+anti_flood=&4Anti FLOOD !
+capslock=&4Il est interdit de parler en MAJUSCULES.
+url=&4Il est interdit de poster des URL.
+ip=&4Il est interdit de poster des adresses IP.
+badword=&4Il est interdit de dire %word%.
+alternativecase=&4AlTeRnAtIvEcAsE interdit.
+repeated_letters=&4Le flood de lettres est interdit.
+too_long=&4Ce mot est un peu trop long : "%word%".
+config_reloaded=&2Configuration reloaded.
+last_warning=&4Dernier avertissement.
+warnings_left=&4%left% avertissements avant le ban.

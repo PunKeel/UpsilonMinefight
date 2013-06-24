@@ -47,10 +47,12 @@ public class TeleportationMenu implements Listener {
 		MM.current_menu.put(e.getPlayer().getName(), getSelfMenuType());
 		HumanEntity p = e.getPlayer();
 		Inventory inv = Bukkit.createInventory(null, 9, "Menu > Téléportation");
-
+		int normal, nether;
+		normal = m.getArenas().getIn_normal();
+		nether = m.getArenas().getIn_nether();
 		inv.setItem(0, spawn);
-		inv.setItem(2, m.nameItem(new ItemStack(Material.GRASS), ChatColor.BLUE + "Map normale", m.getArenas().getIn_normal() + " joueur" + ((m.getArenas().getIn_normal() > 1) ? "s" : "")));
-		inv.setItem(4, m.nameItem(new ItemStack(Material.NETHERRACK), ChatColor.DARK_RED + "Nether", m.getArenas().getIn_nether() + " joueur" + ((m.getArenas().getIn_nether() > 1) ? "s" : "")));
+		inv.setItem(2, m.nameItem(new ItemStack(Material.GRASS), ChatColor.BLUE + "Map normale", normal + " joueur" + ((normal > 1) ? "s" : "")));
+		inv.setItem(4, m.nameItem(new ItemStack(Material.NETHERRACK), ChatColor.DARK_RED + "Nether", nether + " joueur" + ((nether > 1) ? "s" : "")));
 		inv.setItem(6, events);
 		if (m.isVIP(p.getName())) {
 			inv.setItem(8, enchant_vip);
@@ -85,14 +87,14 @@ public class TeleportationMenu implements Listener {
 					MM.openEnderChest(p);
 					return;
 				} else {
-					((Player) p).sendMessage(m.getTAG() + "Il faut être VIP pour l'utiliser !");
+					((Player) p).sendMessage(Main.getTAG() + "Il faut être VIP pour l'utiliser !");
 					return;
 				}
 			case 8:
 				if (m.isVIP(p.getName())) {
 					warp = "enchant";
 				} else {
-					((Player) p).sendMessage(m.getTAG() + "Il faut être VIP pour l'utiliser !");
+					((Player) p).sendMessage(Main.getTAG() + "Il faut être VIP pour l'utiliser !");
 					return;
 				}
 				break;

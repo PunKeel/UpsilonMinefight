@@ -1,0 +1,7 @@
+name: SuggestionsMinefight
+version:  0.1
+description: Le plugin qui gere les suggestions Minefight
+author: PunKeel
+main: fr.ungeek.Suggestions.Main
+depend: [WorldGuard]
+database: true

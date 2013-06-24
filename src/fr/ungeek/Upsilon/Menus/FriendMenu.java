@@ -25,29 +25,31 @@ import java.util.List;
  * Time: 8:00 PM
  * May be open-source & be sold (by PunKeel, of course !)
  */
-public class EventMenu implements Listener {
+public class FriendMenu implements Listener {
     Main m;
     MenuManager MM;
     HashMap<String, Boolean> warps = new HashMap<String, Boolean>();
     List<String> slots = new ArrayList<String>();
     Inventory inv;
-    private ItemStack dac, sauta, sautb, color, lune, vitesse, skin, night_potion, jump_potion, pvp, sautc;
+    private ItemStack dac, hungerfight, sauta, sautb, color, pvp1v1, lune, vitesse, skin, night_potion, jump_potion, pvp, sautc;
 
-    public EventMenu(Main main, MenuManager MM) {
+    public FriendMenu(Main main, MenuManager MM) {
         m = main;
         this.MM = MM;
         warps.put("dac", true); // echelle
-        warps.put("pvp", true); // ender stone
+        warps.put("hungerfight", true); // hungerfight
         warps.put("saut1", true);         // popo
         warps.put("saut2", true);          // popo
         warps.put("saut3", true);          // popo
+        warps.put("pvp1v1", true); // épée
         warps.put("color", true); // laine
         warps.put("vitesse", true); // popo swift
         warps.put("skin", true); // tete de steve
         warps.put("lune", true); // ender stone
+        warps.put("pvp", true); // ender stone
 
         slots.add("dac");
-        slots.add("pvp");
+        slots.add("hungerfight");
         slots.add("saut1");
         slots.add("saut2");
         slots.add("saut3");
@@ -55,6 +57,12 @@ public class EventMenu implements Listener {
         slots.add("vitesse");
         slots.add("skin");
         slots.add("lune");
+        slots.add("");
+        slots.add("");
+        slots.add("");
+        slots.add("pvp1v1");
+        slots.add("");
+        slots.add("pvp");
         jump_potion = new ItemStack(Material.POTION);
         PotionMeta p_meta = (PotionMeta) jump_potion.getItemMeta();
         p_meta.setMainEffect(PotionEffectType.JUMP);
@@ -65,7 +73,7 @@ public class EventMenu implements Listener {
         p_meta.setMainEffect(PotionEffectType.NIGHT_VISION);
         night_potion.setItemMeta(p_meta);
 
-        inv = Bukkit.createInventory(null, 9, "Menu > Téléportation > Events");
+        inv = Bukkit.createInventory(null, 9 * 2, "Menu > Téléportation > Events");
     }
 
     public void generateItems() {
@@ -73,16 +81,18 @@ public class EventMenu implements Listener {
         String lore_on = ChatColor.GREEN + "Cliquez pour rejoindre";
 
         dac = m.nameItem(new ItemStack(Material.LADDER), ChatColor.DARK_AQUA + "Event DAC", warps.get("dac") ? lore_on : lore_off);
+        hungerfight = m.nameItem(new ItemStack(Material.COOKED_BEEF), ChatColor.DARK_AQUA + "Event HungerFight", warps.get("hungerfight") ? lore_on : lore_off);
         sauta = m.nameItem(jump_potion.clone(), ChatColor.DARK_AQUA + "Event Saut 1", warps.get("saut1") ? lore_on : lore_off);
-        sautb = m.nameItem(new ItemStack(Material.GOLD_INGOT), ChatColor.DARK_AQUA + "Event Saut 2", warps.get("saut2") ? lore_on : lore_off);
-        sautc = m.nameItem(new ItemStack(Material.GOLD_INGOT), ChatColor.DARK_AQUA + "Event Saut 3", warps.get("saut3") ? lore_on : lore_off);
+        sautb = m.nameItem(night_potion.clone(), ChatColor.DARK_AQUA + "Event Saut 2", warps.get("saut2") ? lore_on : lore_off);
+        sautc = m.nameItem(new ItemStack(Material.WOOL, 1, (short) 15), ChatColor.DARK_AQUA + "Event Saut 3", warps.get("saut3") ? lore_on : lore_off);
+        pvp1v1 = m.nameItem(new ItemStack(Material.STONE_SWORD), ChatColor.DARK_AQUA + "PVP 1V1", warps.get("pvp1v1") ? lore_on : lore_off);
         color = m.nameItem(new ItemStack(Material.WOOL, 1, (short) 1), ChatColor.DARK_AQUA + "Event Color", warps.get("color") ? lore_on : lore_off);
         vitesse = m.nameItem(new ItemStack(Material.POTION, 1, (short) 8258), ChatColor.DARK_AQUA + "Event Vitesse", warps.get("vitesse") ? lore_on : lore_off);
         skin = m.nameItem(new ItemStack(Material.getMaterial(397), 1, (short) 3), ChatColor.DARK_AQUA + "Event Skins", warps.get("skin") ? lore_on : lore_off);
         lune = m.nameItem(new ItemStack(Material.ENDER_STONE), ChatColor.DARK_AQUA + "La lune", warps.get("lune") ? lore_on : lore_off);
         pvp = m.nameItem(new ItemStack(Material.GOLD_SWORD), ChatColor.GOLD + "PVP", warps.get("pvp") ? lore_on : lore_off);
         inv.setItem(0, dac);
-        inv.setItem(1, pvp);
+        inv.setItem(1, hungerfight);
         inv.setItem(2, sauta);
         inv.setItem(3, sautb);
         inv.setItem(4, sautc);
@@ -90,6 +100,8 @@ public class EventMenu implements Listener {
         inv.setItem(6, vitesse);
         inv.setItem(7, skin);
         inv.setItem(8, lune);
+        inv.setItem(12, pvp1v1);
+        inv.setItem(14, pvp);
 
     }
 
@@ -118,6 +130,7 @@ public class EventMenu implements Listener {
                         Player p = Bukkit.getPlayerExact(pseudo);
                         Inventory inv = p.getOpenInventory().getTopInventory();
                         inv.setItem(0, dac);
+                        inv.setItem(1, hungerfight);
                         inv.setItem(2, sauta);
                         inv.setItem(3, sautb);
                         inv.setItem(4, sautc);
@@ -125,7 +138,9 @@ public class EventMenu implements Listener {
                         inv.setItem(6, vitesse);
                         inv.setItem(7, skin);
                         inv.setItem(8, lune);
-                        inv.setItem(1, pvp);
+
+                        inv.setItem(12, pvp1v1);
+                        inv.setItem(14, pvp);
 
                     }
 

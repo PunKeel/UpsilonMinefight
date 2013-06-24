@@ -1,4 +1,4 @@
-package fr.ungeek.Upsilon;
+package fr.ungeek.NonPremiumLogin;
 
 import com.google.common.collect.Lists;
 import org.bukkit.ChatColor;
@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -16,11 +17,11 @@ import java.util.HashMap;
 
 public class CommandController implements CommandExecutor {
 
-    private final static HashMap<Command, Object> handlers = new HashMap<Command, Object>();
-    private final static HashMap<Command, Method> methods = new HashMap<Command, Method>();
-    private final static HashMap<String, SubCommand> subCommands = new HashMap<String, SubCommand>();
-    private final static HashMap<String, Object> subHandlers = new HashMap<String, Object>();
-    private final static HashMap<String, Method> subMethods = new HashMap<String, Method>();
+    private final static HashMap<Command, Object> handlers = new HashMap<>();
+    private final static HashMap<Command, Method> methods = new HashMap<>();
+    private final static HashMap<String, SubCommand> subCommands = new HashMap<>();
+    private final static HashMap<String, Object> subHandlers = new HashMap<>();
+    private final static HashMap<String, Method> subMethods = new HashMap<>();
 
     /**
      * Registers all command handlers and subcommand handlers in a class, matching them with their corresponding commands and subcommands registered to the specified plugin.
@@ -93,11 +94,11 @@ public class CommandController implements CommandExecutor {
          */
         if (args.length > 0) {
             /*
-		     * Get the subcommand given and the handler and method attached to it
+             * Get the subcommand given and the handler and method attached to it
              */
             SubCommand subCommand = new SubCommand(command, args[0]);
             subCommand = subCommands.get(subCommand.toString());
-		    /*
+            /*
              * If and only if the subcommand actually exists...
              */
             if (subCommand != null) {
@@ -130,7 +131,7 @@ public class CommandController implements CommandExecutor {
                     /*
                      * If a permission is attached to this subcommand and the sender doens't have it, don't continue
                      */
-                    if (!subCommand.permission.isEmpty() && !sender.hasPermission(subCommand.permission)) {
+                    if (!subCommand.permission.isEmpty() && !PermissionsEx.getUser(sender.getName()).has(subCommand.permission)) {
                         sender.sendMessage(ChatColor.RED + subCommand.permissionMessage);
                         return true;
                     }

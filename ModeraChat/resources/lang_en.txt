@@ -1,0 +1,11 @@
+anti_flood=&4Anti-FLOOD !
+capslock=&4It is forbidden to write in CAPSLOCK.
+url=&4It is forbidden to advertise for a server. (URL)
+ip=&4It is forbidden to advertise for a server. (IP)
+badword=&4It is forbidden to say "%word%".
+alternativecase=&4AlTeRnAtIvEcAsE is forbidden.
+repeated_letters=&4You musn't repeat characters.
+too_long=&4That word is a bit too long : "%word%".
+config_reloaded=&2Configuration reloaded.
+last_warning=&4Last warning.
+warnings_left=&4%left% warnings left before ban.

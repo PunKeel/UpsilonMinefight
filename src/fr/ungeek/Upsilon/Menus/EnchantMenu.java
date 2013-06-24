@@ -29,7 +29,7 @@ public class EnchantMenu implements Listener {
 	public void load_config() {
 		if (m.getConfig().contains("level_max")) {
 			level_max = m.getConfig().getInt("level_max", 10);
-			if (level_max < 0 || level_max > 30) {
+			if (level_max < 0 || level_max > 101) {
 				level_max = 15;
 			}
 		}

@@ -1,0 +1,19 @@
+name: ModeraChat
+version: 0.3
+description: Blocking ads and flooders is as easy as playing Minecraft. In Creative.
+author: PunKeel
+website: http://www.ungeek.fr
+main: fr.punkeel.ModeraChat.Main
+database: false
+prefix: MChat
+commands:
+  MChat:
+    description: ModeraChat
+    usage: /MChat [reload]
+permissions:
+  MChat.bypass:
+    description: Permet de ne pas être censuré
+    default: op
+  MChat.reload:
+    description: Permet de ne pas être censuré
+    default: op

@@ -1,0 +1,19 @@
+name: NonPremiumLogin
+version:  0.2
+description: Les non premium peuvent se co avec mot de passe
+author: PunKeel
+main: fr.ungeek.NonPremiumLogin.Main
+depend: [ PermissionsEx, Essentials ]
+commands:
+   login:
+     description: UpsilonProject.
+     aliases: [l]
+   changepwd:
+     description: change mdp
+   register:
+     description: Inscription
+   changepass:
+     description: Change le mdp d'un joueur
+     permission: upsilon.admin.changepassword
+   togglecrack:
+     description: togglecrack

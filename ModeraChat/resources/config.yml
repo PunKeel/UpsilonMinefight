@@ -1,0 +1,128 @@
+####   ModeraChat   ####
+####   By PunKeel   ####
+
+block_ip: true
+# Interdit au membre de poster des adresses IPV4 - Pub, souvent
+# Forbids the user to post IPv4 - often ads.
+
+
+block_url: true
+# Interdit au membre de poster des adresses web (qui se terminent par .fr, .com, .org, .net, .me, .de, .be, .us
+# Forbids the user to post web domains (ending with .fr, .com, .org, .net, .me, .de, .be, .us)
+
+
+block_badwords: true
+# Bloque les mots qui sont dans le fichier badwords.txt (insensible à la casse)
+# Blocks words in badwords.txt (case insensitive)
+
+
+block_badlocutions: true
+# Bloque les locutions qui sont dans le fichier badlocutions.txt
+## /BETA\
+## A utiliser pour bloquer des messages avec espaces.
+## réduction auto des espaces dans le message posté.
+## EX: si la locution "chien ou chat" est bloqué et que le joueur dit "chien    ou   chat" c'est bloqué ! :)
+
+# Blocks locutions (more than one word) written in badlocutions.txt
+# Beta. Could not work.
+# Only one space between words, it's enough ;)
+
+
+locutions_block_aggressive: false
+# Ignore totalement les espaces lors du blocage par "locutions" si "true", sinon considère au moins un espace entre chaque mot.
+# if set to true, words will be matched, ignoring spaces. if false, there must be [at least] one space to match.
+
+block_capslock: true
+# Bloque les messages qui sont en CAPSLOCK ou qui ont plus de 4 caractères consécutifs en majuscules
+# Blocks FULL CAPSLOCK messages, or messages with more than 4 characters in CAPSLOCK
+
+
+block_repeated_letters: true
+# Bloque les lettres répétées plus de X fois
+# Blocks repeated letters
+
+
+block_alternative_case: true
+# Bloque l'AlTeRnAtIvE CaSe (KIKOO INSIDE >.<)
+# Blocks AlTeRnAtIvE CaSe
+
+
+block_double_post: true
+# Empeche un message d'être répété
+# Forbids double/triple posting
+
+
+block_repeated_times: 5
+# Si le message est dit <block_repeated_times> fois ou plus, avertissement.
+# If a message is repeated more than <x> times, it will be blocked
+
+
+block_too_fast_talking: true
+# Empeche de poster 2 messages en moins de X millisecondes
+# Block too fast posting ?
+
+
+too_fast_talking_delay: 400
+# Temps *en millisecondes* entre deux messages
+# Enregistre le temps, même si le message est bloqué, donc ne pas mettre 15 secondes quoi  :^)
+
+# Time in milliseconds between two messages
+
+
+min_repeated_letters: 4
+# Nombre de caractèrs identiques successifs conduisant au bloquage
+# (min) Amount of identical characters to block
+
+max_word_length: 20
+# Nombre de caractèrs dans un mot, au maximum. 0 : infini
+# Maximum amount of letters in a word. 0 = infinite.
+
+warnings_before_ban: 10
+# Avertissements avant le ban
+# Warnings before the user is banned
+
+
+ban_command: ban %nickname%
+# Commande à executer pour le ban
+# Sans / au début, %nickname% est remplacé par le pseudo
+# Command ran when the user gets banned.
+# %nickname% is replaced with it's name. No trailing slash.
+
+domainWhitelist:
+  - "google.fr"
+  - "google.com"
+  - "ungeek.fr"
+  - "www.ungeek.fr"
+
+# Domaines à autoriser.
+# Inclure tous les sous domaines !
+# ungeek.fr va autoriser http://ungeek.fr/, ungeek.fr mais pas www.ungeek.fr ni http://www.ungeek.fr/
+
+# Whitelist domains.
+# include every domain you wan't to allow. For exemple : www.ungeek.fr, ungeek.fr, plugins.ungeek.fr ...
+
+save_warnings_on_reload: true
+# Si on doit enregistrer les avertissements au /reload ou pas
+# Set to "false" to forgive players on server restart/reload
+
+count_warnings_for:
+  - ip
+  - url
+  - badwords
+  - capslock
+  - repeated_letters
+  - alternative_case
+  - repeated_message
+  - too_fast_talking
+  - locutions
+  - too_long
+# Tous les bloquages indiqués ci-dessus ajouteront des points d'avertissement au membre.
+# utile, tant qu'il n'y a pas d'option pour bloquer des messages sans pénaliser le membre
+
+# With this, you specify if you want to count warnings for xxx and xxx but not xxx
+# So, you can prevent CAPSLOCK by warning it, and not set the user banned.
+
+ignore_nicknames: true
+# Strip nicknames while checking message - don't get kicked for telling "MYNAMEISJACK" something :p
+# Doit on supprimer les pseudos du message avant de vérifier le spam
+# Evite de se faire ban si on interpelle "MYNAMEISJACK" (capslock)
