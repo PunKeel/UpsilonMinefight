@@ -209,8 +209,7 @@ public class Main extends JavaPlugin implements Listener {
                 Writer out = new BufferedWriter(new OutputStreamWriter(
                         new FileOutputStream(lng_file), "UTF-8"));
                 byte[] buf = new byte[1024];
-                int len;
-                while ((len = in.read(buf)) > 0) {
+                while (in.read(buf) > 0) {
                     out.write(new String(buf));
                 }
                 in.close();

@@ -48,14 +48,14 @@ public class MenuManager implements Listener {
         if (!m.canUse(p)) return;
         if (e.getItem() == null) return;
         if (e.getItem().getType() != Material.EMERALD) return;
-        if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
-            if (!m.RM.getApplicableRegions(p.getLocation()).allows(FLAG_EMERAUDE)) {
-                p.sendMessage(Main.getTAG() + ChatColor.DARK_RED + "Interdit d'utiliser l'émeraude ici !");
-                return;
-            }
-            e.setCancelled(true);
-            openInventory(p, Menus.MAIN);
+        if (!e.getAction().equals(Action.RIGHT_CLICK_BLOCK) && !e.getAction().equals(Action.RIGHT_CLICK_AIR)) return;
+        if (!m.RM.getApplicableRegions(p.getLocation()).allows(FLAG_EMERAUDE)) {
+            p.sendMessage(Main.getTAG() + ChatColor.DARK_RED + "Interdit d'utiliser l'émeraude ici !");
+            return;
         }
+        e.setCancelled(true);
+        openInventory(p, Menus.MAIN);
+
     }
 
     @EventHandler(ignoreCancelled = true)

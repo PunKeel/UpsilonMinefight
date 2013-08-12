@@ -60,7 +60,7 @@ public class Main extends JavaPlugin implements Listener {
         if (suggestion_drop.contains(p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ()))
             if (e.getItemDrop().getItemStack().getType().equals(Material.WRITTEN_BOOK)) {
                 BookMeta bmeta = (BookMeta) e.getItemDrop().getItemStack().getItemMeta();
-                Suggestion s = new Suggestion(bmeta.getAuthor(), (int) Main.getTimestamp(), bmeta.getTitle(), bmeta.getPages());
+                Suggestion s = new Suggestion(bmeta.getAuthor(), Main.getTimestamp(), bmeta.getTitle(), bmeta.getPages());
                 getDatabase().save(s);
                 e.getItemDrop().remove();
                 p.sendMessage(getTAG() + "Suggestion reçue, elle sera traitée aussitôt que possible !");

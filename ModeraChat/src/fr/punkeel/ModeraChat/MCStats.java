@@ -91,10 +91,6 @@ public class MCStats {
      */
     private final YamlConfiguration configuration;
     /**
-     * The plugin configuration file
-     */
-    private final File configurationFile;
-    /**
      * Unique server id
      */
     private final String guid;
@@ -119,7 +115,10 @@ public class MCStats {
         this.plugin = plugin;
 
         // load the config
-        configurationFile = getConfigFile();
+        /*
+      The plugin configuration file
+     */
+        File configurationFile = getConfigFile();
         configuration = YamlConfiguration.loadConfiguration(configurationFile);
 
         // add some defaults

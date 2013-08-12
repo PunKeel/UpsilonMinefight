@@ -22,14 +22,14 @@ import org.bukkit.inventory.ItemStack;
 public class MainMenu implements Listener {
     Main m;
     MenuManager MM;
-    ItemStack teleport, magasin, amis;
+    ItemStack teleport, magasin;
 
     public MainMenu(Main main, MenuManager MM) {
         m = main;
         this.MM = MM;
         teleport = m.nameItem(new ItemStack(Material.COMPASS), ChatColor.DARK_GREEN + "Menu de téléportation", "Pour se déplacer + vite");
-        magasin = m.nameItem(new ItemStack(Material.WOOD_SWORD), ChatColor.DARK_AQUA + "Menu du magasin", "Vendre des items", ChatColor.DARK_RED + "Achat bientôt disponible");
-        amis = m.nameItem(new ItemStack(Material.SKULL_ITEM, 1, (short) 3), ChatColor.DARK_GRAY + "Gestionnaire d'amis", ChatColor.DARK_RED + "Bientôt disponible", "Gérez vos amis !");
+        magasin = m.nameItem(new ItemStack(Material.WOOD_SWORD), ChatColor.DARK_AQUA + "Menu du magasin", "Vendre des items", ChatColor.DARK_RED + "Bientôt disponible");
+        //amis = m.nameItem(new ItemStack(Material.SKULL_ITEM, 1, (short) 3), ChatColor.DARK_GRAY + "Gestionnaire d'amis", ChatColor.DARK_RED + "Bientôt disponible", "Gérez vos amis !");
     }
 
     public MenuManager.Menus getSelfMenuType() {
@@ -43,8 +43,8 @@ public class MainMenu implements Listener {
         Inventory inv = Bukkit.createInventory(null, 9, "Menu");
         MM.current_menu.put(e.getPlayer().getName(), MenuManager.Menus.MAIN);
         inv.setItem(2, teleport);
-        inv.setItem(4, magasin);
-        inv.setItem(6, amis);
+        inv.setItem(6, magasin);
+        //inv.setItem(6, amis);
         e.getPlayer().openInventory(inv);
     }
 
@@ -56,14 +56,14 @@ public class MainMenu implements Listener {
             case 2:
                 MM.openInventory(p, MenuManager.Menus.TELEPORTATION);
                 return;
-            case 6:
+            /*case 6:
                 if (m.isAdmin(p)) {
                     MM.openInventory(p, MenuManager.Menus.SHOP);
                 } else {
                     p.sendMessage(Main.getTAG() + "Le gestionnaire d'amis est fermé pour le moment.");
                 }
-                return;
-            case 4:
+                return; */
+            case 6:
                 if (m.isAdmin(p)) {
                     MM.openInventory(p, MenuManager.Menus.SHOP);
                 } else {

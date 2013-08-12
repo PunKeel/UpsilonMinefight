@@ -12,6 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class CommandController implements CommandExecutor {
@@ -38,7 +39,7 @@ public class CommandController implements CommandExecutor {
                     CommandHandler annotation = method.getAnnotation(CommandHandler.class);
                     if (plugin.getCommand(annotation.name()) != null) {
                         plugin.getCommand(annotation.name()).setExecutor(new CommandController());
-                        if (!(annotation.aliases().equals(new String[]{""})))
+                        if (!(Arrays.equals(annotation.aliases(), new String[]{""})))
                             plugin.getCommand(annotation.name()).setAliases(Lists.newArrayList(annotation.aliases()));
                         if (!annotation.description().equals(""))
                             plugin.getCommand(annotation.name()).setDescription(annotation.description());

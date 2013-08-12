@@ -31,7 +31,16 @@ public class EventMenu implements Listener {
     HashMap<String, Boolean> warps = new HashMap<String, Boolean>();
     List<String> slots = new ArrayList<String>();
     Inventory inv;
-    private ItemStack dac, sauta, sautb, color, lune, vitesse, skin, night_potion, jump_potion, pvp, sautc;
+    private ItemStack dac;
+    private ItemStack sauta;
+    private ItemStack sautb;
+    private ItemStack color;
+    private ItemStack lune;
+    private ItemStack vitesse;
+    private ItemStack skin;
+    private ItemStack jump_potion;
+    private ItemStack pvp;
+    private ItemStack sautc;
 
     public EventMenu(Main main, MenuManager MM) {
         m = main;
@@ -60,7 +69,7 @@ public class EventMenu implements Listener {
         p_meta.setMainEffect(PotionEffectType.JUMP);
         jump_potion.setItemMeta(p_meta);
 
-        night_potion = new ItemStack(Material.POTION);
+        ItemStack night_potion = new ItemStack(Material.POTION);
         p_meta = (PotionMeta) night_potion.getItemMeta();
         p_meta.setMainEffect(PotionEffectType.NIGHT_VISION);
         night_potion.setItemMeta(p_meta);

@@ -23,19 +23,15 @@ import java.util.Random;
  * May be open-source & be sold (by PunKeel, of course !)
  */
 public class Spleef implements Listener {
-    static String TAG = ChatColor.RESET + "[" + ChatColor.BLUE + "Spleef" + ChatColor.RESET + "] ";
+    static String TAG = ChatColor.RESET + "[" + ChatColor.BLUE + "Spleef" + ChatColor.RESET + "] ", recordman = "";
     HashMap<String, Location> participants = new HashMap<>();
     List<Material> mats = new ArrayList<>();
-    Boolean playing = false;
-    Boolean single_player = false;
+    Boolean playing = false, single_player = false;
     Random random = new Random();
-    long debut_chrono = 0;
-    Long record = (long) 0;
-    String recordman = "";
+    long debut_chrono = 0, record = (long) 0;
     ArrayList<Location> blocs;
-    int radius = 12, centreX = -215, centreZ = 311, centreY = 61, loop = 0, countdown = 15, task_id = 0;
+    int radius = 12, centreX = -215, centreZ = 311, centreY = 61, loop = 0, countdown = 15, task_id = 0, max_joueurs = -1;
     Main main;
-    int max_joueurs = -1;
 
     public Spleef(Main main) {
         this.main = main;
@@ -88,7 +84,6 @@ public class Spleef implements Listener {
         stop_task();
         Player gagnant = null;
         playing = false;
-        single_player = false;
         loop = 0;
         if (participants.size() == 1)
             gagnant = Bukkit.getPlayer((String) participants.keySet().toArray()[0]);
@@ -113,6 +108,7 @@ public class Spleef implements Listener {
         participants = new HashMap<>();
         for (Location l : blocs)
             l.getBlock().setType(Material.GLASS);
+        single_player = false;
     }
 
     @EventHandler
@@ -126,7 +122,7 @@ public class Spleef implements Listener {
         blocs = getBlocks();
         task_id = Bukkit.getServer().getScheduler().scheduleAsyncRepeatingTask(main, new Runnable() {
             public void run() {
-                if (single_player && playing) {
+                if ((single_player || (Main.getTimestamp() - debut_chrono) > 90) && playing) {
                     for (int i = 0; i < 10; i++)
                         if (random.nextBoolean() && random.nextBoolean()) {
                             blocs.get(random.nextInt(blocs.size() - 1)).getBlock().setType(Material.AIR);

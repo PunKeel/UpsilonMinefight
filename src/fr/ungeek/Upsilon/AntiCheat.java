@@ -8,11 +8,13 @@ import de.kumpelblase2.remoteentities.api.RemoteEntityType;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -30,6 +32,7 @@ public class AntiCheat implements Listener {
     EntityManager manager;
     List<UUID> honeypots = new ArrayList<>();
     HashMap<String, Integer> spots = new HashMap<>();
+    HashMap<String, Integer> tests = new HashMap<>();
 
     public AntiCheat(final Main m) {
         main = m;
@@ -42,16 +45,27 @@ public class AntiCheat implements Listener {
         x.getBukkitEntity().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, false), false);
         honeypots.add(x.getBukkitEntity().getUniqueId());
         x.getBukkitEntity().teleport(p.getLocation().add(0, 2.5, 1));
+        for (Player k : Bukkit.getOnlinePlayers()) {
+            if (k.getName().equals(p.getName())) continue;
+            k.hidePlayer((Player) x.getBukkitEntity());
+        }
+
+        if (tests.containsKey(p.getName())) {
+            tests.put(p.getName(), tests.get(p.getName()) + 1);
+        } else {
+
+            tests.put(p.getName(), 1);
+        }
+
         Bukkit.getScheduler().runTaskLater(main, new BukkitRunnable() {
             int i = 0;
 
             @Override
             public void run() {
                 i++;
-                if (x.getBukkitEntity() != null && i <= 6) {
+                if (x.getBukkitEntity() != null && i <= 6 && p.isOnline()) {
                     x.getBukkitEntity().teleport(p.getEyeLocation().add(0, 2, 0));
                     Bukkit.getScheduler().runTaskLater(main, this, 20);
-                    main.getLogger().info(i + "");
                 } else {
                     if (x.getBukkitEntity() != null) {
                         x.getBukkitEntity().remove();
@@ -61,6 +75,15 @@ public class AntiCheat implements Listener {
             }
         }, 20);
 
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent e) {
+        for (Entity x : Bukkit.getWorld(Main.WORLDNAME).getEntities()) {
+            if (honeypots.contains(x.getUniqueId()))
+                if (x instanceof Player)
+                    e.getPlayer().hidePlayer((Player) x);
+        }
     }
 
     @EventHandler
@@ -85,7 +108,7 @@ public class AntiCheat implements Listener {
                     spots.put(name, 1);
                 }
 
-                main.broadcastToAdmins(ChatColor.DARK_GRAY + "Suspect(" + spots.get(name) + ") : " + name);
+                main.broadcastToAdmins(ChatColor.DARK_GRAY + "Suspect(" + spots.get(name) + "/" + tests.get(name) + ") : " + name);
             }
         }
     }

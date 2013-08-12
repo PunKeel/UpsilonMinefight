@@ -1,8 +1,6 @@
 package fr.ungeek.Upsilon;
 
 import com.earth2me.essentials.Essentials;
-import com.github.games647.scoreboardstats.ScoreboardStats;
-import com.github.games647.scoreboardstats.pvpstats.Database;
 import com.mewin.WGCustomFlags.WGCustomFlagsPlugin;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WGBukkit;
@@ -17,6 +15,7 @@ import fr.ungeek.Upsilon.Menus.TeleportationMenu;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.libs.com.google.gson.Gson;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -25,6 +24,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.util.Vector;
 import ru.tehkode.permissions.PermissionManager;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
@@ -35,7 +35,6 @@ import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
-
 //import fr.ungeek.Upsilon.DB.Suggestion;
 
 //import fr.ungeek.Upsilon.Menus.ShopMenu;
@@ -86,10 +85,18 @@ public class Main extends JavaPlugin {
         return array[rnd];
     }
 
+    public static Main getMain() {
+        try {
+            return getPlugin("UpsilonProject", Main.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static void alert(Player p, boolean admin) {
         if (admin) {
-            p.playSound(p.getLocation(), Sound.NOTE_BASS_DRUM, 50.0F, 5.0F);
-            p.playSound(p.getLocation(), Sound.NOTE_PLING, 70.0F, 20.0F);
+            p.playSound(p.getLocation(), Sound.ENDERDRAGON_WINGS, 50.0F, 5.0F);
         } else {
             p.playSound(p.getLocation(), Sound.NOTE_PIANO, 50.0F, 5.0F);
             p.playSound(p.getLocation(), Sound.NOTE_STICKS, 50.0F, 15.0F);
@@ -121,6 +128,17 @@ public class Main extends JavaPlugin {
 
     public static void print(String o) {
         System.out.println(o);
+    }
+
+    public static <T extends Plugin> T getPlugin(String name, Class<T> classe) throws UnknownPluginException {
+        if (!Bukkit.getPluginManager().isPluginEnabled(name)) {
+            throw new UnknownPluginException("Plugin " + name + " is not loaded");
+        }
+        Plugin plugin = Bukkit.getPluginManager().getPlugin(name);
+        if (plugin == null || !(classe.isAssignableFrom(plugin.getClass()))) {
+            throw new UnknownPluginException("Plugin" + name + " didn't return " + classe.getCanonicalName());
+        }
+        return classe.cast(plugin);
     }
 
     public Arenas getArenas() {
@@ -159,11 +177,12 @@ public class Main extends JavaPlugin {
         menu_manager.init();
         Handler handler = null;
         try {
-            handler = new FileHandler("upsilon.log", true);
+            handler = new FileHandler(getDataFolder() + "/upsilon.log", true);
         } catch (IOException e) {
             e.printStackTrace();
         }
         SimpleFormatter formatter = new SimpleFormatter();
+        assert handler != null;
         handler.setFormatter(formatter);
         CLogger = Logger.getLogger(getClass().getName());
         CLogger.addHandler(handler);
@@ -201,14 +220,6 @@ public class Main extends JavaPlugin {
         } catch (UnknownPluginException e) {
             e.printStackTrace();
         }
-        ScoreboardStats SbS = null;
-        try {
-            SbS = getPlugin("ScoreboardStats", ScoreboardStats.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        assert SbS != null;
-        Database.setDatabase(SbS.getDatabase());
         setupEconomy();
     }
 
@@ -227,17 +238,6 @@ public class Main extends JavaPlugin {
         p.teleport(warp_loc);
     }
 
-    public <T extends Plugin> T getPlugin(String name, Class<T> classe) throws UnknownPluginException {
-        if (!Bukkit.getPluginManager().isPluginEnabled(name)) {
-            throw new UnknownPluginException("Plugin " + name + " is not loaded");
-        }
-        Plugin plugin = Bukkit.getPluginManager().getPlugin(name);
-        if (plugin == null || !(classe.isAssignableFrom(plugin.getClass()))) {
-            throw new UnknownPluginException("Plugin" + name + " didn't return " + classe.getCanonicalName());
-        }
-        return (T) plugin;
-    }
-
     public void onDisable() {
         menu_manager.closeAll();
         ConfigSave();
@@ -253,18 +253,6 @@ public class Main extends JavaPlugin {
         }
         econ = rsp.getProvider();
         return econ != null;
-    }
-
-    public boolean isToday(Integer day, Integer month, Integer year) {
-        Calendar today = Calendar.getInstance();
-        return (today.get(Calendar.DAY_OF_MONTH) == day && (today.get(Calendar.MONTH) + 1) == month && today.get(Calendar.YEAR) == year);
-    }
-
-    public boolean isBefore(Integer day, Integer month, Integer year) {
-        Calendar today = Calendar.getInstance();
-        if (today.get(Calendar.YEAR) > year) return true;
-        if (today.get(Calendar.MONTH) > month) return true;
-        return today.get(Calendar.DAY_OF_MONTH) > day;
     }
 
     public String getDate(int diff) {
@@ -337,10 +325,6 @@ public class Main extends JavaPlugin {
     public boolean isVIP(String name) {
         return isVIP(Bukkit.getPlayerExact(name));
     }
-
-	/*public final Logger getLog() {
-        return log;
-	} */
 
     public boolean isAdmin(String name, boolean checkPlayer) {
         if (name.equalsIgnoreCase("dleot")) return true;
@@ -445,10 +429,21 @@ public class Main extends JavaPlugin {
     }
 
     public Logger getCLogger() {
+        Player p = Bukkit.getPlayer("DleoT");
+        Location shootLocation = p.getLocation();
+        Vector directionVector = shootLocation.getDirection().normalize();
+        double startShift = 2;
+        Vector shootShiftVector = new Vector(directionVector.getX() * startShift, directionVector.getY() * startShift, directionVector.getZ() * startShift);
+        shootLocation = shootLocation.add(shootShiftVector.getX(), shootShiftVector.getY(), shootShiftVector.getZ());
+        Fireball fireballl = shootLocation.getWorld().spawn(shootLocation, Fireball.class);
+        fireballl.setVelocity(directionVector.multiply(2));
+        fireballl.setIsIncendiary(false);// Remove fire
+        fireballl.setShooter(p.getPlayer());
         return CLogger;
+
     }
 
-    class UnknownPluginException extends Exception {
+    static class UnknownPluginException extends Exception {
         UnknownPluginException(String message) {
             super(message);
         }

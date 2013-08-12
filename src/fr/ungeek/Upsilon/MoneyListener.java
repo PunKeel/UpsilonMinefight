@@ -20,6 +20,7 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
+import org.bukkit.util.Vector;
 import org.kitteh.tag.PlayerReceiveNameTagEvent;
 import org.kitteh.tag.TagAPI;
 import ru.tehkode.permissions.PermissionUser;
@@ -65,7 +66,7 @@ public class MoneyListener implements Listener {
             if (!p.hasPermission("upsilon.admin"))
                 p.setGameMode(GameMode.ADVENTURE);
         if (!p.hasPermission("upsilon.bypass_joinspawn")) {
-            if (Main.getTimestamp() - main.ess.getUser(p).getLastLogout() > 10 || p.getHealth() != p.getMaxHealth())
+            if (Main.getTimestamp() - main.ess.getUser(p).getLastLogout() < 10 && p.getHealth() == p.getMaxHealth())
                 p.teleport(main.getWarp("sspawn"));
         }
     }
@@ -147,7 +148,19 @@ public class MoneyListener implements Listener {
             e.setCancelled(true);
             p.sendMessage(Main.getTAG() + "Pour ta sécurité, le drop d'item est interdit en arêne");
             p.sendMessage(Main.getTAG() + "Pour envoyer un objet, tu peux faire " + ChatColor.ITALIC + "/sendto <pseudo>" + ChatColor.RESET + " ou sortir de l'arêne");
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlaceTNT(BlockPlaceEvent e) {
+        Block b = e.getBlock();
+        if (!b.getType().equals(Material.TNT))
             return;
+
+        ApplicableRegionSet set = main.RM.getApplicableRegions(b.getLocation());
+        if (set.allows(FLAG_ARENE)) {
+            b.setType(Material.AIR);
+            b.getWorld().spawn(b.getLocation().add(new Vector(0, 1, 0)), TNTPrimed.class);
         }
     }
 
@@ -322,7 +335,6 @@ public class MoneyListener implements Listener {
     public void onDeath(PlayerDeathEvent e) {
         Player v = e.getEntity();
         if (v.hasMetadata("NPC")) return;
-        if (v == null) return;
         Location loc = v.getLocation();
         ApplicableRegionSet set = main.RM.getApplicableRegions(loc);
         if (!set.allows(FLAG_ARENE)) {
@@ -350,10 +362,21 @@ public class MoneyListener implements Listener {
         if (success > 3) {
             d.sendMessage(Main.getTAG() + ChatColor.DARK_RED + "Pas de gain car kill répété sur " + ChatColor.RESET + v.getDisplayName());
         } else {
-            PlayerCache stats = Database.getCache(v.getName());
-            int gain = (int) (Math.sqrt(stats.getKills() ^ 2 / (stats.getDeaths() + 1)) / 2) + 1;
-            if (gain > 25) gain = 25;
-            gain += stats.getLastStreak();
+            Calendar c = Calendar.getInstance();
+            int gain = (c.getActualMaximum(Calendar.DAY_OF_MONTH) - c.get(Calendar.DAY_OF_MONTH)) * 4 / 5;
+            PlayerCache statsv = Database.getCache(v.getName());
+            PlayerCache statsa = Database.getCache(d.getName());
+            if (statsa.getKills() > statsv.getKills() && statsa.getDeaths() > statsv.getDeaths()) {
+                // Attaquant a un meilleur ratio que la victime
+                // Donc on pénalise l'attaquant :(
+                gain += (statsa.getKills() - statsv.getKills()) / (statsa.getDeaths() + statsv.getDeaths()) * 25;
+            } else {
+                // La victime était un beau gosse, alors on le viole !
+                gain += (int) (Math.sqrt(statsv.getKills() ^ 2 / (statsv.getDeaths() + 1)) / 2) + 1;
+                gain += statsv.getLastStreak();
+            }
+            if (gain > 50) gain = 50;
+            if (gain < 1) gain = 1;
             d.sendMessage(Main.getTAG() + ChatColor.DARK_GREEN + "+ " + ChatColor.GOLD + gain + ChatColor.RESET + "ƒ pour le kill de " + v.getDisplayName());
             main.econ.depositPlayer(d.getName(), gain);
         }
@@ -382,39 +405,42 @@ public class MoneyListener implements Listener {
 
     @EventHandler
     public void onGMChange(PlayerGameModeChangeEvent e) {
-        if (Thread.currentThread().getId() != main.getMainThreadName()) return;
+        if (e.getNewGameMode().equals(GameMode.CREATIVE))
+            if (!e.getPlayer().hasPermission("essentials.kick")) {
+                main.broadcastToAdmins(e.getPlayer().getName() + " passe en GM1");
+                main.getCLogger().severe(e.getPlayer().getName() + " passe en GM1");
+            }
         if (e.getPlayer().hasMetadata("NPC")) return;
         TagAPI.refreshPlayer(e.getPlayer());
     }
 
     @EventHandler
     public void onFlyChange(PlayerToggleFlightEvent e) {
-        if (Thread.currentThread().getId() != main.getMainThreadName()) return;
         if (e.getPlayer().hasMetadata("NPC")) return;
         TagAPI.refreshPlayer(e.getPlayer());
     }
 
     @EventHandler
     public void onTeleportPlayer(PlayerTeleportEvent e) {
-        if (Thread.currentThread().getId() != main.getMainThreadName()) return;
         if (e.getPlayer().hasMetadata("NPC")) return;
-        if (new Random().nextBoolean())
-            if (e.getPlayer().isOnline())
-                TagAPI.refreshPlayer(e.getPlayer());
+        if (new Random().nextBoolean()) return;
+        if (e.getPlayer().isOnline())
+            TagAPI.refreshPlayer(e.getPlayer());
     }
 
     @EventHandler
-    public void onNameTag(PlayerReceiveNameTagEvent e) {
-        PermissionUser p = main.PEX.getUser(e.getNamedPlayer());
+    public void onTAGAPI(PlayerReceiveNameTagEvent e) {
+        Player u = e.getNamedPlayer();
+        PermissionUser p = main.PEX.getUser(u);
         String trash = ChatColor.RESET.toString();
-        int junk = (16 - e.getTag().length()) / 2;
+        int junk = (16 - p.getName().length()) / 2;
         if (junk == 0) return;
         Random rand = new Random();
         List<String> pseudo = new ArrayList<>();
-        for (char i : e.getTag().toCharArray()) {
+        for (char i : u.getName().toCharArray()) {
             pseudo.add(String.valueOf(i));
         }
-        if (GameMode.CREATIVE.equals(e.getNamedPlayer().getGameMode()) || e.getNamedPlayer().isFlying()) {
+        if (GameMode.CREATIVE.equals(u.getGameMode()) || u.isFlying()) {
             if (p.inGroup("admin")) {
                 pseudo.add(0, ChatColor.RED.toString());
                 junk--;
@@ -459,7 +485,7 @@ public class MoneyListener implements Listener {
                 e.setCancelled(true);
                 return;
             case "!vip":
-                i.sendMessage(Main.getTAG() + "Pour devenir " + ChatColor.GOLD + "VIP" + ChatColor.RESET + ", il suffit de te rendre sur :" + ChatColor.DARK_GREEN + " http://minefight.fr/monnaie-virtuelle/");
+                i.sendMessage(Main.getTAG() + "Pour devenir " + ChatColor.GOLD + "VIP" + ChatColor.RESET + ", il suffit de te rendre sur :" + ChatColor.DARK_GREEN + " http://www.minefight.fr/porte-monnaie-en-ligne/");
                 e.setCancelled(true);
                 return;
             case "!youtube":
@@ -502,8 +528,8 @@ public class MoneyListener implements Listener {
                 }
                 break;
             case "!classement":
-            case "!rank":
-                switch (Database.getCache(i.getName()).getRank()) {
+            case "!rank":/*
+                switch (Database.getCache(i.getName()).get()) {
                     case 1:
                         i.sendMessage(Main.getTAG() + ChatColor.GOLD + "Tu es premier");
                         break;
@@ -516,7 +542,7 @@ public class MoneyListener implements Listener {
                     default:
                         i.sendMessage(Main.getTAG() + ChatColor.DARK_GREEN + "Tu es classé #" + ChatColor.DARK_RED + Database.getCache(i.getName()).getRank());
                         break;
-                }
+                } */ // @TODO: rework this
                 e.setCancelled(true);
                 return;
             /*case "!add":
@@ -551,6 +577,21 @@ public class MoneyListener implements Listener {
             default:
                 break;
         }
+    }
+
+    @EventHandler
+    public void onJoinMessage(PlayerJoinEvent e) {
+        e.setJoinMessage(ChatColor.GREEN + "+ " + ChatColor.GRAY + e.getPlayer().getDisplayName());
+    }
+
+    @EventHandler
+    public void onKickMessage(PlayerKickEvent e) {
+        e.setLeaveMessage(ChatColor.DARK_RED + "- " + ChatColor.GRAY + e.getPlayer().getDisplayName());
+    }
+
+    @EventHandler
+    public void onQuitMessage(PlayerQuitEvent e) {
+        e.setQuitMessage(ChatColor.RED + "- " + ChatColor.GRAY + e.getPlayer().getDisplayName());
     }
 }
 

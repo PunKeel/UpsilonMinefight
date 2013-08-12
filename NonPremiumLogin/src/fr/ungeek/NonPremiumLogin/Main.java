@@ -3,7 +3,6 @@ package fr.ungeek.NonPremiumLogin;
 import com.earth2me.essentials.Essentials;
 import com.earth2me.essentials.IEssentials;
 import com.earth2me.essentials.Kit;
-import fr.PunKeel.Premium;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -11,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.Plugin;
@@ -35,6 +35,8 @@ public class Main extends JavaPlugin implements Listener {
     HashMap<String, Integer> offline = new HashMap<>();
     HashMap<String, String> online = new HashMap<>();
     boolean cracks_allowed = true;
+    Set<String> newbies = new HashSet<>();
+    Set<String> cracks = new HashSet<>();
     Premium P;
     private IEssentials ess;
 
@@ -42,15 +44,27 @@ public class Main extends JavaPlugin implements Listener {
         return ChatColor.BLUE + "[" + ChatColor.WHITE + "Minefight" + ChatColor.BLUE + "] " + ChatColor.RESET;
     }
 
+    public static <T extends Plugin> T getPlugin(String name, Class<T> classe) throws Exception {
+        if (!Bukkit.getPluginManager().isPluginEnabled(name)) {
+            throw new Exception("Plugin " + name + " is not loaded");
+        }
+        Plugin plugin = Bukkit.getPluginManager().getPlugin(name);
+        if (plugin == null || !(classe.isAssignableFrom(plugin.getClass()))) {
+            throw new Exception("Plugin" + name + " didn't return " + classe.getCanonicalName());
+        }
+        return classe.cast(plugin);
+    }
+
     private boolean isPremium(String name) {
         return P.isPremium(name);
     }
 
     public void onEnable() {
+        P = new Premium(this);
+        P.loadPremiums();
         getServer().getPluginManager().registerEvents(this, this);
         CommandController.registerCommands(this, this);
         AM.loadAccounts();
-        P = getServer().getPremium();
         try {
             ess = getPlugin("Essentials", Essentials.class);
         } catch (Exception e) {
@@ -61,6 +75,7 @@ public class Main extends JavaPlugin implements Listener {
 
     public void onDisable() {
         AM.saveAccounts();
+        P.savePremiums();
         Player p;
         for (String name : offline.keySet()) {
             p = Bukkit.getPlayer(name);
@@ -68,17 +83,6 @@ public class Main extends JavaPlugin implements Listener {
             if (!p.isOnline()) continue;
             p.kickPlayer(ChatColor.DARK_RED + "Reload alors que tu n'étais pas connecté");
         }
-    }
-
-    public <T extends Plugin> T getPlugin(String name, Class<T> classe) throws Exception {
-        if (!Bukkit.getPluginManager().isPluginEnabled(name)) {
-            throw new Exception("Plugin " + name + " is not loaded");
-        }
-        Plugin plugin = Bukkit.getPluginManager().getPlugin(name);
-        if (plugin == null || !(classe.isAssignableFrom(plugin.getClass()))) {
-            throw new Exception("Plugin" + name + " didn't return " + classe.getCanonicalName());
-        }
-        return (T) plugin;
     }
 
     public boolean isLoggedIn(Player p) {
@@ -97,6 +101,35 @@ public class Main extends JavaPlugin implements Listener {
         p.removePotionEffect(PotionEffectType.JUMP);
         online.put(p.getName().toLowerCase(), p.getAddress().getAddress().getHostAddress());
     }
+
+    /*@EventHandler()
+    public void onPreLogin(PlayerHandshakeEvent e) {
+        if (cracks_allowed)
+            if (!P.isPremium(e.getPlayerName()))
+                e.setLoginKey("-");
+    }  */
+
+   /* @EventHandler()
+    public void onPreLogin(AsyncPlayerPreLoginEvent e) {
+        boolean premium = !e.getLoginResult().equals(AsyncPlayerPreLoginEvent.Result.KICK_VERIFY);
+        if (!premium) cracks.add(e.getName());
+        e.setLoginResult(AsyncPlayerPreLoginEvent.Result.ALLOWED);
+        if (e.getAddress().isLoopbackAddress()) return;
+        String ip = e.getAddress().getHostAddress();
+        for (Player x : Bukkit.getOnlinePlayers()) {
+            if (x.getName().equalsIgnoreCase(e.getName()) && !isLoggedIn(x)) {
+                e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, ChatColor.DARK_RED + "Tu es déjà en ligne");
+                return;
+            }
+
+            if (x.getAddress().getAddress().getHostAddress().equals(ip)) {
+                if (!(isPremium(x.getName()) && premium)) {
+                    e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, ChatColor.DARK_RED + "Double compte interdit");
+                    return;
+                }
+            }
+        }
+    }  */
 
     @EventHandler()
     public void onQuit(PlayerQuitEvent e) {
@@ -117,6 +150,9 @@ public class Main extends JavaPlugin implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent e) throws Exception {
         Player p = e.getPlayer();
+        if (!p.hasPlayedBefore()) {
+            newbies.add(p.getName());
+        }
         PermissionUser u = PermissionsEx.getUser(p);
         String ip = p.getAddress().getAddress().getHostAddress();
         if (isPremium(p.getName())) {
@@ -126,7 +162,7 @@ public class Main extends JavaPlugin implements Listener {
             if (!p.hasPlayedBefore()) {
                 e.setJoinMessage(ChatColor.LIGHT_PURPLE + p.getName() + " est nouveau/nouvelle sur Minefight !");
                 final Map<String, Object> kit = ess.getSettings().getKit("newbie");
-                final List<String> items = Kit.getItems(ess.getUser(p), kit);
+                final List<String> items = Kit.getItems(ess, ess.getUser(p), kit);
                 Kit.expandItems(ess, ess.getUser(p), items);
             }
 
@@ -153,28 +189,12 @@ public class Main extends JavaPlugin implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onLogin(PlayerPreLoginEvent e) {
-        String name = e.getName();
-
-        String ip = e.getAddress().getHostAddress();
-        boolean premium = isPremium(name);
-        if (!premium && !cracks_allowed) {
-            e.disallow(PlayerPreLoginEvent.Result.KICK_OTHER, "Versions crack momentanément interdites.");
-            return;
-        }
-        for (Player x : Bukkit.getOnlinePlayers()) {
-            if (x.getName().equalsIgnoreCase(name)) {
-                if (!isLoggedIn(x)) {
-                    e.setKickMessage(ChatColor.DARK_RED + "Tu es déjà connecté");
-                    e.disallow(PlayerPreLoginEvent.Result.KICK_OTHER, ChatColor.DARK_RED + "Tu es déjà connecté");
-                   return;
-                }
-            }
-            if (x.getAddress().getAddress().getHostAddress().equals(ip)) {
-                if (!(isPremium(x.getName()) && premium)) {
-                    e.disallow(PlayerPreLoginEvent.Result.KICK_OTHER, ChatColor.DARK_RED + "Double compte interdit");
-                    return;
-                }
+    public void onDamage(EntityDamageEvent e) {
+        if (!e.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) return;
+        if (e.getEntity() instanceof Player) {
+            Player d = (Player) e.getEntity();
+            if (newbies.contains(d.getName())) {
+                e.setDamage((int) (e.getDamage() / 1.25));
             }
         }
     }
@@ -332,5 +352,4 @@ public class Main extends JavaPlugin implements Listener {
             }
         }
     }
-
 }

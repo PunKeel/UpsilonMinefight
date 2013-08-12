@@ -87,7 +87,6 @@ public class Commandes {
             cs.sendMessage("Joueur non trouvé");
             return;
         }
-        boolean usage = false;
         main.menu_manager.openInventory(p, menu);
         main.broadcastToAdmins(ChatColor.GRAY + "<" + cs.getName() + "> Menu " + menu + " ouvert pour " + p.getDisplayName());
 
@@ -200,13 +199,17 @@ public class Commandes {
 
     }
 
-    @CommandController.CommandHandler(name = "sendto", usage = "/sendto <player>")
+    @CommandController.CommandHandler(name = "sendto", usage = "/sendto <player> [qty]")
     public void onGiveTo(Player p, String[] args) {
         if (args.length != 1 && args.length != 2) {
-            p.sendMessage(Main.getTAG() + "Usage /sendto <pseudo>");
+            p.sendMessage(Main.getTAG() + "Usage /sendto <pseudo> [qty]");
             return;
         }
         String player = args[0];
+        int qty = 1;
+        if (args.length == 2) {
+            qty = Integer.parseInt(args[1]);
+        }
         Player d = Bukkit.getPlayerExact(player);
         if (d == null) {
             p.sendMessage(Main.getTAG() + "Joueur non trouvé");
@@ -220,12 +223,16 @@ public class Commandes {
             p.sendMessage(Main.getTAG() + "Tu n'as aucun item en main à lui donner");
             return;
         }
+        if (p.getItemInHand().getAmount() < qty) {
+            p.sendMessage(Main.getTAG() + "Tu n'as pas " + qty + " fois l'item en main");
+            return;
+        }
         ItemStack IS = p.getItemInHand().clone();
-        IS.setAmount(1);
+        IS.setAmount(qty);
         p.getInventory().removeItem(IS);
         d.getInventory().addItem(IS);
         p.updateInventory();
-        String display = String.valueOf(IS.getType());
+        String display = qty + "*" + String.valueOf(IS.getType());
         if (IS.getDurability() != 0) display = display + ":" + IS.getDurability();
         if (!IS.getEnchantments().isEmpty()) {
             display = display + " (";
@@ -237,7 +244,7 @@ public class Commandes {
         }
         p.sendMessage(Main.getTAG() + "Item " + display + " envoyé à " + d.getName());
         d.sendMessage(Main.getTAG() + "Item " + display + " reçu de " + p.getName());
-        main.getCLogger().info(d.getName() + " a envoyé " + display + " to " + d.getName());
+        main.getCLogger().info(p.getName() + " a envoyé " + display + " to " + d.getName());
 
     }
 
