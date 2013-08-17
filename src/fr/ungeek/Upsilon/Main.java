@@ -65,7 +65,7 @@ public class Main extends JavaPlugin {
     public Gson gson = new Gson();
     public HashMap<String, VoteKickHolder> votekick = new HashMap<>();
     public AntiCheat AC;
-    Boussole B = new Boussole(this);
+    Boussole B;
     private Logger CLogger;
     private long mainThreadName;
     private ConfigManager CM = new ConfigManager(this);
@@ -157,6 +157,7 @@ public class Main extends JavaPlugin {
         CommandController.registerCommands(this, infinidisp);
         CommandController.registerCommands(this, spleef);
         getCommand("roi").setExecutor(roi);
+        B = new Boussole(this);
         setupDependencies();
         globalConfig = CM.getNewConfig("config.yml");
         locationsConfig = CM.getNewConfig("locations.yml");

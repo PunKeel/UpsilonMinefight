@@ -19,6 +19,7 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -115,6 +116,40 @@ public class MoneyListener implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
+    public void onDrop(CraftItemEvent e) {
+        HashSet<Material> interdits = new HashSet<>();
+        interdits.add(Material.GOLD_AXE);
+        interdits.add(Material.GOLD_BOOTS);
+        interdits.add(Material.GOLD_CHESTPLATE);
+        interdits.add(Material.GOLD_HELMET);
+        interdits.add(Material.GOLD_HOE);
+        interdits.add(Material.GOLD_LEGGINGS);
+        interdits.add(Material.GOLD_PICKAXE);
+        interdits.add(Material.GOLDEN_CARROT);
+        interdits.add(Material.GOLDEN_APPLE);
+        interdits.add(Material.GOLD_SPADE);
+        interdits.add(Material.GOLD_SWORD);
+
+        interdits.add(Material.IRON_AXE);
+        interdits.add(Material.IRON_BOOTS);
+        interdits.add(Material.IRON_CHESTPLATE);
+        interdits.add(Material.IRON_HELMET);
+        interdits.add(Material.IRON_HOE);
+        interdits.add(Material.IRON_LEGGINGS);
+        interdits.add(Material.IRON_PICKAXE);
+        interdits.add(Material.IRON_SPADE);
+        interdits.add(Material.IRON_SWORD);
+
+        if (interdits.contains(e.getRecipe().getResult().getType())) {
+            if (!e.getWhoClicked().isOp())
+                e.setCancelled(true);
+            ((Player) e.getWhoClicked()).sendMessage(Main.getTAG() + ChatColor.RED + "Interdit :(");
+
+        }
+
+    }
+
+    @EventHandler(ignoreCancelled = true)
     public void onDrop(PlayerDropItemEvent e) {
         Player p = e.getPlayer();
         if (e.getItemDrop().getItemStack().isSimilar(emerald) && !main.isAdmin(p)) {
@@ -142,11 +177,15 @@ public class MoneyListener implements Listener {
         if (!b.getType().equals(Material.TNT))
             return;
 
+
         ApplicableRegionSet set = main.RM.getApplicableRegions(b.getLocation());
         if (set.allows(FLAG_ARENE)) {
             b.setType(Material.AIR);
             b.getWorld().spawn(b.getLocation().add(new Vector(0, 1, 0)), TNTPrimed.class);
         }
+        e.setCancelled(true);
+        e.getPlayer().getInventory().removeItem(new ItemStack(Material.TNT, 1));
+
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -155,7 +194,7 @@ public class MoneyListener implements Listener {
         Location loc = p.getLocation();
         PlayerCache statsv = Database.getCache(p.getName());
         long ratio = (long) (1 + statsv.getKills()) / (long) (1 + statsv.getDeaths());
-        if (ratio <= 0.2) {
+        if (ratio <= 0.4) {
             p.addPotionEffect(new PotionEffect(PotionEffectType.getById(22), 20 * 30, 1));
         }
         ApplicableRegionSet set = main.RM.getApplicableRegions(loc);
@@ -468,7 +507,7 @@ public class MoneyListener implements Listener {
                 i.sendMessage(Main.getTAG() + "Rejoins la chaine Youtube officielle Minefight : " + ChatColor.DARK_GREEN + " http://bit.ly/YT-MF");
                 e.setCancelled(true);
                 return;
-            case "!votekick":
+            case "!votekick":/*
                 if (i.hasPermission("upsilon.votekick")) {
                     if (mots.length == 2) {
                         Player c = Bukkit.getPlayerExact(mots[1]);
@@ -500,24 +539,11 @@ public class MoneyListener implements Listener {
                     } else {
                         i.sendMessage(Main.getTAG() + "Usage : !votekick <pseudo>");
                     }
-                }
+                }       */
                 break;
             case "!classement":
-            case "!rank":/*
-                switch (Database.getCache(i.getName()).get()) {
-                    case 1:
-                        i.sendMessage(Main.getTAG() + ChatColor.GOLD + "Tu es premier");
-                        break;
-                    case 2:
-                        i.sendMessage(Main.getTAG() + ChatColor.GREEN + "Tu es deuxième, un petit effort pour passer premier !");
-                        break;
-                    case 3:
-                        i.sendMessage(Main.getTAG() + ChatColor.GREEN + "Tu es troisième, un petit effort pour passer deuxième !");
-                        break;
-                    default:
-                        i.sendMessage(Main.getTAG() + ChatColor.DARK_GREEN + "Tu es classé #" + ChatColor.DARK_RED + Database.getCache(i.getName()).getRank());
-                        break;
-                } */ // @TODO: rework this
+            case "!rank":
+                // @TODO: rework this
                 e.setCancelled(true);
                 return;
             case "!help":
