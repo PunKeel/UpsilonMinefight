@@ -64,4 +64,13 @@ public class Boussole implements Listener {
         return nearest;
     }
 
+    public void setFocus(Player cs, String arg) {
+        if (arg == null) {
+            if (focus.containsKey(cs.getName()))
+                focus.remove(cs.getName());
+        } else {
+            focus.put(cs.getName(), arg);
+            updateCompass(cs);
+        }
+    }
 }

@@ -65,6 +65,7 @@ public class Main extends JavaPlugin {
     public Gson gson = new Gson();
     public HashMap<String, VoteKickHolder> votekick = new HashMap<>();
     public AntiCheat AC;
+    Boussole B = new Boussole(this);
     private Logger CLogger;
     private long mainThreadName;
     private ConfigManager CM = new ConfigManager(this);
@@ -175,7 +176,6 @@ public class Main extends JavaPlugin {
         CLogger.addHandler(handler);
         AC = new AntiCheat(this);
         getServer().getPluginManager().registerEvents(AC, this);
-        new Boussole(this);
     }
 
     public void setupDependencies() {
