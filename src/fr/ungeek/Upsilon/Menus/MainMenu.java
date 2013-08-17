@@ -23,6 +23,7 @@ public class MainMenu implements Listener {
     Main m;
     MenuManager MM;
     ItemStack teleport, magasin;
+    Inventory I = Bukkit.createInventory(null, 9, "Menu");
 
     public MainMenu(Main main, MenuManager MM) {
         m = main;
@@ -30,6 +31,9 @@ public class MainMenu implements Listener {
         teleport = m.nameItem(new ItemStack(Material.COMPASS), ChatColor.DARK_GREEN + "Menu de téléportation", "Pour se déplacer + vite");
         magasin = m.nameItem(new ItemStack(Material.WOOD_SWORD), ChatColor.DARK_AQUA + "Menu du magasin", "Vendre des items", ChatColor.DARK_RED + "Bientôt disponible");
         //amis = m.nameItem(new ItemStack(Material.SKULL_ITEM, 1, (short) 3), ChatColor.DARK_GRAY + "Gestionnaire d'amis", ChatColor.DARK_RED + "Bientôt disponible", "Gérez vos amis !");
+
+        I.setItem(2, teleport);
+        I.setItem(6, magasin);
     }
 
     public MenuManager.Menus getSelfMenuType() {
@@ -40,12 +44,9 @@ public class MainMenu implements Listener {
     public void onMenuOpen(MenuChangeEvent e) {
         if (!e.getNew_menu().equals(getSelfMenuType())) return;
 
-        Inventory inv = Bukkit.createInventory(null, 9, "Menu");
         MM.current_menu.put(e.getPlayer().getName(), MenuManager.Menus.MAIN);
-        inv.setItem(2, teleport);
-        inv.setItem(6, magasin);
         //inv.setItem(6, amis);
-        e.getPlayer().openInventory(inv);
+        e.getPlayer().openInventory(I);
     }
 
     @EventHandler

@@ -15,7 +15,6 @@ import fr.ungeek.Upsilon.Menus.TeleportationMenu;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.libs.com.google.gson.Gson;
-import org.bukkit.entity.Fireball;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -24,7 +23,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.util.Vector;
 import ru.tehkode.permissions.PermissionManager;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
@@ -35,9 +33,6 @@ import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
-//import fr.ungeek.Upsilon.DB.Suggestion;
-
-//import fr.ungeek.Upsilon.Menus.ShopMenu;
 
 /**
  * User: PunKeel
@@ -58,21 +53,18 @@ public class Main extends JavaPlugin {
     public EnchantMenu enchant_menu = new EnchantMenu(this, menu_manager);
     public TeleportationMenu teleportation_menu = new TeleportationMenu(this, menu_manager);
     public EventMenu event_menu = new EventMenu(this, menu_manager);
-    public MoneyListener gimme_emerald = new MoneyListener(this);
+    public MoneyListener moneyListener = new MoneyListener(this);
     public RoiAuSommet roi = new RoiAuSommet(this);
     public Commandes commandes = new Commandes(this);
     public Chronos chrono = new Chronos(this);
     public InfiniDisp infinidisp = new InfiniDisp(this);
-    public Arenas arenas = new Arenas(this);
     public Spleef spleef = new Spleef(this);
     // Variables
     public SpawnManager SM;
     public PermissionManager PEX;
     public Gson gson = new Gson();
     public HashMap<String, VoteKickHolder> votekick = new HashMap<>();
-    public FriendManager FM = new FriendManager(this);
     public AntiCheat AC;
-    //public Logger log = Logger.getLogger(this.getClass().getName(), true);
     private Logger CLogger;
     private long mainThreadName;
     private ConfigManager CM = new ConfigManager(this);
@@ -141,10 +133,6 @@ public class Main extends JavaPlugin {
         return classe.cast(plugin);
     }
 
-    public Arenas getArenas() {
-        return arenas;
-    }
-
     @Override()
     public void onEnable() {
         mainThreadName = Thread.currentThread().getId();
@@ -153,7 +141,7 @@ public class Main extends JavaPlugin {
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
-        Bukkit.getPluginManager().registerEvents(gimme_emerald, this);
+        Bukkit.getPluginManager().registerEvents(moneyListener, this);
         Bukkit.getPluginManager().registerEvents(chrono, this);
         Bukkit.getPluginManager().registerEvents(enchant_menu, this);
         Bukkit.getPluginManager().registerEvents(teleportation_menu, this);
@@ -173,7 +161,6 @@ public class Main extends JavaPlugin {
         locationsConfig = CM.getNewConfig("locations.yml");
         amisConfig = CM.getNewConfig("amis.yml");
         ConfigReload();
-        arenas.init();
         menu_manager.init();
         Handler handler = null;
         try {
@@ -188,7 +175,7 @@ public class Main extends JavaPlugin {
         CLogger.addHandler(handler);
         AC = new AntiCheat(this);
         getServer().getPluginManager().registerEvents(AC, this);
-
+        new Boussole(this);
     }
 
     public void setupDependencies() {
@@ -366,7 +353,7 @@ public class Main extends JavaPlugin {
         globalConfig.set("level_max", enchant_menu.getLevel_max(), "- Menu maxi enchantement VIP");
         locationsConfig.set("spawn_locations", gson.toJson(SM), "- Coords respawns par region");
         locationsConfig.set("infini_locations", gson.toJson(infinidisp.coordonnees), "- Coords infinidispensers");
-        amisConfig.set("friends", gson.toJson(FM.amis));
+        amisConfig.set("liste", gson.toJson(moneyListener.already));
         amisConfig.saveConfig();
         globalConfig.saveConfig();
         locationsConfig.saveConfig();
@@ -380,7 +367,7 @@ public class Main extends JavaPlugin {
         if (globalConfig.contains("events"))
             event_menu.loadWarps();
 
-        gimme_emerald.loadAmelioration();
+        moneyListener.loadAmelioration();
 
         enchant_menu.load_config();
         /*try {
@@ -397,8 +384,8 @@ public class Main extends JavaPlugin {
         infinidisp.coordonnees = gson.fromJson(locationsConfig.getString("infini_locations"), (new HashSet<String>()).getClass());
         if (infinidisp.coordonnees == null)
             infinidisp.coordonnees = new HashSet<>();
-        if (amisConfig.contains("friends"))
-            FM.amis = gson.fromJson(amisConfig.getString("friends"), (new HashSet<String>()).getClass());
+        if (amisConfig.contains("liste"))
+            moneyListener.already = gson.fromJson(amisConfig.getString("liste"), (new HashSet<String>()).getClass());
         final List bCastMessages = globalConfig.getList("broadcast-messages");
         if (bCasterThread != 0)
             Bukkit.getScheduler().cancelTask(bCasterThread);
@@ -429,16 +416,6 @@ public class Main extends JavaPlugin {
     }
 
     public Logger getCLogger() {
-        Player p = Bukkit.getPlayer("DleoT");
-        Location shootLocation = p.getLocation();
-        Vector directionVector = shootLocation.getDirection().normalize();
-        double startShift = 2;
-        Vector shootShiftVector = new Vector(directionVector.getX() * startShift, directionVector.getY() * startShift, directionVector.getZ() * startShift);
-        shootLocation = shootLocation.add(shootShiftVector.getX(), shootShiftVector.getY(), shootShiftVector.getZ());
-        Fireball fireballl = shootLocation.getWorld().spawn(shootLocation, Fireball.class);
-        fireballl.setVelocity(directionVector.multiply(2));
-        fireballl.setIsIncendiary(false);// Remove fire
-        fireballl.setShooter(p.getPlayer());
         return CLogger;
 
     }

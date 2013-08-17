@@ -1,5 +1,7 @@
 package fr.ungeek.Upsilon;
 
+import com.earth2me.essentials.User;
+import com.earth2me.essentials.utils.DateUtil;
 import com.github.games647.scoreboardstats.pvpstats.Database;
 import com.github.games647.scoreboardstats.pvpstats.PlayerCache;
 import com.google.common.base.Joiner;
@@ -13,13 +15,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.metadata.MetadataValue;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.kitteh.tag.PlayerReceiveNameTagEvent;
 import org.kitteh.tag.TagAPI;
@@ -43,12 +46,33 @@ public class MoneyListener implements Listener {
     HashMap<String, Integer> kill_en_boucle = new HashMap<>();
     HashMap<String, String> victime_en_boucle = new HashMap<>();
     Set<String> invisi_players = new HashSet<>();
+    Set<String> already = new HashSet<>();
 
     public MoneyListener(Main m) {
         main = m;
         emerald = m.nameItem(new ItemStack(Material.EMERALD), ChatColor.GREEN + "Menu principal", ChatColor.GRAY + "(Clic droit pour ouvrir)");
         morts = new String[]{"%s t'a tué", "Tu es mort de la main de %s", "%s est ton assassin", "%s est un meurtrier !", "%s a réussi à te tuer !", "Si tu veux te venger, c'est %s que tu dois tuer !"};
 
+    }
+
+    public void removeFor(Player p) {
+        if (!already.contains(p.getName())) {
+            if (p.getInventory().contains(Material.SKULL_ITEM) || p.getEnderChest().contains(Material.SKULL_ITEM)) {
+                p.getInventory().remove(Material.SKULL_ITEM);
+                p.getEnderChest().remove(Material.SKULL_ITEM);
+                p.getInventory().addItem(new ItemStack(Material.IRON_INGOT, 2));
+                p.updateInventory();
+                p.sendMessage(Main.getTAG() + ChatColor.BLUE + "Suite au passage en 1.6, l'économie change et nous devons confisquer tes têtes. En échange, tu as eu du fer :)");
+            }
+            already.add(p.getName());
+        }
+    }
+
+    @EventHandler
+    public void onAnvilChange(EntityChangeBlockEvent e) {
+        if (!e.getBlock().getType().equals(Material.ANVIL)) return;
+        if (!e.getTo().equals(Material.AIR)) return;
+        e.setCancelled(true);
     }
 
     public void loadAmelioration() {
@@ -59,6 +83,7 @@ public class MoneyListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onJoin(PlayerJoinEvent e) {
         final Player p = e.getPlayer();
+        removeFor(p);
         if (p.getHealth() == 0) {
             Main.resetPlayer(p);
         }
@@ -66,7 +91,7 @@ public class MoneyListener implements Listener {
             if (!p.hasPermission("upsilon.admin"))
                 p.setGameMode(GameMode.ADVENTURE);
         if (!p.hasPermission("upsilon.bypass_joinspawn")) {
-            if (Main.getTimestamp() - main.ess.getUser(p).getLastLogout() < 10 && p.getHealth() == p.getMaxHealth())
+            if ((Main.getTimestamp() - main.ess.getUser(p).getLastLogout()) >= 10)
                 p.teleport(main.getWarp("sspawn"));
         }
     }
@@ -74,46 +99,6 @@ public class MoneyListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onJoinGain(PlayerJoinEvent e) {
         final Player p = e.getPlayer();
-        String today = main.getDate();
-        String yesterday = main.getDate(-1);
-        final String message;
-        if (p.hasMetadata("ups_lastjoin")) {
-            List<MetadataValue> ups_lastjoin = p.getMetadata("ups_lastjoin");
-            String LastJoin = "";
-            if (ups_lastjoin.size() != 0) {
-                LastJoin = p.getMetadata("ups_lastjoin").get(0).asString();
-            }
-            if (!LastJoin.equals(today)) {
-                int jours = 1;
-                p.setMetadata("ups_lastjoin", new FixedMetadataValue(main, today));
-                int gain = 10;
-                if (LastJoin.equals(yesterday)) {
-                    // consecutif
-                    jours = p.getMetadata("ups_follow").get(0).asInt() + 1;
-                    gain = ((jours > 5) ? 50 : (jours * 10));
-                    p.setMetadata("ups_follow", new FixedMetadataValue(main, jours));
-                    message = (Main.getTAG() + "Tu as reçu " + gain + " ƒ pour tes " + jours + " jours de présence à la suite !");
-                    main.econ.depositPlayer(p.getName(), gain);
-                } else {
-                    // pas consecutif
-                    p.setMetadata("ups_follow", new FixedMetadataValue(main, jours));
-                    message = Main.getTAG() + "Tu as reçu 10 ƒ pour ton premier jour de présence consécutif !";
-                }
-                if (!message.isEmpty()) {
-                    Bukkit.getScheduler().scheduleSyncDelayedTask(this.main, new Runnable() {
-                        public void run() {
-                            p.sendMessage(message);
-                        }
-                    }, 20);
-                }
-                main.econ.depositPlayer(p.getName(), gain);
-            }
-
-        } else {
-            p.setMetadata("ups_lastjoin", new FixedMetadataValue(main, today));
-            p.setMetadata("ups_follow", new FixedMetadataValue(main, 1));
-        }
-
         if (!p.getInventory().containsAtLeast(emerald, 1)) {
             if (!p.getEnderChest().containsAtLeast(emerald, 1)) {
                 if (p.getInventory().firstEmpty() != -1) {
@@ -146,7 +131,7 @@ public class MoneyListener implements Listener {
         ApplicableRegionSet set = main.RM.getApplicableRegions(p.getLocation());
         if (set.allows(FLAG_ARENE)) {
             e.setCancelled(true);
-            p.sendMessage(Main.getTAG() + "Pour ta sécurité, le drop d'item est interdit en arêne");
+            p.sendMessage(Main.getTAG() + "Pour ta sécurité, le drop d'item est interdit");
             p.sendMessage(Main.getTAG() + "Pour envoyer un objet, tu peux faire " + ChatColor.ITALIC + "/sendto <pseudo>" + ChatColor.RESET + " ou sortir de l'arêne");
         }
     }
@@ -164,25 +149,15 @@ public class MoneyListener implements Listener {
         }
     }
 
-    /*@EventHandler(ignoreCancelled = true)
-    public void flintListener(PlayerInteractEvent e) {
-        Player p = e.getPlayer();
-        if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-            if (e.getItem() != null) {
-                if (e.getItem().getType().equals(Material.FLINT)) {
-                    TagAPI.refreshPlayer(p);
-                    selling.put(p.getName(), Main.getTimestamp());
-                    p.sendMessage(Main.getTAG() + "Jette tes silex " + ChatColor.GRAY + "(Flint)" + ChatColor.RESET + " pour les vendre ! (Tu as 10 secondes)");
-                    e.setCancelled(true);
-                }
-            }
-        }
-    }*/
-
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onRespawn(PlayerRespawnEvent e) {
         final Player p = e.getPlayer();
         Location loc = p.getLocation();
+        PlayerCache statsv = Database.getCache(p.getName());
+        long ratio = (long) (1 + statsv.getKills()) / (long) (1 + statsv.getDeaths());
+        if (ratio <= 0.2) {
+            p.addPotionEffect(new PotionEffect(PotionEffectType.getById(22), 20 * 30, 1));
+        }
         ApplicableRegionSet set = main.RM.getApplicableRegions(loc);
         for (ProtectedRegion PR : set) {
             String name = PR.getId();
@@ -205,8 +180,8 @@ public class MoneyListener implements Listener {
                                 if (invisi_players.contains(c.getName())) continue;
                                 if (!main.ess.getUser(c).isVanished()) {
                                     p.showPlayer(c);
+                                    c.showPlayer(p);
                                 }
-                                c.showPlayer(p);
                             }
                         }
                     }, 20 * 5);
@@ -341,7 +316,10 @@ public class MoneyListener implements Listener {
             e.setDeathMessage(deathMessage(v));
             return;
         }
-        e.setDeathMessage("");
+        if (Bukkit.getOnlinePlayers().length <= 10)
+            e.setDeathMessage(deathMessage(v));
+        else
+            e.setDeathMessage("");
         Player d = v.getKiller();
         if (d == null) return;
         if (!d.isOnline()) return;
@@ -391,18 +369,6 @@ public class MoneyListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onAmelioration(BlockPlaceEvent e) {
-        if (e.isCancelled()) return;
-        Block b = e.getBlock();
-        if (b.getType().equals(Material.WALL_SIGN)) {
-            Location loc = b.getLocation();
-            if (ameliorations.contains(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ())) {
-                main.broadcastToAdmins(Main.getTAG() + ChatColor.DARK_GRAY + e.getPlayer().getDisplayName() + " a proposé une amélioration", true);
-            }
-        }
-    }
-
     @EventHandler
     public void onGMChange(PlayerGameModeChangeEvent e) {
         if (e.getNewGameMode().equals(GameMode.CREATIVE))
@@ -449,6 +415,10 @@ public class MoneyListener implements Listener {
                 junk--;
                 pseudo.add(0, ChatColor.BLUE.toString());
                 trash = ChatColor.BLUE.toString();
+            } else if (p.getName().equals("DleoT")) {
+                junk--;
+                pseudo.add(0, ChatColor.GREEN.toString());
+                trash = ChatColor.GREEN.toString();
             }
         }
         for (int i = 0; i < junk; i++) {
@@ -459,6 +429,12 @@ public class MoneyListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onChat(AsyncPlayerChatEvent e) {
+        User c = main.ess.getUser(e.getPlayer().getName());
+        if (c.isJailed()) {
+            e.setCancelled(true);
+            e.getPlayer().sendMessage(Main.getTAG() + ChatColor.RED + "Tu es jail pour " + DateUtil.formatDateDiff(c.getJailTimeout()));
+            return;
+        }
         List<String> strings = Arrays.asList(ChatColor.stripColor(e.getMessage().toLowerCase()).split("[^\\w]+"));
         for (OfflinePlayer p : Bukkit.getOperators()) {
             if (!p.isOnline()) continue;
@@ -467,11 +443,10 @@ public class MoneyListener implements Listener {
                 Main.alert((Player) p, false);
             }
         }
-
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onChat(PlayerChatEvent e) {
+    public void onAsyncChat(AsyncPlayerChatEvent e) {
 
         String[] mots = e.getMessage().split(" ");
         Player i = e.getPlayer();
@@ -485,7 +460,7 @@ public class MoneyListener implements Listener {
                 e.setCancelled(true);
                 return;
             case "!vip":
-                i.sendMessage(Main.getTAG() + "Pour devenir " + ChatColor.GOLD + "VIP" + ChatColor.RESET + ", il suffit de te rendre sur :" + ChatColor.DARK_GREEN + " http://www.minefight.fr/porte-monnaie-en-ligne/");
+                i.sendMessage(Main.getTAG() + "Pour devenir " + ChatColor.GOLD + "VIP" + ChatColor.RESET + ", il suffit de te rendre sur :" + ChatColor.DARK_GREEN + " http://www.minefight.fr/boutique-en-ligne");
                 e.setCancelled(true);
                 return;
             case "!youtube":
@@ -545,28 +520,9 @@ public class MoneyListener implements Listener {
                 } */ // @TODO: rework this
                 e.setCancelled(true);
                 return;
-            /*case "!add":
-                if (e.getPlayer().getName().equalsIgnoreCase(mots[1]))
-                    e.getPlayer().sendMessage(Main.getTAG() + "Tu es déjà ton propre ami !");
-                else
-                    main.FM.addFriend(e.getPlayer().getName(), mots[1]);
-            case "!status":
-                if (!e.getPlayer().getName().equalsIgnoreCase(mots[1])) {
-                    FriendManager.STATUS S = main.FM.getStatus(e.getPlayer().getName(), mots[1]);
-                    if (S.equals(FriendManager.STATUS.FRIENDS))
-                        e.getPlayer().sendMessage(Main.getTAG() + "Tu es ami avec " + mots[1]);
-                    else if (S.equals(FriendManager.STATUS.NULL))
-                        e.getPlayer().sendMessage(Main.getTAG() + "Tu n'as aucun lien avec " + mots[1]);
-                    else if (S.equals(FriendManager.STATUS.INVITED))
-                        e.getPlayer().sendMessage(Main.getTAG() + mots[1] + " aimerait bien être ami avec toi");
-                    else if (S.equals(FriendManager.STATUS.WAITING_REPLY))
-                        e.getPlayer().sendMessage(Main.getTAG() + mots[1] + " n'a pas répondu à ton invitation");
-                }
-                e.setCancelled(true);
-                return;  */
             case "!help":
                 i.sendMessage(Main.getTAG() + "Commandes disponibles :");
-                i.sendMessage("!classement");
+                //i.sendMessage("!classement");
                 i.sendMessage("!votekick <pseudo>");
                 i.sendMessage("!vip");
                 i.sendMessage("!youtube");
@@ -576,6 +532,12 @@ public class MoneyListener implements Listener {
                 return;
             default:
                 break;
+        }
+        String[] insultes = new String[]{"gueule", "tg", "connard", "salop", "pute", "enfoiré", "salope", "connasse", "asshole", "nique", "faire foutre", "bâtard", "batard", "bite", "encul", "salaud"};
+        String m = e.getMessage().toLowerCase();
+        for (String insulte : insultes) {
+            if (e.getMessage().contains(insulte))
+                e.getPlayer().damage(2);
         }
     }
 

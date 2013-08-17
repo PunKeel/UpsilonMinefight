@@ -3,7 +3,7 @@ version:  0.2
 description: Les non premium peuvent se co avec mot de passe
 author: PunKeel
 main: fr.ungeek.NonPremiumLogin.Main
-depend: [ PermissionsEx, Essentials ]
+#depend: [ PermissionsEx, Essentials ]
 commands:
    login:
      description: UpsilonProject.

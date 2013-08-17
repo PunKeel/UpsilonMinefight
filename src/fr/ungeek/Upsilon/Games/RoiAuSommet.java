@@ -30,7 +30,7 @@ import java.util.Random;
  */
 public class RoiAuSommet implements Listener, CommandExecutor {
 
-    List<String> participants = new ArrayList<String>();
+    List<String> participants = new ArrayList<>();
     String TAG = ChatColor.DARK_AQUA + "[" + ChatColor.DARK_GREEN + "Roi Au Sommet" + ChatColor.DARK_AQUA + "] " + ChatColor.RESET;
     ETAPES etat = ETAPES.OFF;
     Integer joueurs_max = 20;

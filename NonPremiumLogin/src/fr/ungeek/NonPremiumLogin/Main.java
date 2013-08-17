@@ -1,8 +1,15 @@
 package fr.ungeek.NonPremiumLogin;
 
-import com.earth2me.essentials.Essentials;
-import com.earth2me.essentials.IEssentials;
-import com.earth2me.essentials.Kit;
+//import com.earth2me.essentials.IEssentials;
+//import com.earth2me.essentials.Kit;
+
+import com.comphenix.protocol.Packets;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.ConnectionSide;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.injector.GamePhase;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -17,12 +24,16 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import ru.tehkode.permissions.PermissionUser;
-import ru.tehkode.permissions.bukkit.PermissionsEx;
 
-import java.util.*;
+import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import static fr.ungeek.NonPremiumLogin.CommandController.CommandHandler;
+
+//import ru.tehkode.permissions.PermissionUser;
+//import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 /**
  * User: PunKeel
@@ -37,8 +48,9 @@ public class Main extends JavaPlugin implements Listener {
     boolean cracks_allowed = true;
     Set<String> newbies = new HashSet<>();
     Set<String> cracks = new HashSet<>();
+    HashMap<InetSocketAddress, String> joueurs = new HashMap<>();
     Premium P;
-    private IEssentials ess;
+    //private IEssentials ess;
 
     public static String getTAG() {
         return ChatColor.BLUE + "[" + ChatColor.WHITE + "Minefight" + ChatColor.BLUE + "] " + ChatColor.RESET;
@@ -65,12 +77,35 @@ public class Main extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(this, this);
         CommandController.registerCommands(this, this);
         AM.loadAccounts();
-        try {
+        /*try {
             ess = getPlugin("Essentials", Essentials.class);
         } catch (Exception e) {
             e.printStackTrace();
             cracks_allowed = false;
-        }
+        }   */
+        ProtocolManager manager = ProtocolLibrary.getProtocolManager();
+        manager.addPacketListener(
+                new PacketAdapter(this, ConnectionSide.SERVER_SIDE, GamePhase.LOGIN, Packets.Server.KEY_REQUEST) {
+                    @Override
+                    public void onPacketSending(PacketEvent event) {
+                        if (isPremium(joueurs.get(event.getPlayer().getAddress()))) {
+                            event.getPacket().getStrings().getValues().set(0, "-");
+                            System.out.println(event.getPacket().getIntegers().getValues());
+                            System.out.println(joueurs.get(event.getPlayer().getAddress()));
+                        }
+                    }
+                }
+        );
+        manager.addPacketListener(
+                new PacketAdapter(this, ConnectionSide.CLIENT_SIDE, GamePhase.LOGIN, Packets.Client.HANDSHAKE) {
+                    @Override
+                    public void onPacketReceiving(PacketEvent event) {
+                        joueurs.put(event.getPlayer().getAddress(), event.getPacket().getStrings().getValues().get(0));
+                    }
+                }
+        );
+
+
     }
 
     public void onDisable() {
@@ -153,21 +188,21 @@ public class Main extends JavaPlugin implements Listener {
         if (!p.hasPlayedBefore()) {
             newbies.add(p.getName());
         }
-        PermissionUser u = PermissionsEx.getUser(p);
+        //PermissionUser u = PermissionsEx.getUser(p);
         String ip = p.getAddress().getAddress().getHostAddress();
         if (isPremium(p.getName())) {
-            if (u.inGroup("cracked"))
-                u.removeGroup("cracked");
+            //if (u.inGroup("cracked"))
+            //    u.removeGroup("cracked");
             e.setJoinMessage(ChatColor.GREEN + "+ " + ChatColor.RESET + p.getDisplayName());
             if (!p.hasPlayedBefore()) {
                 e.setJoinMessage(ChatColor.LIGHT_PURPLE + p.getName() + " est nouveau/nouvelle sur Minefight !");
-                final Map<String, Object> kit = ess.getSettings().getKit("newbie");
-                final List<String> items = Kit.getItems(ess, ess.getUser(p), kit);
-                Kit.expandItems(ess, ess.getUser(p), items);
+                //final Map<String, Object> kit = ess.getSettings().getKit("newbie");
+                //final List<String> items = Kit.getItems(ess, ess.getUser(p), kit);
+                //Kit.expandItems(ess, ess.getUser(p), items);
             }
 
         } else {
-            u.addGroup("cracked");
+            //u.addGroup("cracked");
             if (online.containsKey(p.getName().toLowerCase())) {
                 if (online.get(p.getName().toLowerCase()).equals(ip)) {
                     unfreezePlayer(p);
