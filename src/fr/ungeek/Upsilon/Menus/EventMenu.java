@@ -37,33 +37,30 @@ public class EventMenu implements Listener {
     private ItemStack color;
     private ItemStack lune;
     private ItemStack vitesse;
-    private ItemStack skin;
     private ItemStack jump_potion;
-    private ItemStack pvp;
+    private ItemStack event_multiple;
     private ItemStack sautc;
 
     public EventMenu(Main main, MenuManager MM) {
         m = main;
         this.MM = MM;
         warps.put("dac", true); // echelle
-        warps.put("pvp", true); // ender stone
         warps.put("saut1", true);         // popo
         warps.put("saut2", true);          // popo
         warps.put("saut3", true);          // popo
         warps.put("color", true); // laine
         warps.put("vitesse", true); // popo swift
-        warps.put("skin", true); // tete de steve
         warps.put("lune", true); // ender stone
+        warps.put("event_multiple", true); // ender stone
 
         slots.add("dac");
-        slots.add("pvp");
         slots.add("saut1");
         slots.add("saut2");
         slots.add("saut3");
         slots.add("color");
         slots.add("vitesse");
-        slots.add("skin");
         slots.add("lune");
+        slots.add("eventep1");
         jump_potion = new ItemStack(Material.POTION);
         PotionMeta p_meta = (PotionMeta) jump_potion.getItemMeta();
         p_meta.setMainEffect(PotionEffectType.JUMP);
@@ -87,18 +84,16 @@ public class EventMenu implements Listener {
         sautc = m.nameItem(new ItemStack(Material.GOLD_INGOT), ChatColor.DARK_AQUA + "Event Saut 3", warps.get("saut3") ? lore_on : lore_off);
         color = m.nameItem(new ItemStack(Material.WOOL, 1, (short) 1), ChatColor.DARK_AQUA + "Event Color", warps.get("color") ? lore_on : lore_off);
         vitesse = m.nameItem(new ItemStack(Material.POTION, 1, (short) 8258), ChatColor.DARK_AQUA + "Event Vitesse", warps.get("vitesse") ? lore_on : lore_off);
-        skin = m.nameItem(new ItemStack(Material.getMaterial(397), 1, (short) 3), ChatColor.DARK_AQUA + "Event Skins", warps.get("skin") ? lore_on : lore_off);
         lune = m.nameItem(new ItemStack(Material.ENDER_STONE), ChatColor.DARK_AQUA + "La lune", warps.get("lune") ? lore_on : lore_off);
-        pvp = m.nameItem(new ItemStack(Material.GOLD_SWORD), ChatColor.GOLD + "PVP", warps.get("pvp") ? lore_on : lore_off);
+        event_multiple = m.nameItem(new ItemStack(Material.getMaterial(159)), ChatColor.GOLD + "Event Multiple", warps.get("event_multiple") ? lore_on : lore_off);
         inv.setItem(0, dac);
-        inv.setItem(1, pvp);
-        inv.setItem(2, sauta);
-        inv.setItem(3, sautb);
-        inv.setItem(4, sautc);
-        inv.setItem(5, color);
-        inv.setItem(6, vitesse);
-        inv.setItem(7, skin);
-        inv.setItem(8, lune);
+        inv.setItem(1, sauta);
+        inv.setItem(2, sautb);
+        inv.setItem(3, sautc);
+        inv.setItem(4, color);
+        inv.setItem(5, vitesse);
+        inv.setItem(6, lune);
+        inv.setItem(7, event_multiple);
 
     }
 
@@ -127,14 +122,13 @@ public class EventMenu implements Listener {
                         Player p = Bukkit.getPlayerExact(pseudo);
                         Inventory inv = p.getOpenInventory().getTopInventory();
                         inv.setItem(0, dac);
-                        inv.setItem(2, sauta);
-                        inv.setItem(3, sautb);
-                        inv.setItem(4, sautc);
-                        inv.setItem(5, color);
-                        inv.setItem(6, vitesse);
-                        inv.setItem(7, skin);
-                        inv.setItem(8, lune);
-                        inv.setItem(1, pvp);
+                        inv.setItem(1, sauta);
+                        inv.setItem(2, sautb);
+                        inv.setItem(3, sautc);
+                        inv.setItem(4, color);
+                        inv.setItem(5, vitesse);
+                        inv.setItem(6, lune);
+                        inv.setItem(7, event_multiple);
 
                     }
 
