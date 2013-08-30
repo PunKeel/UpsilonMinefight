@@ -5,9 +5,6 @@ package fr.PunKeel.Upsilon;
  * http://forums.bukkit.org/threads/tut-custom-yaml-configurations-with-comments.142592/
  */
 
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
