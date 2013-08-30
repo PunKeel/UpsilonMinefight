@@ -1,0 +1,41 @@
+name: UpsilonProject
+version:  6.6.8
+description: Un plugin cool, je te jure.
+author: PunKeel
+main: fr.PunKeel.Upsilon.Main
+depend: [Vault, WorldGuard, Essentials, PermissionsEx, WGCustomFlags, RemoteEntities, ScoreboardStats ]
+commands:
+   upsilon:
+     description: UpsilonProject.
+     aliases: [ups, menu]
+     permission: upsilon.admin
+   roi:
+     description: Roi au sommet
+   addspawn:
+     description: Add a respawn location !
+   tpspawn:
+     description: Tp to a respawn !
+   delspawn:
+     description: You do no more wan't me ?
+   getspawns:
+     description: la liste des spawns :D
+   chrono:
+     description: Lulz, achètes toi un dico !
+   swarp:
+     description: Téléporte sans afficher de message <3
+   infinidisp:
+     description: Laisser la magie opérer ! :)
+   sendto:
+     description: Envoie un item à un joueur
+   setblock:
+     description: Place un bloc <3
+   spleef:
+     description: Spleef :D
+   askgm:
+     description: Demande gamemode
+   cheat:
+     description: Soumet le joueur au test du forcefield.
+   checkpoint:
+     description: Checkpoints :D
+   focus:
+     description: Permet de suivre quelqu'un
