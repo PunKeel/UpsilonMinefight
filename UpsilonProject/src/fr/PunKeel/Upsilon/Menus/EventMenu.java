@@ -51,7 +51,7 @@ public class EventMenu implements Listener {
         warps.put("color", true); // laine
         warps.put("vitesse", true); // popo swift
         warps.put("lune", true); // ender stone
-        warps.put("event_multiple", true); // ender stone
+        warps.put("eventep1", true); // ender stone
 
         slots.add("dac");
         slots.add("saut1");
@@ -85,7 +85,7 @@ public class EventMenu implements Listener {
         color = m.nameItem(new ItemStack(Material.WOOL, 1, (short) 1), ChatColor.DARK_AQUA + "Event Color", warps.get("color") ? lore_on : lore_off);
         vitesse = m.nameItem(new ItemStack(Material.POTION, 1, (short) 8258), ChatColor.DARK_AQUA + "Event Vitesse", warps.get("vitesse") ? lore_on : lore_off);
         lune = m.nameItem(new ItemStack(Material.ENDER_STONE), ChatColor.DARK_AQUA + "La lune", warps.get("lune") ? lore_on : lore_off);
-        event_multiple = m.nameItem(new ItemStack(Material.getMaterial(159)), ChatColor.GOLD + "Event Multiple", warps.get("event_multiple") ? lore_on : lore_off);
+        event_multiple = m.nameItem(new ItemStack(Material.getMaterial(159)), ChatColor.GOLD + "Event Multiple", warps.get("eventep1") ? lore_on : lore_off);
         inv.setItem(0, dac);
         inv.setItem(1, sauta);
         inv.setItem(2, sautb);
