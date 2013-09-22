@@ -58,7 +58,7 @@ public class Main extends JavaPlugin implements Listener {
             }
             Suggestion s = new Suggestion(bmeta.getAuthor(), Main.getTimestamp(), bmeta.getTitle(), bmeta.getPages());
             getDatabase().save(s);
-            e.setItem(null);
+            e.setItem(new ItemStack(Material.DIRT));
             broadcastToAdmins(getTAG() + "Nouvelle suggestion de " + ChatColor.DARK_GREEN + bmeta.getAuthor() + ChatColor.RESET + " : " + ChatColor.GOLD + bmeta.getTitle());
         }
     }
