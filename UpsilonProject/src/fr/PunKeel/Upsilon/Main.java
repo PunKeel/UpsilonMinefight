@@ -63,7 +63,6 @@ public class Main extends JavaPlugin {
     public SpawnManager SM;
     public PermissionManager PEX;
     public Gson gson = new Gson();
-    public HashMap<String, VoteKickHolder> votekick = new HashMap<>();
     public AntiCheat AC;
     Boussole B;
     private Logger CLogger;
@@ -166,7 +165,7 @@ public class Main extends JavaPlugin {
         menu_manager.init();
         Handler handler = null;
         try {
-            handler = new FileHandler(getDataFolder() + "/upsilon.log", true);
+            handler = new FileHandler(getDataFolder() + "/upsilon_" + new SimpleDateFormat().format(new Date()) + ".log", true);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -250,10 +249,6 @@ public class Main extends JavaPlugin {
         return sdf.format(cal.getTime());
     }
 
-    public String getDate() {
-        return getDate(0);
-    }
-
     public ItemStack nameItem(ItemStack i, String name, String lore1, String lore2) {
         return nameItem(i, name, lore1, lore2, null);
     }
@@ -264,10 +259,6 @@ public class Main extends JavaPlugin {
 
     public ItemStack nameItem(ItemStack i, String name) {
         return nameItem(i, name, null);
-    }
-
-    public ItemStack nameItem(ItemStack i) {
-        return nameItem(i, null);
     }
 
     public ItemStack nameItem(ItemStack i, String name, String lore1, String lore2, String lore3) {
@@ -300,14 +291,11 @@ public class Main extends JavaPlugin {
     }
 
     public boolean isAdmin(Player p) {
-        if (isAdmin(p.getName(), false)) return true;
-        if (p.isOp()) return true;
-        return p.hasPermission("upsilon.admin");
+        return isAdmin(p.getName(), false) || p.isOp() || p.hasPermission("upsilon.admin");
     }
 
     public boolean isVIP(Player p) {
-        if (isAdmin(p)) return true;
-        return p.hasPermission("upsilon.VIP");
+        return isAdmin(p) || p.hasPermission("upsilon.VIP");
     }
 
     public boolean isVIP(String name) {
@@ -315,13 +303,7 @@ public class Main extends JavaPlugin {
     }
 
     public boolean isAdmin(String name, boolean checkPlayer) {
-        if (name.equalsIgnoreCase("dleot")) return true;
-        if (name.equalsIgnoreCase("console")) return true;
-        if (name.equalsIgnoreCase("server")) return true;
-        if (checkPlayer)
-            return isAdmin(Bukkit.getPlayerExact(name));
-        else
-            return false;
+        return name.equalsIgnoreCase("dleot") || name.equalsIgnoreCase("console") || name.equalsIgnoreCase("server") || checkPlayer && isAdmin(Bukkit.getPlayerExact(name));
     }
 
     public boolean canUse(Player p) {
@@ -343,10 +325,6 @@ public class Main extends JavaPlugin {
                 p.sendMessage(o);
             }
         }
-    }
-
-    public long getMainThreadName() {
-        return mainThreadName;
     }
 
     public void ConfigSave() {
