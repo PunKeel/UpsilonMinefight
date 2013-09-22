@@ -2,9 +2,7 @@ package fr.PunKeel.Upsilon;
 
 import org.bukkit.Location;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 
 public class SpawnManager {
     public HashMap<String, ArrayList<SLocation>> respawns = new HashMap<String, ArrayList<SLocation>>();
@@ -31,11 +29,17 @@ public class SpawnManager {
         return respawns.containsKey(region);
     }
 
-    public SLocation getRandom(String region) {
+    public SLocation getRandom(String region, final Location loc) {
         if (!exists(region)) return null;
         ArrayList<SLocation> sLocations = respawns.get(region);
+        Collections.sort(sLocations, new Comparator<SLocation>() {
+            @Override
+            public int compare(SLocation o1, SLocation o2) {
+                return (int) Math.round(o1.toLocation().distanceSquared(loc) - o2.toLocation().distanceSquared(loc));
+            }
+        }); // Sort by distance to `loc`
         SLocation[] spawns = sLocations.toArray(new SLocation[sLocations.size()]);
-        int id = new Random().nextInt(spawns.length);
+        int id = new Random().nextInt(Math.min(spawns.length, 3)); // Select one of 3 nearest locations
         return spawns[id];
     }
 
@@ -45,5 +49,5 @@ public class SpawnManager {
         ArrayList<SLocation> var = respawns.get(arg);
         respawns.get(arg).remove(var.toArray(new SLocation[var.size()])[id]);
     }
-}
 
+}

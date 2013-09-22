@@ -139,12 +139,9 @@ public class MoneyListener implements Listener {
         interdits.add(Material.IRON_PICKAXE);
         interdits.add(Material.IRON_SPADE);
         interdits.add(Material.IRON_SWORD);
-
         if (interdits.contains(e.getRecipe().getResult().getType())) {
-            if (!e.getWhoClicked().isOp())
-                e.setCancelled(true);
+            if (!e.getWhoClicked().isOp()) e.setCancelled(true);
             ((Player) e.getWhoClicked()).sendMessage(Main.getTAG() + ChatColor.RED + "Interdit :(");
-
         }
 
     }
@@ -225,12 +222,12 @@ public class MoneyListener implements Listener {
                         }
                     }, 20 * 5);
                 }
-                e.setRespawnLocation(main.SM.getRandom(name).toLocation());
+                e.setRespawnLocation(main.SM.getRandom(name, loc).toLocation());
                 return;
             }
         }
 
-        e.setRespawnLocation(main.getWarp("sspawn"));
+        e.setRespawnLocation(main.getWarp("spawn"));
     }
 
     public String deathMessage(Player p) {
@@ -384,11 +381,10 @@ public class MoneyListener implements Listener {
             PlayerCache statsv = Database.getCache(v.getName());
             PlayerCache statsa = Database.getCache(d.getName());
             if (statsa.getKills() > statsv.getKills() && statsa.getDeaths() > statsv.getDeaths()) {
-                // Attaquant a un meilleur ratio que la victime
-                // Donc on pénalise l'attaquant :(
+                // Victime moins forte que attaquant
                 gain += (statsa.getKills() - statsv.getKills()) / (statsa.getDeaths() + statsv.getDeaths()) * 25;
             } else {
-                // La victime était un beau gosse, alors on le viole !
+                // Victime plus forte qu'attaquant
                 gain += (int) (Math.sqrt(statsv.getKills() ^ 2 / (statsv.getDeaths() + 1)) / 2) + 1;
                 gain += statsv.getLastStreak();
             }
