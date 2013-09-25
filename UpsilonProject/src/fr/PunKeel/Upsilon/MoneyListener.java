@@ -40,14 +40,14 @@ import java.util.*;
  */
 public class MoneyListener implements Listener {
     private static final StateFlag FLAG_ARENE = new StateFlag("arene", false);
+    private static final StateFlag FLAG_DIE_ON_LEAVE = new StateFlag("die_on_leave", false);
+    Set<String> already = new HashSet<>();
     private Main main;
     private ItemStack emerald;
     private String[] morts;
-    private ProtectedRegion ameliorations;
     private HashMap<String, Integer> kill_en_boucle = new HashMap<>();
     private HashMap<String, String> victime_en_boucle = new HashMap<>();
     private Set<String> invisi_players = new HashSet<>();
-    Set<String> already = new HashSet<>();
 
     public MoneyListener(Main m) {
         main = m;
@@ -77,8 +77,8 @@ public class MoneyListener implements Listener {
     }
 
     public void loadAmelioration() {
-        ameliorations = main.RM.getRegion("amelioration");
         main.getWGCF().addCustomFlag(FLAG_ARENE);
+        main.getWGCF().addCustomFlag(FLAG_DIE_ON_LEAVE);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -104,6 +104,7 @@ public class MoneyListener implements Listener {
             if (!p.getEnderChest().containsAtLeast(emerald, 1)) {
                 if (p.getInventory().firstEmpty() != -1) {
                     p.getInventory().addItem(emerald);
+                    p.updateInventory();
                 } else {
                     if (p.getEnderChest().firstEmpty() != -1) {
                         p.getInventory().addItem(emerald);
@@ -576,6 +577,14 @@ public class MoneyListener implements Listener {
     @EventHandler
     public void onQuitMessage(PlayerQuitEvent e) {
         e.setQuitMessage(ChatColor.RED + "- " + ChatColor.GRAY + e.getPlayer().getDisplayName());
+    }
+
+    @EventHandler
+    public void onMoveDieOnLeave(PlayerMoveEvent e) {
+        ApplicableRegionSet AR_old = main.RM.getApplicableRegions(e.getFrom());
+        ApplicableRegionSet AR_new = main.RM.getApplicableRegions(e.getTo());
+        if (AR_old.allows(FLAG_DIE_ON_LEAVE) && !AR_new.allows(FLAG_DIE_ON_LEAVE))
+            e.getPlayer().damage(e.getPlayer().getMaxHealth() * 2);
     }
 }
 
