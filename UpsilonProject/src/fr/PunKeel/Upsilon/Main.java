@@ -240,13 +240,6 @@ public class Main extends JavaPlugin {
         return econ != null;
     }
 
-    public String getDate(int diff) {
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, diff + 123);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        return sdf.format(cal.getTime());
-    }
-
     public ItemStack nameItem(ItemStack i, String name, String lore1, String lore2) {
         return nameItem(i, name, lore1, lore2, null);
     }

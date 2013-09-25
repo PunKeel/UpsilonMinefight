@@ -25,7 +25,7 @@ import java.util.HashSet;
  */
 public class InfiniDisp implements Listener {
     private Main main;
-    HashSet<String> coordonnees = new HashSet<String>();
+    HashSet<String> coordonnees = new HashSet<>();
 
     public InfiniDisp(Main main) {
         this.main = main;
