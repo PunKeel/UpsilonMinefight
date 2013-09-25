@@ -9,10 +9,10 @@ import com.sk89q.worldedit.bags.BlockBag;
  * Time: 10:18 PM
  * May be open-source & be sold (by PunKeel, of course !)
  */
-public class fakeLocalPlayer extends LocalPlayer {
-    LocalWorld W;
+class fakeLocalPlayer extends LocalPlayer {
+    private LocalWorld W;
 
-    protected fakeLocalPlayer(ServerInterface server, LocalWorld world) {
+    fakeLocalPlayer(ServerInterface server, LocalWorld world) {
         super(server);
         W = world;
     }

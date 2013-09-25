@@ -28,11 +28,11 @@ import java.util.*;
  * May be open-source & be sold (by PunKeel, of course !)
  */
 public class AntiCheat implements Listener {
-    Main main;
-    EntityManager manager;
-    List<UUID> honeypots = new ArrayList<>();
-    HashMap<String, Integer> spots = new HashMap<>();
-    HashMap<String, Integer> tests = new HashMap<>();
+    private Main main;
+    private EntityManager manager;
+    private List<UUID> honeypots = new ArrayList<>();
+    private HashMap<String, Integer> spots = new HashMap<>();
+    private HashMap<String, Integer> tests = new HashMap<>();
 
     public AntiCheat(final Main m) {
         main = m;

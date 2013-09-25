@@ -7,7 +7,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "suggestion")
-public class Suggestion {
+class Suggestion {
 
     @Id
     @Column(unique = true)

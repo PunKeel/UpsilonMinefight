@@ -10,7 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.*;
 import java.nio.charset.Charset;
 
-public class ConfigManager {
+class ConfigManager {
 
     private JavaPlugin plugin;
 
@@ -26,7 +26,7 @@ public class ConfigManager {
     * @param filePath - Path to file
     * @return - New SimpleConfig
     */
-    public SimpleConfig getNewConfig(String filePath, String[] header) {
+    SimpleConfig getNewConfig(String filePath, String[] header) {
 
         File file = this.getConfigFile(filePath);
 
@@ -39,8 +39,7 @@ public class ConfigManager {
 
         }
 
-        SimpleConfig config = new SimpleConfig(this.getConfigContent(filePath), file, this.getCommentsNum(file), plugin);
-        return config;
+        return new SimpleConfig(this.getConfigContent(filePath), file, this.getCommentsNum(file), plugin);
 
     }
 
@@ -87,7 +86,7 @@ public class ConfigManager {
     * @param file - Path to file
     * @param resource - Resource to copy
     */
-    public void prepareFile(String filePath, String resource) {
+    void prepareFile(String filePath, String resource) {
 
         File file = this.getConfigFile(filePath);
 
@@ -113,7 +112,7 @@ public class ConfigManager {
     * Create new file for config without resource
     * @param file - File to create
     */
-    public void prepareFile(String filePath) {
+    void prepareFile(String filePath) {
         this.prepareFile(filePath, null);
     }
 
@@ -264,7 +263,7 @@ public class ConfigManager {
     * @param filePath - Path to file
     * @return - readied file
     */
-    public InputStream getConfigContent(String filePath) {
+    InputStream getConfigContent(String filePath) {
         return this.getConfigContent(this.getConfigFile(filePath));
     }
 

@@ -23,15 +23,25 @@ import java.util.Random;
  * May be open-source & be sold (by PunKeel, of course !)
  */
 public class Spleef implements Listener {
-    static String TAG = ChatColor.RESET + "[" + ChatColor.BLUE + "Spleef" + ChatColor.RESET + "] ", recordman = "";
-    HashMap<String, Location> participants = new HashMap<>();
-    List<Material> mats = new ArrayList<>();
-    Boolean playing = false, single_player = false;
-    Random random = new Random();
-    long debut_chrono = 0, record = (long) 0;
-    ArrayList<Location> blocs;
-    int radius = 12, centreX = -215, centreZ = 311, centreY = 61, loop = 0, countdown = 15, task_id = 0, max_joueurs = -1;
-    Main main;
+    private static String TAG = ChatColor.RESET + "[" + ChatColor.BLUE + "Spleef" + ChatColor.RESET + "] ";
+    private static String recordman = "";
+    private HashMap<String, Location> participants = new HashMap<>();
+    private List<Material> mats = new ArrayList<>();
+    private Boolean playing = false;
+    private Boolean single_player = false;
+    private Random random = new Random();
+    private long debut_chrono = 0;
+    private long record = (long) 0;
+    private ArrayList<Location> blocs;
+    private int radius = 12;
+    private int centreX = -215;
+    private int centreZ = 311;
+    private int centreY = 61;
+    private int loop = 0;
+    private int countdown = 15;
+    private int task_id = 0;
+    private int max_joueurs = -1;
+    private Main main;
 
     public Spleef(Main main) {
         this.main = main;
@@ -64,11 +74,11 @@ public class Spleef implements Listener {
         playing = true;
     }
 
-    public boolean isInCircle(int x, int z) {
+    boolean isInCircle(int x, int z) {
         return (x - centreX) * (x - centreX) + (z - centreZ) * (z - centreZ) <= (radius * radius);
     }
 
-    public ArrayList<Location> getBlocks() {
+    ArrayList<Location> getBlocks() {
         ArrayList<Location> t = new ArrayList<>();
         for (int X = -radius; X <= radius; X++) {
             for (int Z = -radius; Z <= radius; Z++) {
@@ -117,7 +127,7 @@ public class Spleef implements Listener {
             PlayerQuit(event.getPlayer().getName());
     }
 
-    public void start_task() {
+    void start_task() {
         if (task_id != 0) stop_task();
         blocs = getBlocks();
         task_id = Bukkit.getServer().getScheduler().scheduleAsyncRepeatingTask(main, new Runnable() {
@@ -161,12 +171,12 @@ public class Spleef implements Listener {
         }, 20L, 10L);
     }
 
-    public void stop_task() {
+    void stop_task() {
         Bukkit.getScheduler().cancelTask(task_id);
         task_id = 0;
     }
 
-    public void PlayerQuit(String name) {
+    void PlayerQuit(String name) {
         Player p = Bukkit.getPlayer(name);
 
         p.teleport(participants.get(p.getName()));

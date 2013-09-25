@@ -26,11 +26,11 @@ import java.util.List;
  * May be open-source & be sold (by PunKeel, of course !)
  */
 public class EventMenu implements Listener {
-    Main m;
-    MenuManager MM;
-    HashMap<String, Boolean> warps = new HashMap<String, Boolean>();
-    List<String> slots = new ArrayList<String>();
-    Inventory inv;
+    private Main m;
+    private MenuManager MM;
+    private HashMap<String, Boolean> warps = new HashMap<String, Boolean>();
+    private List<String> slots = new ArrayList<String>();
+    private Inventory inv;
     private ItemStack dac;
     private ItemStack sauta;
     private ItemStack sautb;
@@ -74,7 +74,7 @@ public class EventMenu implements Listener {
         inv = Bukkit.createInventory(null, 9, "Menu > Téléportation > Events");
     }
 
-    public void generateItems() {
+    void generateItems() {
         String lore_off = ChatColor.DARK_RED + "Event indisponible";
         String lore_on = ChatColor.GREEN + "Cliquez pour rejoindre";
 
@@ -138,7 +138,7 @@ public class EventMenu implements Listener {
         }
     }
 
-    public MenuManager.Menus getSelfMenuType() {
+    MenuManager.Menus getSelfMenuType() {
         return MenuManager.Menus.EVENTS;
     }
 

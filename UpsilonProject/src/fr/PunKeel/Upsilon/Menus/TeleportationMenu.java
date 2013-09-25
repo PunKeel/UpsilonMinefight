@@ -21,10 +21,16 @@ import org.bukkit.inventory.ItemStack;
  * May be open-source & be sold (by PunKeel, of course !)
  */
 public class TeleportationMenu implements Listener {
-    Main m;
-    MenuManager MM;
-    ItemStack spawn, events, enchant_vip, enchant_notvip, enderchest_notvip, enderchest_vip;
-    Inventory vip = Bukkit.createInventory(null, 9, "Menu > Téléportation"), notvip = Bukkit.createInventory(null, 9, "Menu > Téléportation");
+    private Main m;
+    private MenuManager MM;
+    private ItemStack spawn;
+    private ItemStack events;
+    private ItemStack enchant_vip;
+    private ItemStack enchant_notvip;
+    private ItemStack enderchest_notvip;
+    private ItemStack enderchest_vip;
+    private Inventory vip = Bukkit.createInventory(null, 9, "Menu > Téléportation");
+    private Inventory notvip = Bukkit.createInventory(null, 9, "Menu > Téléportation");
 
     public TeleportationMenu(Main main, MenuManager MM) {
         m = main;
@@ -50,7 +56,7 @@ public class TeleportationMenu implements Listener {
 
     }
 
-    public MenuManager.Menus getSelfMenuType() {
+    MenuManager.Menus getSelfMenuType() {
         return MenuManager.Menus.TELEPORTATION;
     }
 

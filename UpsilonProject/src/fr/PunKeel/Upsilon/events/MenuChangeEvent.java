@@ -7,7 +7,7 @@ import org.bukkit.event.HandlerList;
 
 public class MenuChangeEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
-    boolean isAsync;
+    private boolean isAsync;
     private MenuManager.Menus new_menu;
     private HumanEntity p;
 

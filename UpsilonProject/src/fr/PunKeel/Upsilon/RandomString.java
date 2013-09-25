@@ -2,7 +2,7 @@ package fr.PunKeel.Upsilon;
 
 import java.util.Random;
 
-public class RandomString {
+class RandomString {
 
     private static final char[] symbols = new char[36];
 

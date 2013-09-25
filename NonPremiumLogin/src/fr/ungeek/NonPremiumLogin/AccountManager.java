@@ -14,10 +14,10 @@ import java.util.HashMap;
  * Time: 5:10 PM
  * May be open-source & be sold (by PunKeel, of course !)
  */
-public class AccountManager {
-    public Gson gson = new Gson();
-    public HashMap<String, String> comptes = new HashMap<>();
-    Main main;
+class AccountManager {
+    private Gson gson = new Gson();
+    private HashMap<String, String> comptes = new HashMap<>();
+    private Main main;
 
     public AccountManager(Main main) {
         this.main = main;

@@ -25,18 +25,44 @@ import java.util.regex.Pattern;
  * May be open-source & be sold (by PunKeel, of course !)
  */
 public class Main extends JavaPlugin implements Listener {
-    HashMap<String, Integer> warnings = new HashMap<>();
-    Set<String> badwords = new HashSet<>(), badlocutions = new HashSet<>(), traductions_in_jars = new HashSet<>();
-    File BW_file, W_file, BL_file, lng_file;
-    boolean ignore_nicknames, block_ip, block_url, block_badwords, block_capslock, block_repeated_letters, block_alternative_case, block_double_post, block_too_fast_talking, save_warnings_on_reload, block_badlocutions, locutions_block_aggressive;
-    Integer warnings_before_ban = 3, min_repeated_letters = 3, too_fast_talking_delay = 400, block_repeated_times = 3, max_word_length = 0;
-    Pattern ip, url, capslock, repeated_letters, alternative_case_a, alternative_case_A;
-    String banCommand = "ban %nickname%";
-    List<String> domainWhitelist = new ArrayList<>(), countWarningsFor = new ArrayList<>();
-    HashMap<String, Long> last_message_time = new HashMap<>();
-    HashMap<String, String> last_message = new HashMap<>();
-    HashMap<String, String> traductions = new HashMap<>();
-    Set<String> usernames = new HashSet<>();
+    private HashMap<String, Integer> warnings = new HashMap<>();
+    private Set<String> badwords = new HashSet<>();
+    private Set<String> badlocutions = new HashSet<>();
+    private Set<String> traductions_in_jars = new HashSet<>();
+    private File BW_file;
+    private File W_file;
+    private File BL_file;
+    private File lng_file;
+    private boolean ignore_nicknames;
+    private boolean block_ip;
+    private boolean block_url;
+    private boolean block_badwords;
+    private boolean block_capslock;
+    private boolean block_repeated_letters;
+    private boolean block_alternative_case;
+    private boolean block_double_post;
+    private boolean block_too_fast_talking;
+    private boolean save_warnings_on_reload;
+    private boolean block_badlocutions;
+    private boolean locutions_block_aggressive;
+    private Integer warnings_before_ban = 3;
+    private Integer min_repeated_letters = 3;
+    private Integer too_fast_talking_delay = 400;
+    private Integer block_repeated_times = 3;
+    private Integer max_word_length = 0;
+    private Pattern ip;
+    private Pattern url;
+    private Pattern capslock;
+    private Pattern repeated_letters;
+    private Pattern alternative_case_a;
+    private Pattern alternative_case_A;
+    private String banCommand = "ban %nickname%";
+    private List<String> domainWhitelist = new ArrayList<>();
+    private List<String> countWarningsFor = new ArrayList<>();
+    private HashMap<String, Long> last_message_time = new HashMap<>();
+    private HashMap<String, String> last_message = new HashMap<>();
+    private HashMap<String, String> traductions = new HashMap<>();
+    private Set<String> usernames = new HashSet<>();
 
     @Override
     public void onEnable() {
@@ -85,7 +111,7 @@ public class Main extends JavaPlugin implements Listener {
         }
     }
 
-    public void addWarning(Player p, String raison) {
+    void addWarning(Player p, String raison) {
         if (!countWarningsFor.contains(raison)) return;
         if (warnings.containsKey(p.getName())) {
             if (warnings_before_ban - warnings.get(p.getName()) <= 1) {
@@ -109,7 +135,7 @@ public class Main extends JavaPlugin implements Listener {
         }
     }
 
-    public void loadbadWords() {
+    void loadbadWords() {
         try {
             if (!BW_file.exists()) {
                 BW_file.createNewFile();
@@ -128,7 +154,7 @@ public class Main extends JavaPlugin implements Listener {
         }
     }
 
-    public void loadbadLocutions() {
+    void loadbadLocutions() {
         try {
             if (!BL_file.exists()) {
                 BL_file.createNewFile();
@@ -159,7 +185,7 @@ public class Main extends JavaPlugin implements Listener {
         return false;
     }
 
-    public void loadConfig() {
+    void loadConfig() {
         reloadConfig();
 
         block_ip = getConfig().getBoolean("block_ip", true);
@@ -197,7 +223,7 @@ public class Main extends JavaPlugin implements Listener {
 
     }
 
-    public void loadTranslation() {
+    void loadTranslation() {
         try {
             if (!lng_file.exists()) {
                 lng_file.createNewFile();
@@ -257,7 +283,7 @@ public class Main extends JavaPlugin implements Listener {
 
     }
 
-    public void loadWarnings() {
+    void loadWarnings() {
 
         if (!save_warnings_on_reload) return;
         try {

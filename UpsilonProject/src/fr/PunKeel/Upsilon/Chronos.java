@@ -16,10 +16,11 @@ import java.util.HashMap;
  * May be open-source & be sold (by PunKeel, of course !)
  */
 public class Chronos implements Listener {
-    HashMap<String, HashMap<String, Integer>> chronoHashMap = new HashMap<>();
-    HashMap<String, HashMap<String, Location>> checkpointHashMap = new HashMap<>();
-    Main main;
-    String usage_chrono, usage_checkpoint;
+    private HashMap<String, HashMap<String, Integer>> chronoHashMap = new HashMap<>();
+    private HashMap<String, HashMap<String, Location>> checkpointHashMap = new HashMap<>();
+    private Main main;
+    private String usage_chrono;
+    private String usage_checkpoint;
 
     public Chronos(Main main) {
         this.main = main;

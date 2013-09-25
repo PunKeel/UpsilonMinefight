@@ -16,9 +16,9 @@ import java.util.Scanner;
  * + * May be open-source & be sold (by PunKeel, of course !)
  * +
  */
-public class Premium {
-    HashMap<String, Boolean> premiums = new HashMap<>();
-    Main main;
+class Premium {
+    private HashMap<String, Boolean> premiums = new HashMap<>();
+    private Main main;
 
     public Premium(Main m) {
         main = m;

@@ -17,9 +17,9 @@ import java.util.Random;
  * May be open-source & be sold (by PunKeel, of course !)
  */
 public class EnchantMenu implements Listener {
-    Main m;
-    MenuManager MM;
-    int level_max = 15;
+    private Main m;
+    private MenuManager MM;
+    private int level_max = 15;
 
     public EnchantMenu(Main main, MenuManager MM) {
         m = main;
@@ -39,7 +39,7 @@ public class EnchantMenu implements Listener {
         return level_max;
     }
 
-    public MenuManager.Menus getSelfMenuType() {
+    MenuManager.Menus getSelfMenuType() {
         return MenuManager.Menus.ENCHANTING;
     }
 

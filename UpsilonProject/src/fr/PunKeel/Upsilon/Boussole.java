@@ -14,8 +14,8 @@ import java.util.HashMap;
  * Time: 7:01 PM
  * May be open-source & be sold (by PunKeel, of course !)
  */
-public class Boussole implements Listener {
-    HashMap<String, String> focus = new HashMap<>();
+class Boussole implements Listener {
+    private HashMap<String, String> focus = new HashMap<>();
 
     public Boussole(Main main) {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(main, new Runnable() {
@@ -31,7 +31,7 @@ public class Boussole implements Listener {
         }, 20L, 20 * 20L);
     }
 
-    public void updateCompass(Player p) {
+    void updateCompass(Player p) {
         Player cible;
         if (focus.containsKey(p.getName())) {
             cible = Bukkit.getPlayer(focus.get(p.getName()));
@@ -49,7 +49,7 @@ public class Boussole implements Listener {
 
     }
 
-    public Player findNearestPlayer(Player p) {
+    Player findNearestPlayer(Player p) {
         Location ploc = p.getLocation();
         Player nearest = null;
         double distance = Integer.MAX_VALUE, newd;

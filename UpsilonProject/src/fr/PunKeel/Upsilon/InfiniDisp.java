@@ -24,7 +24,7 @@ import java.util.HashSet;
  * May be open-source & be sold (by PunKeel, of course !)
  */
 public class InfiniDisp implements Listener {
-    Main main;
+    private Main main;
     HashSet<String> coordonnees = new HashSet<String>();
 
     public InfiniDisp(Main main) {
@@ -92,7 +92,7 @@ public class InfiniDisp implements Listener {
         coordonnees.remove(getLocation(b.getLocation()));
     }
 
-    public String getLocation(Location l) {
+    String getLocation(Location l) {
         return l.getBlockX() + "_" + l.getBlockY() + "_" + l.getBlockZ();
     }
 

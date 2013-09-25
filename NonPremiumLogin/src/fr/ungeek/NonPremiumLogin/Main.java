@@ -42,17 +42,17 @@ import static fr.ungeek.NonPremiumLogin.CommandController.CommandHandler;
  * May be open-source & be sold (by PunKeel, of course !)
  */
 public class Main extends JavaPlugin implements Listener {
-    AccountManager AM = new AccountManager(this);
-    HashMap<String, Integer> offline = new HashMap<>();
-    HashMap<String, String> online = new HashMap<>();
-    boolean cracks_allowed = true;
-    Set<String> newbies = new HashSet<>();
+    private AccountManager AM = new AccountManager(this);
+    private HashMap<String, Integer> offline = new HashMap<>();
+    private HashMap<String, String> online = new HashMap<>();
+    private boolean cracks_allowed = true;
+    private Set<String> newbies = new HashSet<>();
     Set<String> cracks = new HashSet<>();
-    HashMap<InetSocketAddress, String> joueurs = new HashMap<>();
-    Premium P;
+    private HashMap<InetSocketAddress, String> joueurs = new HashMap<>();
+    private Premium P;
     //private IEssentials ess;
 
-    public static String getTAG() {
+    private static String getTAG() {
         return ChatColor.BLUE + "[" + ChatColor.WHITE + "Minefight" + ChatColor.BLUE + "] " + ChatColor.RESET;
     }
 
@@ -120,17 +120,17 @@ public class Main extends JavaPlugin implements Listener {
         }
     }
 
-    public boolean isLoggedIn(Player p) {
+    boolean isLoggedIn(Player p) {
         return !offline.containsKey(p.getName().toLowerCase());
     }
 
-    public void freezePlayer(Player p) {
+    void freezePlayer(Player p) {
         p.setWalkSpeed(0.0F);
         p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 10000, 128));
         offline.put(p.getName().toLowerCase(), 0);
     }
 
-    public void unfreezePlayer(Player p) {
+    void unfreezePlayer(Player p) {
         offline.remove(p.getName().toLowerCase());
         p.setWalkSpeed(0.2F);
         p.removePotionEffect(PotionEffectType.JUMP);
@@ -380,7 +380,7 @@ public class Main extends JavaPlugin implements Listener {
         }
     }
 
-    public void broadcastToAdmins(String o) {
+    void broadcastToAdmins(String o) {
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (p.hasPermission("upsilon.admin.see")) {
                 p.sendMessage(o);

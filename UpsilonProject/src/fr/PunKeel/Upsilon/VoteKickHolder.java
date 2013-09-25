@@ -4,16 +4,17 @@ import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
 
-public class VoteKickHolder {
-    int votes, last_vote;
-    ArrayList<String> voters = new ArrayList<>();
+class VoteKickHolder {
+    private int votes;
+    private int last_vote;
+    private ArrayList<String> voters = new ArrayList<>();
 
     VoteKickHolder() {
         this.votes = 0;
         this.last_vote = 0;
     }
 
-    public void reset() {
+    void reset() {
         this.votes = 0;
         this.last_vote = 0;
         this.voters.clear();

@@ -5,14 +5,14 @@ import org.bukkit.Location;
 import java.util.*;
 
 public class SpawnManager {
-    public HashMap<String, ArrayList<SLocation>> respawns = new HashMap<String, ArrayList<SLocation>>();
+    private HashMap<String, ArrayList<SLocation>> respawns = new HashMap<String, ArrayList<SLocation>>();
 
     public void addRespawn(String region, Location loc) {
         SLocation l = new SLocation(loc);
         addRespawn(region, l);
     }
 
-    public void addRespawn(String region, SLocation loc) {
+    void addRespawn(String region, SLocation loc) {
         if (!respawns.containsKey(region)) {
             respawns.put(region, new ArrayList<SLocation>());
         }

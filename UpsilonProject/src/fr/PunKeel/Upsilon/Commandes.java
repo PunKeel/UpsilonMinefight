@@ -20,8 +20,8 @@ import java.util.*;
  * May be open-source & be sold (by PunKeel, of course !)
  */
 public class Commandes {
-    Main main;
-    HashMap<String, Integer> demandes_GM = new HashMap<>();
+    private Main main;
+    private HashMap<String, Integer> demandes_GM = new HashMap<>();
 
     public Commandes(Main main) {
         this.main = main;

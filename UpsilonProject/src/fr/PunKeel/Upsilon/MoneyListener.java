@@ -39,14 +39,14 @@ import java.util.*;
  * May be open-source & be sold (by PunKeel, of course !)
  */
 public class MoneyListener implements Listener {
-    public static final StateFlag FLAG_ARENE = new StateFlag("arene", false);
-    Main main;
-    ItemStack emerald;
-    String[] morts;
-    ProtectedRegion ameliorations;
-    HashMap<String, Integer> kill_en_boucle = new HashMap<>();
-    HashMap<String, String> victime_en_boucle = new HashMap<>();
-    Set<String> invisi_players = new HashSet<>();
+    private static final StateFlag FLAG_ARENE = new StateFlag("arene", false);
+    private Main main;
+    private ItemStack emerald;
+    private String[] morts;
+    private ProtectedRegion ameliorations;
+    private HashMap<String, Integer> kill_en_boucle = new HashMap<>();
+    private HashMap<String, String> victime_en_boucle = new HashMap<>();
+    private Set<String> invisi_players = new HashSet<>();
     Set<String> already = new HashSet<>();
 
     public MoneyListener(Main m) {
@@ -56,7 +56,7 @@ public class MoneyListener implements Listener {
 
     }
 
-    public void removeFor(Player p) {
+    void removeFor(Player p) {
         if (!already.contains(p.getName())) {
             if (p.getInventory().contains(Material.SKULL_ITEM) || p.getEnderChest().contains(Material.SKULL_ITEM)) {
                 p.getInventory().remove(Material.SKULL_ITEM);
@@ -230,7 +230,7 @@ public class MoneyListener implements Listener {
         e.setRespawnLocation(main.getWarp("spawn"));
     }
 
-    public String deathMessage(Player p) {
+    String deathMessage(Player p) {
         if (p.getLastDamageCause() == null) {
             return "";
         }

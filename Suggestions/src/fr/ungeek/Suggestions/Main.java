@@ -20,11 +20,11 @@ import java.util.List;
  * May be open-source & be sold (by PunKeel, of course !)
  */
 public class Main extends JavaPlugin implements Listener {
-    public static String getTAG() {
+    private static String getTAG() {
         return ChatColor.DARK_GREEN + "[" + ChatColor.WHITE + "Minefight" + ChatColor.DARK_GREEN + "] " + ChatColor.RESET;
     }
 
-    public static Integer getTimestamp() {
+    private static Integer getTimestamp() {
         return (int) (System.nanoTime() / 1000000000);
     }
 
@@ -63,7 +63,7 @@ public class Main extends JavaPlugin implements Listener {
         }
     }
 
-    public void broadcastToAdmins(String o) {
+    void broadcastToAdmins(String o) {
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (p.hasPermission("upsilon.admin.see")) {
                 p.sendMessage(o);

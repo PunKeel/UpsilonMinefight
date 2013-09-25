@@ -4,8 +4,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 public class SLocation {
-    double x, y, z, yaw;
-    Location loc = null;
+    private double x;
+    private double y;
+    private double z;
+    private double yaw;
+    private Location loc = null;
 
     public SLocation(Location location) {
         x = location.getX();

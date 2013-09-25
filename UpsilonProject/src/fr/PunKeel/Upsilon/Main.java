@@ -43,30 +43,29 @@ import java.util.logging.SimpleFormatter;
 public class Main extends JavaPlugin {
     public static String WORLDNAME = "world";
     public Economy econ;
-    public WorldGuardPlugin WG;
+    private WorldGuardPlugin WG;
     public WorldEditPlugin WE;
     public Essentials ess;
     public RegionManager RM;
     // Own classes
     public MenuManager menu_manager = new MenuManager(this);
-    public MainMenu main_menu = new MainMenu(this, menu_manager);
-    public EnchantMenu enchant_menu = new EnchantMenu(this, menu_manager);
-    public TeleportationMenu teleportation_menu = new TeleportationMenu(this, menu_manager);
+    private MainMenu main_menu = new MainMenu(this, menu_manager);
+    private EnchantMenu enchant_menu = new EnchantMenu(this, menu_manager);
+    private TeleportationMenu teleportation_menu = new TeleportationMenu(this, menu_manager);
     public EventMenu event_menu = new EventMenu(this, menu_manager);
-    public MoneyListener moneyListener = new MoneyListener(this);
-    public RoiAuSommet roi = new RoiAuSommet(this);
-    public Commandes commandes = new Commandes(this);
-    public Chronos chrono = new Chronos(this);
-    public InfiniDisp infinidisp = new InfiniDisp(this);
-    public Spleef spleef = new Spleef(this);
+    private MoneyListener moneyListener = new MoneyListener(this);
+    private RoiAuSommet roi = new RoiAuSommet(this);
+    private Commandes commandes = new Commandes(this);
+    private Chronos chrono = new Chronos(this);
+    private InfiniDisp infinidisp = new InfiniDisp(this);
+    private Spleef spleef = new Spleef(this);
     // Variables
     public SpawnManager SM;
     public PermissionManager PEX;
-    public Gson gson = new Gson();
+    private Gson gson = new Gson();
     public AntiCheat AC;
     Boussole B;
     private Logger CLogger;
-    private long mainThreadName;
     private ConfigManager CM = new ConfigManager(this);
     private SimpleConfig globalConfig, locationsConfig, amisConfig;
     private WGCustomFlagsPlugin WGCF;
@@ -122,7 +121,7 @@ public class Main extends JavaPlugin {
         System.out.println(o);
     }
 
-    public static <T extends Plugin> T getPlugin(String name, Class<T> classe) throws UnknownPluginException {
+    private static <T extends Plugin> T getPlugin(String name, Class<T> classe) throws UnknownPluginException {
         if (!Bukkit.getPluginManager().isPluginEnabled(name)) {
             throw new UnknownPluginException("Plugin " + name + " is not loaded");
         }
@@ -135,7 +134,6 @@ public class Main extends JavaPlugin {
 
     @Override()
     public void onEnable() {
-        mainThreadName = Thread.currentThread().getId();
         PEX = PermissionsEx.getPermissionManager();
         if (PEX == null) {
             Bukkit.getPluginManager().disablePlugin(this);
@@ -178,7 +176,7 @@ public class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(AC, this);
     }
 
-    public void setupDependencies() {
+    void setupDependencies() {
         try {
             WE = getPlugin("WorldEdit", WorldEditPlugin.class);
         } catch (Exception e) {
@@ -261,7 +259,7 @@ public class Main extends JavaPlugin {
         return nameItem(i, name, null);
     }
 
-    public ItemStack nameItem(ItemStack i, String name, String lore1, String lore2, String lore3) {
+    ItemStack nameItem(ItemStack i, String name, String lore1, String lore2, String lore3) {
         ItemMeta im = i.getItemMeta();
         if (name == null) name = "";
         if (lore1 == null) lore1 = "";
@@ -294,7 +292,7 @@ public class Main extends JavaPlugin {
         return isAdmin(p.getName(), false) || p.isOp() || p.hasPermission("upsilon.admin");
     }
 
-    public boolean isVIP(Player p) {
+    boolean isVIP(Player p) {
         return isAdmin(p) || p.hasPermission("upsilon.VIP");
     }
 
@@ -302,7 +300,7 @@ public class Main extends JavaPlugin {
         return isVIP(Bukkit.getPlayerExact(name));
     }
 
-    public boolean isAdmin(String name, boolean checkPlayer) {
+    boolean isAdmin(String name, boolean checkPlayer) {
         return name.equalsIgnoreCase("dleot") || name.equalsIgnoreCase("console") || name.equalsIgnoreCase("server") || checkPlayer && isAdmin(Bukkit.getPlayerExact(name));
     }
 

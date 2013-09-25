@@ -20,10 +20,11 @@ import org.bukkit.inventory.ItemStack;
  * May be open-source & be sold (by PunKeel, of course !)
  */
 public class MainMenu implements Listener {
-    Main m;
-    MenuManager MM;
-    ItemStack teleport, magasin;
-    Inventory I = Bukkit.createInventory(null, 9, "Menu");
+    private Main m;
+    private MenuManager MM;
+    private ItemStack teleport;
+    private ItemStack magasin;
+    private Inventory I = Bukkit.createInventory(null, 9, "Menu");
 
     public MainMenu(Main main, MenuManager MM) {
         m = main;
@@ -36,7 +37,7 @@ public class MainMenu implements Listener {
         I.setItem(6, magasin);
     }
 
-    public MenuManager.Menus getSelfMenuType() {
+    MenuManager.Menus getSelfMenuType() {
         return MenuManager.Menus.MAIN;
     }
 
