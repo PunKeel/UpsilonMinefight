@@ -428,6 +428,7 @@ public class MoneyListener implements Listener {
     public void onTeleportPlayer(PlayerTeleportEvent e) {
         if (e.getPlayer().hasMetadata("NPC")) return;
         if (new Random().nextBoolean()) return;
+        if(e.getCause().equals(PlayerTeleportEvent.TeleportCause.PLUGIN)) return;
         if (e.getPlayer().isOnline())
             TagAPI.refreshPlayer(e.getPlayer());
     }

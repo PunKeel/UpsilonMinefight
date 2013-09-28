@@ -7,7 +7,6 @@ import com.google.common.collect.Lists;
 import com.mewin.WGCustomFlags.WGCustomFlagsPlugin;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WGBukkit;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import fr.PunKeel.Upsilon.Games.RoiAuSommet;
 import fr.PunKeel.Upsilon.Games.Spleef;
@@ -33,10 +32,10 @@ import ru.tehkode.permissions.bukkit.PermissionsEx;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 /**
  * User: PunKeel
@@ -58,7 +57,6 @@ public class Main extends JavaPlugin {
     public PermissionManager PEX;
     public AntiCheat AC;
     Boussole B;
-    private WorldGuardPlugin WG;
     private MainMenu main_menu = new MainMenu(this, menu_manager);
     private EnchantMenu enchant_menu = new EnchantMenu(this, menu_manager);
     private TeleportationMenu teleportation_menu = new TeleportationMenu(this, menu_manager);
@@ -165,17 +163,6 @@ public class Main extends JavaPlugin {
         amisConfig = CM.getNewConfig("amis.yml");
         ConfigReload();
         menu_manager.init();
-        Handler handler = null;
-        try {
-            handler = new FileHandler(getDataFolder() + "/upsilon_" + new SimpleDateFormat().format(new Date()) + ".log", true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        SimpleFormatter formatter = new SimpleFormatter();
-        assert handler != null;
-        handler.setFormatter(formatter);
-        CLogger = Logger.getLogger(getClass().getName());
-        CLogger.addHandler(handler);
         AC = new AntiCheat(this);
         getServer().getPluginManager().registerEvents(AC, this);
 
@@ -225,11 +212,6 @@ public class Main extends JavaPlugin {
             e.printStackTrace();
         }
 
-        try {
-            WG = getPlugin("WorldGuard", WorldGuardPlugin.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         World world = Bukkit.getWorld(WORLDNAME);
         world.setGameRuleValue("doMobSpawning", "false");
         world.setGameRuleValue("doMobLoot", "false");
@@ -428,6 +410,23 @@ public class Main extends JavaPlugin {
     }
 
     public Logger getCLogger() {
+        if (CLogger == null) {
+            String timeStamp = new SimpleDateFormat().format(new Date());
+            Handler handler;
+            try {
+                handler = new FileHandler(getDataFolder() + "/upsilon_%u.%g_" + timeStamp + ".log", 30000, 4);
+            } catch (IOException e) {
+                e.printStackTrace();
+                handler = new ConsoleHandler();
+            }
+            CLogger = Logger.getLogger(this.getClass().getName());
+            CLogger.setUseParentHandlers(false);
+
+            LogFormatter formatter = new LogFormatter();
+            handler.setFormatter(formatter);
+
+            CLogger.addHandler(handler);
+        }
         return CLogger;
 
     }
