@@ -391,6 +391,8 @@ public class MoneyListener implements Listener {
             }
             if (gain > 50) gain = 50;
             if (gain < 1) gain = 1;
+            if(main.isVIP(d))
+                gain = (int) (gain*1.25);
             d.sendMessage(Main.getTAG() + ChatColor.DARK_GREEN + "+ " + ChatColor.GOLD + gain + ChatColor.RESET + "ƒ pour le kill de " + v.getDisplayName());
             main.econ.depositPlayer(d.getName(), gain);
         }

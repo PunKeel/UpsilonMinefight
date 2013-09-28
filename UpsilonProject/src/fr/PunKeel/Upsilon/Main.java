@@ -1,6 +1,9 @@
 package fr.PunKeel.Upsilon;
 
 import com.earth2me.essentials.Essentials;
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.mewin.WGCustomFlags.WGCustomFlagsPlugin;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WGBukkit;
@@ -23,6 +26,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.scheduler.BukkitRunnable;
 import ru.tehkode.permissions.PermissionManager;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
@@ -43,28 +47,28 @@ import java.util.logging.SimpleFormatter;
 public class Main extends JavaPlugin {
     public static String WORLDNAME = "world";
     public Economy econ;
-    private WorldGuardPlugin WG;
     public WorldEditPlugin WE;
     public Essentials ess;
     public RegionManager RM;
     // Own classes
     public MenuManager menu_manager = new MenuManager(this);
+    public EventMenu event_menu = new EventMenu(this, menu_manager);
+    // Variables
+    public SpawnManager SM;
+    public PermissionManager PEX;
+    public AntiCheat AC;
+    Boussole B;
+    private WorldGuardPlugin WG;
     private MainMenu main_menu = new MainMenu(this, menu_manager);
     private EnchantMenu enchant_menu = new EnchantMenu(this, menu_manager);
     private TeleportationMenu teleportation_menu = new TeleportationMenu(this, menu_manager);
-    public EventMenu event_menu = new EventMenu(this, menu_manager);
     private MoneyListener moneyListener = new MoneyListener(this);
     private RoiAuSommet roi = new RoiAuSommet(this);
     private Commandes commandes = new Commandes(this);
     private Chronos chrono = new Chronos(this);
     private InfiniDisp infinidisp = new InfiniDisp(this);
     private Spleef spleef = new Spleef(this);
-    // Variables
-    public SpawnManager SM;
-    public PermissionManager PEX;
     private Gson gson = new Gson();
-    public AntiCheat AC;
-    Boussole B;
     private Logger CLogger;
     private ConfigManager CM = new ConfigManager(this);
     private SimpleConfig globalConfig, locationsConfig, amisConfig;
@@ -174,6 +178,44 @@ public class Main extends JavaPlugin {
         CLogger.addHandler(handler);
         AC = new AntiCheat(this);
         getServer().getPluginManager().registerEvents(AC, this);
+
+        setupPayhour();
+    }
+
+    private void setupPayhour() {
+        Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, new BukkitRunnable() {
+            ArrayList<String> players = new ArrayList<>()
+                    ,
+                    players_old = new ArrayList<>();
+
+            @Override
+            public void run() {
+                int gain;
+                if (new Random().nextBoolean()) {
+                    for (String k : players) {
+                        Player p = Bukkit.getPlayerExact(k);
+                        if (p == null || !p.isOnline()) continue;
+
+                        gain = 10;
+                        if (players_old.contains(k))
+                            gain += 5; // Si présent depuis looongtemps, +5
+                        if (isVIP(k))
+                            gain *= 10; // gain *10 si VIP :D
+
+                        p.sendMessage(getTAG() + ChatColor.RED + "Payday !" + ChatColor.RESET + " Minefight t'offre " + gain + "ƒ pour ta présence ! :)");
+                        econ.depositPlayer(k, gain);
+                    }
+                }
+                players_old = players;
+                players = Lists.newArrayList(Iterables.transform(Lists.newArrayList(Bukkit.getOnlinePlayers()), new Function<Player, String>() {
+                    @Override
+                    public String apply(Player p) {
+                        return p.getName();
+                    }
+                }));
+
+            }
+        }, 10, 60 * 29 * 20); // 60 * 29 * 20 = 29 minutes
     }
 
     void setupDependencies() {
