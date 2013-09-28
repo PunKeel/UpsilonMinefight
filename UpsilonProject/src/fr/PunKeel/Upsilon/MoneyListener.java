@@ -107,7 +107,7 @@ public class MoneyListener implements Listener {
                     p.updateInventory();
                 } else {
                     if (p.getEnderChest().firstEmpty() != -1) {
-                        p.getInventory().addItem(emerald);
+                        p.getEnderChest().addItem(emerald);
                     } else {
                         p.sendMessage(Main.getTAG() + "Ton inventaire est plein, vide le un peu et reconnecte toi pour obtenir une émeraude ! :)");
                     }
@@ -391,8 +391,8 @@ public class MoneyListener implements Listener {
             }
             if (gain > 50) gain = 50;
             if (gain < 1) gain = 1;
-            if(main.isVIP(d))
-                gain = (int) (gain*1.25);
+            if (main.isVIP(d))
+                gain = (int) (gain * 1.25);
             d.sendMessage(Main.getTAG() + ChatColor.DARK_GREEN + "+ " + ChatColor.GOLD + gain + ChatColor.RESET + "ƒ pour le kill de " + v.getDisplayName());
             main.econ.depositPlayer(d.getName(), gain);
         }
@@ -428,7 +428,7 @@ public class MoneyListener implements Listener {
     public void onTeleportPlayer(PlayerTeleportEvent e) {
         if (e.getPlayer().hasMetadata("NPC")) return;
         if (new Random().nextBoolean()) return;
-        if(e.getCause().equals(PlayerTeleportEvent.TeleportCause.PLUGIN)) return;
+        if (e.getCause().equals(PlayerTeleportEvent.TeleportCause.PLUGIN)) return;
         if (e.getPlayer().isOnline())
             TagAPI.refreshPlayer(e.getPlayer());
     }
