@@ -56,7 +56,7 @@ public class MenuManager implements Listener {
             return;
         }
         e.setCancelled(true);
-        openInventory(p, Menus.MAIN);
+        openInventory(p, Menus.TELEPORTATION);
     }
 
     @EventHandler(ignoreCancelled = true)
