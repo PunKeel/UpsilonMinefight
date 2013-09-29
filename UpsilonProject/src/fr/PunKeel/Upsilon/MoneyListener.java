@@ -107,7 +107,12 @@ public class MoneyListener implements Listener {
         final Player p = e.getPlayer();
         if (!p.hasPermission("upsilon.bypass_joinspawn"))
             if ((Main.getTimestamp() - main.ess.getUser(p).getLastLogout()) >= 10)
-                main.teleportToWarp("spawn", p);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(main, new Runnable() {
+                    @Override
+                    public void run() {
+                        main.teleportToWarp("spawn", p);
+                    }
+                });
         if (!p.getInventory().containsAtLeast(emerald, 1)) {
             if (!p.getEnderChest().containsAtLeast(emerald, 1)) {
                 if (p.getInventory().firstEmpty() != -1) {

@@ -151,8 +151,8 @@ public class TeamManager implements Listener {
             if (scores.get(td.getName()) == 1f) {
                 int gain = Math.round((float) 2000 / td.getPlayers().size());
                 shareMoney(td, gain);
-                broadcastTeamMessage(td, Main.getTAG() + ChatColor.DARK_GREEN + "+2000ƒ" + ChatColor.RESET + " à partager avec ta team !");
-                scores.put(td.getName(), 0f);
+                broadcastTeamMessage(td, Main.getTAG() + ChatColor.DARK_GREEN + "+ " + ChatColor.GOLD + "2000" + ChatColor.DARK_GREEN + "ƒ" + ChatColor.RESET + " à partager avec ta team !");
+                scores.put(td.getName(), 0.00001f);
             }
             broadcastTeamBarHealth(td, scores.get(td.getName()));
 
