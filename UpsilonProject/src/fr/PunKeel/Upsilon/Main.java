@@ -67,6 +67,7 @@ public class Main extends JavaPlugin {
     private ConfigManager CM = new ConfigManager(this);
     private SimpleConfig globalConfig, locationsConfig, amisConfig;
     private WGCustomFlagsPlugin WGCF;
+    private TeamManager TM = new TeamManager(this);
     private int bCasterThread = 0;
 
     public static <T> T getRandom(T[] array) {
@@ -147,6 +148,7 @@ public class Main extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(spleef, this);
         Bukkit.getPluginManager().registerEvents(roi, this);
         Bukkit.getPluginManager().registerEvents(infinidisp, this);
+        Bukkit.getPluginManager().registerEvents(TM, this);
         CommandController.registerCommands(this, commandes);
         CommandController.registerCommands(this, chrono);
         CommandController.registerCommands(this, infinidisp);
