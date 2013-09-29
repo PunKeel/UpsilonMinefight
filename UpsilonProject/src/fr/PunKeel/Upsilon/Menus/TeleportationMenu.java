@@ -23,24 +23,18 @@ import org.bukkit.inventory.ItemStack;
 public class TeleportationMenu implements Listener {
     private Main m;
     private MenuManager MM;
-    private ItemStack spawn;
-    private ItemStack events;
-    private ItemStack enchant_vip;
-    private ItemStack enchant_notvip;
-    private ItemStack enderchest_notvip;
-    private ItemStack enderchest_vip;
     private Inventory vip = Bukkit.createInventory(null, 9, "Menu > Téléportation");
     private Inventory notvip = Bukkit.createInventory(null, 9, "Menu > Téléportation");
 
     public TeleportationMenu(Main main, MenuManager MM) {
         m = main;
         this.MM = MM;
-        spawn = m.nameItem(new ItemStack(Material.getMaterial(155)), ChatColor.DARK_PURPLE + "Spawn");
-        events = m.nameItem(new ItemStack(Material.COMPASS), ChatColor.DARK_AQUA + "Events");
-        enchant_notvip = m.nameItem(new ItemStack(Material.ENCHANTMENT_TABLE), ChatColor.GOLD + "Table d'enchantements", ChatColor.DARK_RED + "VIP seulement !");
-        enchant_vip = m.nameItem(new ItemStack(Material.ENCHANTMENT_TABLE), ChatColor.GOLD + "Table d'enchantements", ChatColor.DARK_GREEN + "Cliquez pour accéder !");
-        enderchest_notvip = m.nameItem(new ItemStack(Material.ENDER_CHEST), ChatColor.GOLD + "Ender Chest", ChatColor.DARK_RED + "VIP seulement !");
-        enderchest_vip = m.nameItem(new ItemStack(Material.ENDER_CHEST), ChatColor.GOLD + "Ender Chest", ChatColor.DARK_GREEN + "Cliquez pour accéder !");
+        ItemStack spawn = m.nameItem(new ItemStack(Material.getMaterial(155)), ChatColor.DARK_PURPLE + "Spawn");
+        ItemStack events = m.nameItem(new ItemStack(Material.COMPASS), ChatColor.DARK_AQUA + "Events");
+        ItemStack enchant_notvip = m.nameItem(new ItemStack(Material.ENCHANTMENT_TABLE), ChatColor.GOLD + "Table d'enchantements", ChatColor.DARK_RED + "VIP seulement !");
+        ItemStack enchant_vip = m.nameItem(new ItemStack(Material.ENCHANTMENT_TABLE), ChatColor.GOLD + "Table d'enchantements", ChatColor.DARK_GREEN + "Cliquez pour accéder !");
+        ItemStack enderchest_notvip = m.nameItem(new ItemStack(Material.ENDER_CHEST), ChatColor.GOLD + "Ender Chest", ChatColor.DARK_RED + "VIP seulement !");
+        ItemStack enderchest_vip = m.nameItem(new ItemStack(Material.ENDER_CHEST), ChatColor.GOLD + "Ender Chest", ChatColor.DARK_GREEN + "Cliquez pour accéder !");
 
         //
 
