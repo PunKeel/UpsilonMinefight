@@ -22,15 +22,13 @@ import org.bukkit.inventory.ItemStack;
 public class MainMenu implements Listener {
     private Main m;
     private MenuManager MM;
-    private ItemStack teleport;
-    private ItemStack magasin;
     private Inventory I = Bukkit.createInventory(null, 9, "Menu");
 
     public MainMenu(Main main, MenuManager MM) {
         m = main;
         this.MM = MM;
-        teleport = m.nameItem(new ItemStack(Material.COMPASS), ChatColor.DARK_GREEN + "Menu de téléportation", "Pour se déplacer + vite");
-        magasin = m.nameItem(new ItemStack(Material.WOOD_SWORD), ChatColor.DARK_AQUA + "Menu du magasin", "Vendre des items", ChatColor.DARK_RED + "Bientôt disponible");
+        ItemStack teleport = m.nameItem(new ItemStack(Material.COMPASS), ChatColor.DARK_GREEN + "Menu de téléportation", "Pour se déplacer + vite");
+        ItemStack magasin = m.nameItem(new ItemStack(Material.WOOD_SWORD), ChatColor.DARK_AQUA + "Menu du magasin", "Vendre des items", ChatColor.DARK_RED + "Bientôt disponible");
         //amis = m.nameItem(new ItemStack(Material.SKULL_ITEM, 1, (short) 3), ChatColor.DARK_GRAY + "Gestionnaire d'amis", ChatColor.DARK_RED + "Bientôt disponible", "Gérez vos amis !");
 
         I.setItem(2, teleport);
