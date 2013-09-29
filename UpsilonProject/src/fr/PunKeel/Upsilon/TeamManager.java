@@ -12,6 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -33,6 +34,7 @@ public class TeamManager implements Listener {
     Scoreboard SB;
     HashMap<String, Float> scores = new HashMap<>();
     Main main;
+    HashMap<String, String> team_joueur = new HashMap<>();
 
     public TeamManager(Main m) {
         main = m;
@@ -88,6 +90,8 @@ public class TeamManager implements Listener {
     public void onJoin(PlayerLoginEvent e) {
         if (!e.getResult().equals(PlayerLoginEvent.Result.ALLOWED)) return;
         Player p = e.getPlayer();
+        if (team_joueur.containsKey(p.getName()))
+            team_joueur.remove(p.getName());
         String hostname = e.getHostname().toLowerCase();
         if (hostname.isEmpty())
             return;
@@ -96,7 +100,15 @@ public class TeamManager implements Listener {
         String subdomain = hostname.split("\\.")[0];
         if (blacklist.contains(subdomain))
             return;
-        BarAPI.setMessage(p, "Vous avez rejoint la team");
+        team_joueur.put(p.getName(), subdomain);
+    }
+
+    @EventHandler
+    public void onLogin(PlayerJoinEvent e) {
+        Player p = e.getPlayer();
+        if (!team_joueur.containsKey(p.getName())) return;
+        String subdomain = team_joueur.get(p.getName());
+        BarAPI.setMessage(p, "[" + ChatColor.GREEN + subdomain + ChatColor.RESET + "]Vous avez rejoint la team");
         Team t = SB.getTeam(subdomain);
         if (t == null) {
             t = SB.registerNewTeam(subdomain);
