@@ -165,7 +165,7 @@ public class MoneyListener implements Listener {
         }
 
         if ((e.getItemDrop().getItemStack().getType().equals(Material.FLINT) || e.getItemDrop().getItemStack().getType().equals(Material.GOLD_INGOT))) {
-            main.econ.depositPlayer(p.getName(), e.getItemDrop().getItemStack().getAmount() * 5);
+            main.addToBalance(p.getName(), e.getItemDrop().getItemStack().getAmount() * 5);
             p.sendMessage(Main.getTAG() + ChatColor.DARK_GREEN + "+" + ChatColor.RESET + e.getItemDrop().getItemStack().getAmount() * 5 + "ƒ pour la vente");
             e.getItemDrop().remove();
             return;
@@ -415,7 +415,7 @@ public class MoneyListener implements Listener {
                 killstreaks.put(d.getName(), 1);
             if (congrats.containsKey(killstreaks.get(d.getName())))
                 topbar_messages.put(d.getName(), ChatColor.DARK_GREEN + congrats.get(statsa.getStreak()));
-            main.econ.depositPlayer(d.getName(), gain);
+            main.addToBalance(d.getName(), gain);
 
         }
         if (!BarAPI.hasBar(v)) {

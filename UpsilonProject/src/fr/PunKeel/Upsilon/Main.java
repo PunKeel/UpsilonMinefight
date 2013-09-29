@@ -1,9 +1,8 @@
 package fr.PunKeel.Upsilon;
 
 import com.earth2me.essentials.Essentials;
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import com.earth2me.essentials.api.NoLoanPermittedException;
+import com.earth2me.essentials.api.UserDoesNotExistException;
 import com.mewin.WGCustomFlags.WGCustomFlagsPlugin;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WGBukkit;
@@ -14,7 +13,6 @@ import fr.PunKeel.Upsilon.Menus.EnchantMenu;
 import fr.PunKeel.Upsilon.Menus.EventMenu;
 import fr.PunKeel.Upsilon.Menus.MainMenu;
 import fr.PunKeel.Upsilon.Menus.TeleportationMenu;
-import net.milkbowl.vault.economy.Economy;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.libs.com.google.gson.Gson;
 import org.bukkit.entity.HumanEntity;
@@ -22,7 +20,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -45,7 +42,6 @@ import java.util.logging.Logger;
  */
 public class Main extends JavaPlugin {
     public static String WORLDNAME = "world";
-    public Economy econ;
     public WorldEditPlugin WE;
     public Essentials ess;
     public RegionManager RM;
@@ -169,40 +165,46 @@ public class Main extends JavaPlugin {
         setupPayhour();
     }
 
+    void addToBalance(String username, int amount) {
+        try {
+            com.earth2me.essentials.api.Economy.add(username, amount);
+        } catch (UserDoesNotExistException e) {
+            e.printStackTrace();
+        } catch (NoLoanPermittedException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void setupPayhour() {
         Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, new BukkitRunnable() {
-            ArrayList<String> players = new ArrayList<>()
+            Set<String> players
                     ,
-                    players_old = new ArrayList<>();
+                    players_old;
 
             @Override
             public void run() {
                 int gain;
-                if (new Random().nextBoolean()) {
-                    for (String k : players) {
-                        Player p = Bukkit.getPlayerExact(k);
-                        if (p == null || !p.isOnline()) continue;
+                for (String k : players) {
+                    Player p = Bukkit.getPlayerExact(k);
+                    if (p == null || !p.isOnline()) continue;
 
-                        gain = 10;
-                        if (players_old.contains(k))
-                            gain += 5; // Si présent depuis looongtemps, +5
-                        if (isVIP(k))
-                            gain *= 10; // gain *10 si VIP :D
+                    gain = 10;
+                    if (players_old != null && players_old.contains(k))
+                        gain += 5; // Si présent depuis looongtemps, +5
+                    if (isVIP(k))
+                        gain *= 10; // gain *10 si VIP :D
 
-                        p.sendMessage(getTAG() + ChatColor.RED + "Payday !" + ChatColor.RESET + " Minefight t'offre " + gain + "ƒ pour ta présence ! :)");
-                        econ.depositPlayer(k, gain);
-                    }
+                    p.sendMessage(getTAG() + ChatColor.RED + "Payday !" + ChatColor.RESET + " Minefight t'offre " + gain + "ƒ pour ta présence ! :)");
+                    addToBalance(k, gain);
+
                 }
+
                 players_old = players;
-                players = Lists.newArrayList(Iterables.transform(Lists.newArrayList(Bukkit.getOnlinePlayers()), new Function<Player, String>() {
-                    @Override
-                    public String apply(Player p) {
-                        return p.getName();
-                    }
-                }));
+                players = ess.getUserMap().getAllUniqueUsers();
+
 
             }
-        }, 10, 60 * 29 * 20); // 60 * 29 * 20 = 29 minutes
+        }, 10, 60 * 30 * 20); // 60 * 29 * 20 = 29 minutes
     }
 
     void setupDependencies() {
@@ -229,7 +231,6 @@ public class Main extends JavaPlugin {
         } catch (UnknownPluginException e) {
             e.printStackTrace();
         }
-        setupEconomy();
     }
 
     public void teleportToWarp(String warp, HumanEntity p) {
@@ -250,18 +251,6 @@ public class Main extends JavaPlugin {
     public void onDisable() {
         menu_manager.closeAll();
         ConfigSave();
-    }
-
-    private boolean setupEconomy() {
-        if (this.getServer().getPluginManager().getPlugin("Vault") == null) {
-            return false;
-        }
-        RegisteredServiceProvider<Economy> rsp = this.getServer().getServicesManager().getRegistration(Economy.class);
-        if (rsp == null) {
-            return false;
-        }
-        econ = rsp.getProvider();
-        return econ != null;
     }
 
     public ItemStack nameItem(ItemStack i, String name, String lore1, String lore2) {

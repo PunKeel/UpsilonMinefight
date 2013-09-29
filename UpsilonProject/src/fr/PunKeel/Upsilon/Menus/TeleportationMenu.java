@@ -30,7 +30,7 @@ public class TeleportationMenu implements Listener {
         m = main;
         this.MM = MM;
         ItemStack spawn = m.nameItem(new ItemStack(Material.getMaterial(155)), ChatColor.DARK_PURPLE + "Spawn");
-        ItemStack events = m.nameItem(new ItemStack(Material.COMPASS), ChatColor.DARK_AQUA + "Events");
+        ItemStack events = m.nameItem(new ItemStack(Material.EMPTY_MAP), ChatColor.DARK_AQUA + "Events");
         ItemStack enchant_notvip = m.nameItem(new ItemStack(Material.ENCHANTMENT_TABLE), ChatColor.GOLD + "Table d'enchantements", ChatColor.DARK_RED + "VIP seulement !");
         ItemStack enchant_vip = m.nameItem(new ItemStack(Material.ENCHANTMENT_TABLE), ChatColor.GOLD + "Table d'enchantements", ChatColor.DARK_GREEN + "Cliquez pour accéder !");
         ItemStack enderchest_notvip = m.nameItem(new ItemStack(Material.ENDER_CHEST), ChatColor.GOLD + "Ender Chest", ChatColor.DARK_RED + "VIP seulement !");
