@@ -3,7 +3,7 @@ package fr.PunKeel.Upsilon;
 import com.earth2me.essentials.api.Economy;
 import com.earth2me.essentials.api.NoLoanPermittedException;
 import com.earth2me.essentials.api.UserDoesNotExistException;
-import me.confuser.barapi.BarAPI;
+import fr.PunKeel.Upsilon.BarAPI.FakeDragon;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -30,7 +30,7 @@ import java.util.Random;
 public class TeamManager implements Listener {
     HashSet<String> blacklist = new HashSet<>();
     Scoreboard SB;
-    HashMap<String, Float> scores = new HashMap<>();
+    HashMap<String, Integer> scores = new HashMap<>();
     Main main;
     HashMap<String, String> team_joueur = new HashMap<>();
 
@@ -48,14 +48,14 @@ public class TeamManager implements Listener {
         if (team == null) return;
         for (OfflinePlayer p : team.getPlayers())
             if (p.isOnline())
-                BarAPI.setMessage((Player) p, "[" + ChatColor.GREEN + team.getDisplayName() + ChatColor.RESET + "] " + message);
+                FakeDragon.setStatus((Player) p, "[" + ChatColor.GREEN + team.getDisplayName() + ChatColor.RESET + "] " + message, scores.get(team.getName()));
     }
 
     void broadcastTeamBarHealth(Team team) {
         if (team == null) return;
         for (OfflinePlayer p : team.getPlayers())
             if (p.isOnline())
-                BarAPI.setHealth((Player) p, 100 * scores.get(team.getName()));
+                FakeDragon.setStatus((Player) p, null, scores.get(team.getName()));
     }
 
     void quit(Player p) {
@@ -110,7 +110,7 @@ public class TeamManager implements Listener {
         Player p = e.getPlayer();
         if (!team_joueur.containsKey(p.getName())) return;
         String subdomain = team_joueur.get(p.getName());
-        BarAPI.setMessage(p, "[" + ChatColor.GREEN + subdomain + ChatColor.RESET + "] Vous avez rejoint la team");
+        FakeDragon.setStatus(p, "[" + ChatColor.GREEN + subdomain + ChatColor.RESET + "] Vous avez rejoint la team", 1);
         Team t = SB.getTeam(subdomain);
         if (t == null) {
             t = SB.registerNewTeam(subdomain);
@@ -120,7 +120,7 @@ public class TeamManager implements Listener {
         broadcastTeamBarMessage(t, p.getDisplayName() + ChatColor.GOLD + " vous rejoint !");
         t.addPlayer(p);
         if (!scores.containsKey(t.getName()))
-            scores.put(t.getName(), 0.00001f);
+            scores.put(t.getName(), 1);
         broadcastTeamBarHealth(t);
     }
 
@@ -148,28 +148,27 @@ public class TeamManager implements Listener {
         if (tp == td) return;
         if (td != null) {
             broadcastTeamBarMessage(td, d.getDisplayName() + " a tué " + p.getDisplayName());
-            float bonus = (float) (new Random().nextDouble() / 9);
+            int bonus = new Random().nextInt(1);
             if (!scores.containsKey(td.getName()))
                 scores.put(td.getName(), bonus);
             else
-                scores.put(td.getName(), Math.max(1f, scores.get(td.getName()) + bonus));
-            if (scores.get(td.getName()) == 1f) {
+                scores.put(td.getName(), Math.min(100, scores.get(td.getName()) + bonus));
+            if (scores.get(td.getName()) == 100) {
                 int gain = Math.round((float) 2000 / td.getPlayers().size());
                 shareMoney(td, gain);
                 broadcastTeamMessage(td, Main.getTAG() + ChatColor.DARK_GREEN + "+ " + ChatColor.GOLD + "2000" + ChatColor.DARK_GREEN + "ƒ" + ChatColor.RESET + " à partager avec ta team !");
-                scores.put(td.getName(), 0.00001f);
+                scores.put(td.getName(), 1);
             }
             broadcastTeamBarHealth(td);
 
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
+    @EventHandler
     public void onRespawn(PlayerRespawnEvent e) {
         Player p = e.getPlayer();
-        Team tp = SB.getPlayerTeam(p);
-        if (tp != null) {
-            broadcastTeamBarHealth(tp);
-        }
+        Team t = SB.getPlayerTeam(p);
+        if (t == null) return;
+        FakeDragon.setStatus(p, null, -1);
     }
 }

@@ -8,7 +8,7 @@ import com.google.common.base.Joiner;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import me.confuser.barapi.BarAPI;
+import fr.PunKeel.Upsilon.BarAPI.FakeDragon;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
@@ -420,7 +420,7 @@ public class MoneyListener implements Listener {
             d.sendMessage(Main.getTAG() + ChatColor.DARK_GREEN + "+ " + ChatColor.GOLD + gain + ChatColor.RESET + "ƒ pour le kill de " + v.getDisplayName());
 
             if (congrats.containsKey(killstreaks.get(d.getName())))
-                BarAPI.setMessage(d, ChatColor.DARK_GREEN + congrats.get(statsa.getStreak()));
+                FakeDragon.setStatus(d, ChatColor.DARK_GREEN + congrats.get(statsa.getStreak()), -1);
             main.addToBalance(d.getName(), gain);
 
         }

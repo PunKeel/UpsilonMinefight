@@ -23,6 +23,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Team;
 import ru.tehkode.permissions.PermissionManager;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
@@ -53,6 +54,7 @@ public class Main extends JavaPlugin {
     public PermissionManager PEX;
     public AntiCheat AC;
     Boussole B;
+    TeamManager TM;
     private MainMenu main_menu = new MainMenu(this, menu_manager);
     private EnchantMenu enchant_menu = new EnchantMenu(this, menu_manager);
     private TeleportationMenu teleportation_menu = new TeleportationMenu(this, menu_manager);
@@ -67,7 +69,6 @@ public class Main extends JavaPlugin {
     private ConfigManager CM = new ConfigManager(this);
     private SimpleConfig globalConfig, locationsConfig, amisConfig;
     private WGCustomFlagsPlugin WGCF;
-    TeamManager TM;
     private int bCasterThread = 0;
 
     public static <T> T getRandom(T[] array) {
@@ -387,6 +388,13 @@ public class Main extends JavaPlugin {
                 if (i >= messages.length) i = 0;
             }
         }, 20, 20 * 60 * 3);
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (Team team : TM.SB.getTeams())
+                    TM.broadcastTeamBarHealth(team);
+            }
+        }, 20L, 20L);
 
     }
 
