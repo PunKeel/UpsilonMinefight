@@ -53,7 +53,7 @@ public class TeamManager implements Listener {
     void broadcastTeamBarHealth(Team team, float health) {
         for (OfflinePlayer p : team.getPlayers())
             if (p.isOnline())
-                BarAPI.setHealth((Player) p, health);
+                BarAPI.setHealth((Player) p, 100 * health);
     }
 
     void quit(Player p) {
