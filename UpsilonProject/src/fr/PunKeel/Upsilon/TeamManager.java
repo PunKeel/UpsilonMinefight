@@ -110,7 +110,7 @@ public class TeamManager implements Listener {
         Team t = SB.getTeam(subdomain);
         if (t == null) {
             t = SB.registerNewTeam(subdomain);
-            t.setAllowFriendlyFire(true);
+            t.setAllowFriendlyFire(false);
             t.setCanSeeFriendlyInvisibles(true);
         }
         broadcastTeamBarMessage(t, p.getDisplayName() + ChatColor.GOLD + " vous rejoint !");
@@ -143,7 +143,7 @@ public class TeamManager implements Listener {
         Team td = SB.getPlayerTeam(d);
         if (td != null) {
             broadcastTeamBarMessage(td, d.getDisplayName() + " a tué " + p.getDisplayName());
-            float bonus = new Random().nextFloat() / 9;
+            float bonus = (float) (new Random().nextDouble() / 9);
             if (!scores.containsKey(td.getName()))
                 scores.put(td.getName(), bonus);
             else
