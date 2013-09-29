@@ -28,8 +28,8 @@ import java.util.List;
 public class EventMenu implements Listener {
     private Main m;
     private MenuManager MM;
-    private HashMap<String, Boolean> warps = new HashMap<String, Boolean>();
-    private List<String> slots = new ArrayList<String>();
+    private HashMap<String, Boolean> warps = new HashMap<>();
+    private List<String> slots = new ArrayList<>();
     private Inventory inv;
     private ItemStack dac;
     private ItemStack sauta;
