@@ -50,7 +50,7 @@ public class TeamManager implements Listener {
     void broadcastTeamBarMessage(Team team, String message) {
         for (OfflinePlayer p : team.getPlayers())
             if (p.isOnline())
-                BarAPI.setMessage((Player) p, "[" + ChatColor.GREEN + team + ChatColor.RESET + "]" + message);
+                BarAPI.setMessage((Player) p, "[" + ChatColor.GREEN + team + ChatColor.RESET + "] " + message);
     }
 
     void broadcastTeamBarHealth(Team team, float health) {
@@ -109,7 +109,7 @@ public class TeamManager implements Listener {
         Player p = e.getPlayer();
         if (!team_joueur.containsKey(p.getName())) return;
         String subdomain = team_joueur.get(p.getName());
-        BarAPI.setMessage(p, "[" + ChatColor.GREEN + subdomain + ChatColor.RESET + "]Vous avez rejoint la team");
+        BarAPI.setMessage(p, "[" + ChatColor.GREEN + subdomain + ChatColor.RESET + "] Vous avez rejoint la team");
         Team t = SB.getTeam(subdomain);
         if (t == null) {
             t = SB.registerNewTeam(subdomain);

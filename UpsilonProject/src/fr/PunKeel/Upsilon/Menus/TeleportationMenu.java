@@ -70,8 +70,8 @@ public class TeleportationMenu implements Listener {
     @EventHandler
     public void onMenuClick(MenuClickEvent e) {
         if (!e.getCurrent_menu().equals(getSelfMenuType())) return;
-        HumanEntity p = e.getEvent().getWhoClicked();
-        String warp;
+        final HumanEntity p = e.getEvent().getWhoClicked();
+        final String warp;
         switch (e.getEvent().getSlot()) {
             case 1:
                 warp = "spawn";
@@ -105,7 +105,12 @@ public class TeleportationMenu implements Listener {
         } else if (warp.equalsIgnoreCase("enchant")) {
             MM.openInventory(p, MenuManager.Menus.ENCHANTING);
         } else {
-            m.teleportToWarp(warp, p);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(m, new Runnable() {
+                @Override
+                public void run() {
+                    m.teleportToWarp(warp, p);
+                }
+            });
         }
     }
 }

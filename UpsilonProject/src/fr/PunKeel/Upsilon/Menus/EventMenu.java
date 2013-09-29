@@ -153,10 +153,10 @@ public class EventMenu implements Listener {
     public void onMenuClick(MenuClickEvent e) {
         if (!e.getCurrent_menu().equals(getSelfMenuType())) return;
         if (slots.size() <= e.getEvent().getSlot()) return;
-        String warp = String.valueOf(slots.get(e.getEvent().getSlot()));
+        final String warp = String.valueOf(slots.get(e.getEvent().getSlot()));
         if (warp == null) return;
         if (warp.isEmpty()) return;
-        Player p = (Player) e.getEvent().getWhoClicked();
+        final Player p = (Player) e.getEvent().getWhoClicked();
 
         if (p.hasPermission("upsilon.admin.event")) {
             boolean toggle, broadcast;
@@ -178,14 +178,24 @@ public class EventMenu implements Listener {
         if (m.isAdmin(p)) {
 
             MM.closeInventory(p);
-            m.teleportToWarp(warp, p);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(m, new Runnable() {
+                @Override
+                public void run() {
+                    m.teleportToWarp(warp, p);
+                }
+            });
             if (!warps.get(warp))
                 p.sendMessage(Main.getTAG() + "Cet événement est fermé pour le moment");
 
         } else {
             if (warps.get(warp)) {
                 MM.closeInventory(p);
-                m.teleportToWarp(warp, p);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(m, new Runnable() {
+                    @Override
+                    public void run() {
+                        m.teleportToWarp(warp, p);
+                    }
+                });
             } else
                 p.sendMessage(Main.getTAG() + "Cet événement est fermé pour le moment");
         }
