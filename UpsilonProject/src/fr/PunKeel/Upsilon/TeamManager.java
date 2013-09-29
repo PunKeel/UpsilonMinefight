@@ -86,6 +86,7 @@ public class TeamManager implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onJoin(PlayerLoginEvent e) {
+        if (!e.getResult().equals(PlayerLoginEvent.Result.ALLOWED)) return;
         Player p = e.getPlayer();
         String hostname = e.getHostname().toLowerCase();
         if (hostname.isEmpty())
