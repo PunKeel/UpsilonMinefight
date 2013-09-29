@@ -411,10 +411,10 @@ public class Main extends JavaPlugin {
 
     public Logger getCLogger() {
         if (CLogger == null) {
-            String timeStamp = new SimpleDateFormat().format(new Date());
+            String timeStamp = new SimpleDateFormat("dd.MM.yyyy").format(new Date());
             Handler handler;
             try {
-                handler = new FileHandler(getDataFolder() + "/upsilon_%u.%g_" + timeStamp + ".log", 30000, 4);
+                handler = new FileHandler(getDataFolder() + "/upsilon_" + timeStamp + ".log", 30000, 4);
             } catch (IOException e) {
                 e.printStackTrace();
                 handler = new ConsoleHandler();

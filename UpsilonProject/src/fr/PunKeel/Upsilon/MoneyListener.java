@@ -98,18 +98,17 @@ public class MoneyListener implements Listener {
         if (p.getHealth() == 0) {
             Main.resetPlayer(p);
         }
-        if (!p.getGameMode().equals(GameMode.ADVENTURE))
-            if (!p.hasPermission("upsilon.admin"))
-                p.setGameMode(GameMode.ADVENTURE);
-        if (!p.hasPermission("upsilon.bypass_joinspawn")) {
-            if ((Main.getTimestamp() - main.ess.getUser(p).getLastLogout()) >= 10)
-                p.teleport(main.getWarp("sspawn"));
-        }
+        if (!p.getGameMode().equals(GameMode.ADVENTURE) && !p.hasPermission("upsilon.admin"))
+            p.setGameMode(GameMode.ADVENTURE);
+
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onJoinGain(PlayerJoinEvent e) {
         final Player p = e.getPlayer();
+        if (!p.hasPermission("upsilon.bypass_joinspawn"))
+            if ((Main.getTimestamp() - main.ess.getUser(p).getLastLogout()) >= 10)
+                main.teleportToWarp("spawn", p);
         if (!p.getInventory().containsAtLeast(emerald, 1)) {
             if (!p.getEnderChest().containsAtLeast(emerald, 1)) {
                 if (p.getInventory().firstEmpty() != -1) {
@@ -175,7 +174,7 @@ public class MoneyListener implements Listener {
         if (set.allows(FLAG_ARENE)) {
             e.setCancelled(true);
             p.sendMessage(Main.getTAG() + "Pour ta sécurité, le drop d'item est interdit");
-            p.sendMessage(Main.getTAG() + "Pour envoyer un objet, tu peux faire " + ChatColor.ITALIC + "/sendto <pseudo>" + ChatColor.RESET + " ou sortir de l'arêne");
+            p.sendMessage(Main.getTAG() + "Pour envoyer un objet, tu peux faire " + ChatColor.ITALIC + "/sendto <pseudo> [quantité]" + ChatColor.RESET + " ou sortir de l'arêne");
         }
     }
 
@@ -406,8 +405,7 @@ public class MoneyListener implements Listener {
                 if (killstreaks.containsKey(v.getName()))
                     gain += killstreaks.get(v.getName());
             }
-            if (gain > 50) gain = 50;
-            if (gain < 1) gain = 1;
+            gain = Math.min(1, Math.max(gain, 50)); // gain entre 1 et 50 :D
             if (main.isVIP(d))
                 gain = (int) (gain * 1.25);
             d.sendMessage(Main.getTAG() + ChatColor.DARK_GREEN + "+ " + ChatColor.GOLD + gain + ChatColor.RESET + "ƒ pour le kill de " + v.getDisplayName());
