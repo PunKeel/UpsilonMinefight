@@ -12,10 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerKickEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
@@ -50,7 +47,7 @@ public class TeamManager implements Listener {
     void broadcastTeamBarMessage(Team team, String message) {
         for (OfflinePlayer p : team.getPlayers())
             if (p.isOnline())
-                BarAPI.setMessage((Player) p, "[" + ChatColor.GREEN + team + ChatColor.RESET + "] " + message);
+                BarAPI.setMessage((Player) p, "[" + ChatColor.GREEN + team.getDisplayName() + ChatColor.RESET + "] " + message);
     }
 
     void broadcastTeamBarHealth(Team team, float health) {
@@ -118,6 +115,9 @@ public class TeamManager implements Listener {
         }
         broadcastTeamBarMessage(t, p.getDisplayName() + ChatColor.GOLD + " vous rejoint !");
         t.addPlayer(p);
+        if (!scores.containsKey(t.getName()))
+            scores.put(t.getName(), 0f);
+        broadcastTeamBarHealth(t, scores.get(t.getName()));
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -156,6 +156,15 @@ public class TeamManager implements Listener {
             }
             broadcastTeamBarHealth(td, scores.get(td.getName()));
 
+        }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onRespawn(PlayerRespawnEvent e) {
+        Player p = e.getPlayer();
+        Team tp = SB.getPlayerTeam(p);
+        if (tp != null) {
+            broadcastTeamBarHealth(tp, scores.get(tp.getName()));
         }
     }
 }
