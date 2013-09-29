@@ -10,6 +10,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 import java.util.*;
 
@@ -352,6 +353,24 @@ public class Commandes {
         }
         main.AC.testPlayer(p);
         cs.sendMessage(Main.getTAG() + "Test forcefield/bowaimbot lancé sur " + p.getName());
+    }
+
+    @CommandController.CommandHandler(name = "vector", permission = "upsilon.vector", usage = "/vector <x> <y> <z> <player>")
+    public void onVector(CommandSender cs, String[] args) {
+        if (args.length != 4) {
+            cs.sendMessage(Main.getTAG() + "Usage : /vector <x> <y> <z> <player>");
+            return;
+        }
+        Float x = Float.valueOf(args[0]);
+        Float y = Float.valueOf(args[1]);
+        Float z = Float.valueOf(args[2]);
+        String name = args[3];
+        Player p = Bukkit.getPlayer(name);
+        if (p == null) {
+            cs.sendMessage(Main.getTAG() + "Joueur " + name + " non trouvé");
+            return;
+        }
+        p.setVelocity(p.getVelocity().add(new Vector(x, y, z)));
     }
 }
 
