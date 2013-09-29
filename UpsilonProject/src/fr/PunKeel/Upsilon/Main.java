@@ -67,7 +67,7 @@ public class Main extends JavaPlugin {
     private ConfigManager CM = new ConfigManager(this);
     private SimpleConfig globalConfig, locationsConfig, amisConfig;
     private WGCustomFlagsPlugin WGCF;
-    private TeamManager TM;
+    TeamManager TM;
     private int bCasterThread = 0;
 
     public static <T> T getRandom(T[] array) {

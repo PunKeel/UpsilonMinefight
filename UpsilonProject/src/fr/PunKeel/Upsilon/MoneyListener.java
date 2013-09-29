@@ -231,6 +231,8 @@ public class MoneyListener implements Listener {
                                 if (!main.ess.getUser(c).isVanished()) {
                                     p.showPlayer(c);
                                     c.showPlayer(p);
+                                    main.TM.broadcastTeamBarHealth(main.TM.SB.getPlayerTeam(c));
+                                    main.TM.broadcastTeamBarHealth(main.TM.SB.getPlayerTeam(p));
                                 }
                             }
                         }

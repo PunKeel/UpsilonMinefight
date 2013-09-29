@@ -45,15 +45,17 @@ public class TeamManager implements Listener {
     }
 
     void broadcastTeamBarMessage(Team team, String message) {
+        if (team == null) return;
         for (OfflinePlayer p : team.getPlayers())
             if (p.isOnline())
                 BarAPI.setMessage((Player) p, "[" + ChatColor.GREEN + team.getDisplayName() + ChatColor.RESET + "] " + message);
     }
 
-    void broadcastTeamBarHealth(Team team, float health) {
+    void broadcastTeamBarHealth(Team team) {
+        if (team == null) return;
         for (OfflinePlayer p : team.getPlayers())
             if (p.isOnline())
-                BarAPI.setHealth((Player) p, 100 * health);
+                BarAPI.setHealth((Player) p, 100 * scores.get(team.getName()));
     }
 
     void quit(Player p) {
@@ -69,12 +71,14 @@ public class TeamManager implements Listener {
     }
 
     private void broadcastTeamMessage(Team team, String message) {
+        if (team == null) return;
         for (OfflinePlayer p : team.getPlayers())
             if (p.isOnline())
                 ((Player) p).sendMessage(message);
     }
 
     private void shareMoney(Team team, int amount) {
+        if (team == null) return;
         for (OfflinePlayer p : team.getPlayers())
             if (p.isOnline())
                 try {
@@ -117,7 +121,7 @@ public class TeamManager implements Listener {
         t.addPlayer(p);
         if (!scores.containsKey(t.getName()))
             scores.put(t.getName(), 0.00001f);
-        broadcastTeamBarHealth(t, scores.get(t.getName()));
+        broadcastTeamBarHealth(t);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -155,7 +159,7 @@ public class TeamManager implements Listener {
                 broadcastTeamMessage(td, Main.getTAG() + ChatColor.DARK_GREEN + "+ " + ChatColor.GOLD + "2000" + ChatColor.DARK_GREEN + "ƒ" + ChatColor.RESET + " à partager avec ta team !");
                 scores.put(td.getName(), 0.00001f);
             }
-            broadcastTeamBarHealth(td, scores.get(td.getName()));
+            broadcastTeamBarHealth(td);
 
         }
     }
@@ -165,7 +169,7 @@ public class TeamManager implements Listener {
         Player p = e.getPlayer();
         Team tp = SB.getPlayerTeam(p);
         if (tp != null) {
-            broadcastTeamBarHealth(tp, scores.get(tp.getName()));
+            broadcastTeamBarHealth(tp);
         }
     }
 }
