@@ -31,11 +31,12 @@ import java.util.HashMap;
 public class MenuManager implements Listener {
 
     public static final StateFlag FLAG_EMERAUDE = new StateFlag("emeraude", true);
-    public HashMap<String, Menus> current_menu = new HashMap<String, Menus>();
+    public HashMap<String, Menus> current_menu;
     Main m;
 
     public MenuManager(Main main) {
         m = main;
+        current_menu = new HashMap<String, Menus>();
     }
 
     public void init() {

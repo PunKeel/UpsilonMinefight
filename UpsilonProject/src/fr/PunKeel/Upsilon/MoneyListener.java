@@ -361,6 +361,9 @@ public class MoneyListener implements Listener {
     @EventHandler(priority = EventPriority.LOW)
     public void onDeath(PlayerDeathEvent e) {
         Player v = e.getEntity();
+
+        if (killstreaks.containsKey(v.getName())) killstreaks.remove(v.getName());
+
         if (v.hasMetadata("NPC")) return;
         Location loc = v.getLocation();
         ApplicableRegionSet set = main.RM.getApplicableRegions(loc);
@@ -375,6 +378,12 @@ public class MoneyListener implements Listener {
         Player d = v.getKiller();
         if (d == null) return;
         if (!d.isOnline()) return;
+
+        if (killstreaks.containsKey(d.getName()))
+            killstreaks.put(d.getName(), killstreaks.get(d.getName()) + 1);
+        else
+            killstreaks.put(d.getName(), 1);
+
         if (d.getName().equals(v.getName())) return;
         int success;
         if (kill_en_boucle.containsKey(d.getName())) {
@@ -409,10 +418,7 @@ public class MoneyListener implements Listener {
             if (main.isVIP(d))
                 gain = (int) (gain * 1.25);
             d.sendMessage(Main.getTAG() + ChatColor.DARK_GREEN + "+ " + ChatColor.GOLD + gain + ChatColor.RESET + "ƒ pour le kill de " + v.getDisplayName());
-            if (killstreaks.containsKey(d.getName()))
-                killstreaks.put(d.getName(), killstreaks.get(d.getName()) + 1);
-            else
-                killstreaks.put(d.getName(), 1);
+
             if (congrats.containsKey(killstreaks.get(d.getName())))
                 topbar_messages.put(d.getName(), ChatColor.DARK_GREEN + congrats.get(statsa.getStreak()));
             main.addToBalance(d.getName(), gain);
@@ -423,7 +429,6 @@ public class MoneyListener implements Listener {
         } else {
             v.sendMessage(Main.getTAG() + Main.getRandom(morts).replaceAll("%s", d.getDisplayName()));
         }
-        killstreaks.remove(v.getName());
     }
 
     @EventHandler
