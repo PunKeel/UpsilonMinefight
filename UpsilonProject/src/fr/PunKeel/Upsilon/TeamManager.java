@@ -116,7 +116,7 @@ public class TeamManager implements Listener {
         broadcastTeamBarMessage(t, p.getDisplayName() + ChatColor.GOLD + " vous rejoint !");
         t.addPlayer(p);
         if (!scores.containsKey(t.getName()))
-            scores.put(t.getName(), 0f);
+            scores.put(t.getName(), 0.00001f);
         broadcastTeamBarHealth(t, scores.get(t.getName()));
     }
 
