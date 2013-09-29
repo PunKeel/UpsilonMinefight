@@ -8,6 +8,7 @@ import com.google.common.base.Joiner;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import me.confuser.barapi.BarAPI;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
@@ -48,11 +49,20 @@ public class MoneyListener implements Listener {
     private HashMap<String, Integer> kill_en_boucle = new HashMap<>();
     private HashMap<String, String> victime_en_boucle = new HashMap<>();
     private Set<String> invisi_players = new HashSet<>();
+    private HashMap<Integer, String> congrats = new HashMap<>();
+    private HashMap<String, Integer> killstreaks = new HashMap<>();
+    private HashMap<String, String> topbar_messages = new HashMap<>();
 
     public MoneyListener(Main m) {
         main = m;
         emerald = m.nameItem(new ItemStack(Material.EMERALD), ChatColor.GREEN + "Menu principal", ChatColor.GRAY + "(Clic droit pour ouvrir)");
         morts = new String[]{"%s t'a tué", "Tu es mort de la main de %s", "%s est ton assassin", "%s est un meurtrier !", "%s a réussi à te tuer !", "Si tu veux te venger, c'est %s que tu dois tuer !"};
+        congrats.put(2, "Double kill");
+        congrats.put(3, "Triple kill");
+        congrats.put(4, "Quadra kill");
+        congrats.put(5, "Penta kill");
+        congrats.put(6, "Legendary kill");
+        congrats.put(10, "Killing spree");
 
     }
 
@@ -190,6 +200,12 @@ public class MoneyListener implements Listener {
     public void onRespawn(PlayerRespawnEvent e) {
         final Player p = e.getPlayer();
         Location loc = p.getLocation();
+
+        if (topbar_messages.containsKey(p.getName())) {
+            BarAPI.setMessage(p, ChatColor.RESET + topbar_messages.get(p.getName()), 20);
+            topbar_messages.remove(p.getName());
+        }
+
         PlayerCache statsv = Database.getCache(p.getName());
         long ratio = (long) (1 + statsv.getKills()) / (long) (1 + statsv.getDeaths());
         if (ratio <= 0.4) {
@@ -378,7 +394,7 @@ public class MoneyListener implements Listener {
             d.sendMessage(Main.getTAG() + ChatColor.DARK_RED + "Pas de gain car kill répété sur " + ChatColor.RESET + v.getDisplayName());
         } else {
             Calendar c = Calendar.getInstance();
-            int gain = (c.getActualMaximum(Calendar.DAY_OF_MONTH) - c.get(Calendar.DAY_OF_MONTH)) * 4 / 5;
+            int gain = (c.getActualMaximum(Calendar.DAY_OF_MONTH) - c.get(Calendar.DAY_OF_MONTH)) * 4 / 5; // Permet de gagner plus au début du mois (=> reset auto)
             PlayerCache statsv = Database.getCache(v.getName());
             PlayerCache statsa = Database.getCache(d.getName());
             if (statsa.getKills() > statsv.getKills() && statsa.getDeaths() > statsv.getDeaths()) {
@@ -387,16 +403,29 @@ public class MoneyListener implements Listener {
             } else {
                 // Victime plus forte qu'attaquant
                 gain += (int) (Math.sqrt(statsv.getKills() ^ 2 / (statsv.getDeaths() + 1)) / 2) + 1;
-                gain += statsv.getLastStreak();
+                if (killstreaks.containsKey(v.getName()))
+                    gain += killstreaks.get(v.getName());
             }
             if (gain > 50) gain = 50;
             if (gain < 1) gain = 1;
             if (main.isVIP(d))
                 gain = (int) (gain * 1.25);
             d.sendMessage(Main.getTAG() + ChatColor.DARK_GREEN + "+ " + ChatColor.GOLD + gain + ChatColor.RESET + "ƒ pour le kill de " + v.getDisplayName());
+            if (killstreaks.containsKey(d.getName()))
+                killstreaks.put(d.getName(), killstreaks.get(d.getName()) + 1);
+            else
+                killstreaks.put(d.getName(), 1);
+            if (congrats.containsKey(killstreaks.get(d.getName())))
+                topbar_messages.put(d.getName(), ChatColor.DARK_GREEN + congrats.get(statsa.getStreak()));
             main.econ.depositPlayer(d.getName(), gain);
+
         }
-        v.sendMessage(Main.getTAG() + Main.getRandom(morts).replaceAll("%s", d.getDisplayName()));
+        if (!BarAPI.hasBar(v)) {
+            topbar_messages.put(v.getName(), "Tué par " + ChatColor.DARK_RED + d.getDisplayName());
+        } else {
+            v.sendMessage(Main.getTAG() + Main.getRandom(morts).replaceAll("%s", d.getDisplayName()));
+        }
+        killstreaks.remove(v.getName());
     }
 
     @EventHandler
@@ -560,7 +589,6 @@ public class MoneyListener implements Listener {
                 break;
         }
         String[] insultes = new String[]{"gueule", "tg", "connard", "salop", "pute", "enfoiré", "salope", "connasse", "asshole", "nique", "faire foutre", "bâtard", "batard", "bite", "encul", "salaud"};
-        String m = e.getMessage().toLowerCase();
         for (String insulte : insultes) {
             if (e.getMessage().contains(insulte))
                 e.getPlayer().damage(2);
