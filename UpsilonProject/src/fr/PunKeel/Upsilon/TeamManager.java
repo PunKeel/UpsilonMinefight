@@ -22,6 +22,7 @@ import org.bukkit.scoreboard.Team;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Random;
 
 /**
  * User: PunKeel
@@ -142,11 +143,12 @@ public class TeamManager implements Listener {
         Team td = SB.getPlayerTeam(d);
         if (td != null) {
             broadcastTeamBarMessage(td, d.getDisplayName() + " a tué " + p.getDisplayName());
+            float bonus = new Random().nextFloat() / 9;
             if (!scores.containsKey(td.getName()))
-                scores.put(td.getName(), 0.1f);
+                scores.put(td.getName(), bonus);
             else
-                scores.put(td.getName(), Math.max(1f, scores.get(td.getName()) + 0.1f));
-            if (scores.get(td.getName()) == 1) {
+                scores.put(td.getName(), Math.max(1f, scores.get(td.getName()) + bonus));
+            if (scores.get(td.getName()) == 1f) {
                 int gain = Math.round((float) 2000 / td.getPlayers().size());
                 shareMoney(td, gain);
                 broadcastTeamMessage(td, Main.getTAG() + ChatColor.DARK_GREEN + "+2000ƒ" + ChatColor.RESET + " à partager avec ta team !");
