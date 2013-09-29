@@ -67,7 +67,7 @@ public class Main extends JavaPlugin {
     private ConfigManager CM = new ConfigManager(this);
     private SimpleConfig globalConfig, locationsConfig, amisConfig;
     private WGCustomFlagsPlugin WGCF;
-    private TeamManager TM = new TeamManager(this);
+    private TeamManager TM;
     private int bCasterThread = 0;
 
     public static <T> T getRandom(T[] array) {
@@ -138,6 +138,7 @@ public class Main extends JavaPlugin {
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
+        TM = new TeamManager(this);
         Bukkit.getPluginManager().registerEvents(moneyListener, this);
         Bukkit.getPluginManager().registerEvents(chrono, this);
         Bukkit.getPluginManager().registerEvents(enchant_menu, this);
@@ -186,6 +187,7 @@ public class Main extends JavaPlugin {
             @Override
             public void run() {
                 int gain;
+                if (players == null) return;
                 for (String k : players) {
                     Player p = Bukkit.getPlayerExact(k);
                     if (p == null || !p.isOnline()) continue;
