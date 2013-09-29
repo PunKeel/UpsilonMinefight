@@ -141,6 +141,7 @@ public class TeamManager implements Listener {
             broadcastTeamBarMessage(tp, p.getDisplayName() + " a été tué par " + d.getDisplayName());
         }
         Team td = SB.getPlayerTeam(d);
+        if (tp == td) return;
         if (td != null) {
             broadcastTeamBarMessage(td, d.getDisplayName() + " a tué " + p.getDisplayName());
             float bonus = (float) (new Random().nextDouble() / 9);
