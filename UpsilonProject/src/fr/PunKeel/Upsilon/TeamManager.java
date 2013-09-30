@@ -110,18 +110,17 @@ public class TeamManager implements Listener {
         Player p = e.getPlayer();
         if (!team_joueur.containsKey(p.getName())) return;
         String subdomain = team_joueur.get(p.getName());
-        FakeDragon.setStatus(p, "[" + ChatColor.GREEN + subdomain + ChatColor.RESET + "] Vous avez rejoint la team", 1);
         Team t = SB.getTeam(subdomain);
         if (t == null) {
             t = SB.registerNewTeam(subdomain);
             t.setAllowFriendlyFire(false);
             t.setCanSeeFriendlyInvisibles(true);
         }
-        broadcastTeamBarMessage(t, p.getDisplayName() + ChatColor.GOLD + " vous rejoint !");
-        t.addPlayer(p);
         if (!scores.containsKey(t.getName()))
             scores.put(t.getName(), 1);
-        broadcastTeamBarHealth(t);
+        FakeDragon.setStatus(p, "[" + ChatColor.GREEN + subdomain + ChatColor.RESET + "] Vous avez rejoint la team", scores.get(subdomain));
+        broadcastTeamBarMessage(t, p.getDisplayName() + ChatColor.GOLD + " vous rejoint !");
+        t.addPlayer(p);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
