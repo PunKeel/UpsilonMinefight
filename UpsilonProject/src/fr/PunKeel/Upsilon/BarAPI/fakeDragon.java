@@ -3,8 +3,6 @@ package fr.PunKeel.Upsilon.BarAPI;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -14,61 +12,49 @@ import java.util.Map;
 
 public class FakeDragon {
 
-    public static final int MAX_HEALTH = 200;
-    public static Integer ENTITY_ID = 6000;
-    public static Map<String, FakeDragon> dragonplayers = new HashMap<String, FakeDragon>();
-    public boolean visible;
-    public int EntityID;
-    public int x;
-    public int y;
-    public int z;
-    public int pitch = 0;
-    public int head_pitch = 0;
-    public int yaw = 0;
-    public byte xvel = 0;
-    public byte yvel = 0;
-    public byte zvel = 0;
-    public float health;
-    public String name;
+    private static final int MAX_HEALTH = 200;
+    private static final Map<String, FakeDragon> dragonplayers = new HashMap<>();
+    private final boolean visible;
+    private final int EntityID;
+    private final int x;
+    private final int y;
+    private final int z;
+    private float health;
+    private String name;
 
-    public FakeDragon(String name, int EntityID, Location loc) {
+    private FakeDragon(String name, int EntityID, Location loc) {
         this(name, EntityID, (int) Math.floor(loc.getBlockX() * 32.0D), (int) Math.floor(loc.getBlockY() * 32.0D), (int) Math.floor(loc.getBlockZ() * 32.0D));
     }
 
-    public FakeDragon(String name, int EntityID, Location loc, float health, boolean visible) {
-        this(name, EntityID, (int) Math.floor(loc.getBlockX() * 32.0D), (int) Math.floor(loc.getBlockY() * 32.0D), (int) Math.floor(loc.getBlockZ() * 32.0D), health, visible);
-    }
-
-    public FakeDragon(String name, int EntityID, int x, int y, int z) {
-        this(name, EntityID, x, y, z, MAX_HEALTH, false);
-    }
-
-    public FakeDragon(String name, int EntityID, int x, int y, int z, float health, boolean visible) {
+    private FakeDragon(String name, int EntityID, int x, int y, int z) {
         this.name = name;
         this.EntityID = EntityID;
         this.x = x;
         this.y = y;
         this.z = z;
-        this.health = health;
-        this.visible = visible;
+        this.health = (float) FakeDragon.MAX_HEALTH;
+        this.visible = false;
     }
 
     public static void setStatus(Player player, String text, int healthpercent) {
-        FakeDragon dragon = null;
+        FakeDragon dragon;
         if (dragonplayers.containsKey(player.getName())) {
             dragon = dragonplayers.get(player.getName());
             if (text == null)
                 text = dragon.name;
-
+            else
+                dragon.name = text;
             if (healthpercent == -1)
                 healthpercent = (int) (dragon.health / FakeDragon.MAX_HEALTH) * 100;
-        } else if (!text.equals("")) {
+
+        } else {
+            Integer ENTITY_ID = 6000;
             dragon = new FakeDragon(text, ENTITY_ID, player.getLocation().add(0, -200, 0));
 
             dragonplayers.put(player.getName(), dragon);
         }
 
-        if (text.equals("") && dragonplayers.containsKey(player.getName())) {
+        if (text.isEmpty() && dragonplayers.containsKey(player.getName())) {
             Object destroyPacket = dragon.getDestroyEntityPacket();
             General.sendPacket(player, destroyPacket);
 
@@ -85,54 +71,7 @@ public class FakeDragon {
         }
     }
 
-    public static void displayDragonTextBar(Plugin plugin, String text, final Player player, long length) {
-        setStatus(player, text, 100);
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                setStatus(player, "", 100);
-            }
-        }.runTaskLater(plugin, length);
-    }
-
-    public static void displayDragonLoadingBar(final Plugin plugin, final String text, final String completeText, final Player player, final int healthAdd, final long delay, final boolean loadUp) {
-        setStatus(player, "", (loadUp ? 1 : 100));
-
-        new BukkitRunnable() {
-            int health = (loadUp ? 1 : 100);
-
-            @Override
-            public void run() {
-                if ((loadUp ? health < 100 : health > 1)) {
-                    setStatus(player, text, health);
-                    if (loadUp) {
-                        health += healthAdd;
-                    } else {
-                        health -= healthAdd;
-                    }
-                } else {
-                    setStatus(player, completeText, (loadUp ? 100 : 1));
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            setStatus(player, "", (loadUp ? 100 : 1));
-                        }
-                    }.runTaskLater(plugin, 20);
-
-                    this.cancel();
-                }
-            }
-        }.runTaskTimer(plugin, delay, delay);
-    }
-
-    public static void displayDragonLoadingBar(final Plugin plugin, final String text, final String completeText, final Player player, final int secondsDelay, final boolean loadUp) {
-        final int healthChangePerSecond = 100 / secondsDelay / 4;
-
-        displayDragonLoadingBar(plugin, text, completeText, player, healthChangePerSecond, 5L, loadUp);
-    }
-
-    public Object getMobPacket() {
+    Object getMobPacket() {
         Class<?> mob_class = General.getCraftClass("Packet24MobSpawn");
         Object mobPacket = null;
         try {
@@ -155,37 +94,41 @@ public class FakeDragon {
             e.set(mobPacket, z);//Z position
             Field f = General.getField(mob_class, "f");
             f.setAccessible(true);
+            int pitch = 0;
             f.set(mobPacket, (byte) ((int) (pitch * 256.0F / 360.0F)));//Pitch
             Field g = General.getField(mob_class, "g");
             g.setAccessible(true);
+            int head_pitch = 0;
             g.set(mobPacket, (byte) ((int) (head_pitch * 256.0F / 360.0F)));//Head Pitch
             Field h = General.getField(mob_class, "h");
             h.setAccessible(true);
+            int yaw = 0;
             h.set(mobPacket, (byte) ((int) (yaw * 256.0F / 360.0F)));//Yaw
             Field i = General.getField(mob_class, "i");
             i.setAccessible(true);
+            byte xvel = 0;
             i.set(mobPacket, xvel);//X velocity
             Field j = General.getField(mob_class, "j");
             j.setAccessible(true);
+            byte yvel = 0;
             j.set(mobPacket, yvel);//Y velocity
             Field k = General.getField(mob_class, "k");
             k.setAccessible(true);
+            byte zvel = 0;
             k.set(mobPacket, zvel);//Z velocity
 
             Object watcher = getWatcher();
             Field t = General.getField(mob_class, "t");
             t.setAccessible(true);
             t.set(mobPacket, watcher);
-        } catch (InstantiationException e1) {
-            e1.printStackTrace();
-        } catch (IllegalAccessException e1) {
+        } catch (InstantiationException | IllegalAccessException e1) {
             e1.printStackTrace();
         }
 
         return mobPacket;
     }
 
-    public Object getDestroyEntityPacket() {
+    Object getDestroyEntityPacket() {
         Class<?> packet_class = General.getCraftClass("Packet29DestroyEntity");
         Object packet = null;
         try {
@@ -194,16 +137,14 @@ public class FakeDragon {
             Field a = General.getField(packet_class, "a");
             a.setAccessible(true);
             a.set(packet, new int[]{EntityID});
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
 
         return packet;
     }
 
-    public Object getMetadataPacket(Object watcher) {
+    Object getMetadataPacket(Object watcher) {
         Class<?> packet_class = General.getCraftClass("Packet40EntityMetadata");
         Object packet = null;
         try {
@@ -217,20 +158,14 @@ public class FakeDragon {
             Field b = General.getField(packet_class, "b");
             b.setAccessible(true);
             b.set(packet, watcher_c.invoke(watcher));
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (InstantiationException | InvocationTargetException | IllegalArgumentException | IllegalAccessException e) {
             e.printStackTrace();
         }
 
         return packet;
     }
 
-    public Object getTeleportPacket(Location loc) {
+    Object getTeleportPacket(Location loc) {
         Class<?> packet_class = General.getCraftClass("Packet34EntityTeleport");
         Object packet = null;
         try {
@@ -254,32 +189,13 @@ public class FakeDragon {
             Field f = General.getField(packet_class, "f");
             f.setAccessible(true);
             f.set(packet, (byte) ((int) (loc.getPitch() * 256.0F / 360.0F)));
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
         return packet;
     }
 
-    public Object getRespawnPacket() {
-        Class<?> packet_class = General.getCraftClass("Packet205ClientCommand");
-        Object packet = null;
-        try {
-            packet = packet_class.newInstance();
-
-            Field a = General.getField(packet_class, "a");
-            a.setAccessible(true);
-            a.set(packet, 1);
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return packet;
-    }
-
-    public Object getWatcher() {
+    Object getWatcher() {
         Class<?> watcher_class = General.getCraftClass("DataWatcher");
         Object watcher = null;
         try {
@@ -289,18 +205,12 @@ public class FakeDragon {
             a.setAccessible(true);
 
             a.invoke(watcher, 0, visible ? (byte) 0 : (byte) 0x20);
-            a.invoke(watcher, 6, (Float) (float) health);
-            a.invoke(watcher, 7, (Integer) (int) 0);
-            a.invoke(watcher, 8, (Byte) (byte) 0);
-            a.invoke(watcher, 10, (String) name);
-            a.invoke(watcher, 11, (Byte) (byte) 1);
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+            a.invoke(watcher, 6, health);
+            a.invoke(watcher, 7, 0);
+            a.invoke(watcher, 8, (byte) 0);
+            a.invoke(watcher, 10, name);
+            a.invoke(watcher, 11, (byte) 1);
+        } catch (InstantiationException | InvocationTargetException | IllegalArgumentException | IllegalAccessException e) {
             e.printStackTrace();
         }
 
