@@ -51,13 +51,6 @@ public class TeamManager implements Listener {
                 FakeDragon.setStatus((Player) p, "[" + ChatColor.GREEN + team.getDisplayName() + ChatColor.RESET + "] " + message, scores.get(team.getName()));
     }
 
-    void broadcastTeamBarHealth(Team team) {
-        if (team == null) return;
-        for (OfflinePlayer p : team.getPlayers())
-            if (p.isOnline())
-                FakeDragon.setStatus((Player) p, null, scores.get(team.getName()));
-    }
-
     void quit(Player p) {
         Team t = SB.getPlayerTeam(p);
         if (t == null)
@@ -66,7 +59,7 @@ public class TeamManager implements Listener {
         if (t.getPlayers().size() == 0)
             t.unregister();
         else
-            broadcastTeamBarMessage(t, p.getDisplayName() + ChatColor.GOLD + " vous quitte");
+            broadcastTeamBarMessage(t, ChatColor.GOLD + p.getDisplayName() + ChatColor.RESET + " vous quitte");
 
     }
 
@@ -119,7 +112,7 @@ public class TeamManager implements Listener {
         if (!scores.containsKey(t.getName()))
             scores.put(t.getName(), 1);
         FakeDragon.setStatus(p, "[" + ChatColor.GREEN + subdomain + ChatColor.RESET + "] Vous avez rejoint la team", scores.get(subdomain));
-        broadcastTeamBarMessage(t, p.getDisplayName() + ChatColor.GOLD + " vous rejoint !");
+        broadcastTeamBarMessage(t, ChatColor.GOLD + p.getDisplayName() + ChatColor.RESET + " vous rejoint !");
         t.addPlayer(p);
     }
 
@@ -141,13 +134,12 @@ public class TeamManager implements Listener {
             return;
         Team tp = SB.getPlayerTeam(p);
         if (tp != null) {
-            broadcastTeamBarMessage(tp, p.getDisplayName() + " a été tué par " + d.getDisplayName());
+            broadcastTeamBarMessage(tp, ChatColor.GOLD + p.getDisplayName() + ChatColor.RESET + " a été tué par " + ChatColor.GOLD + d.getDisplayName());
         }
         Team td = SB.getPlayerTeam(d);
         if (tp == td) return;
         if (td != null) {
-            broadcastTeamBarMessage(td, d.getDisplayName() + " a tué " + p.getDisplayName());
-            int bonus = new Random().nextInt(1);
+            int bonus = new Random().nextInt(1) + 1;
             if (!scores.containsKey(td.getName()))
                 scores.put(td.getName(), bonus);
             else
@@ -158,7 +150,8 @@ public class TeamManager implements Listener {
                 broadcastTeamMessage(td, Main.getTAG() + ChatColor.DARK_GREEN + "+ " + ChatColor.GOLD + "2000" + ChatColor.DARK_GREEN + "ƒ" + ChatColor.RESET + " à partager avec ta team !");
                 scores.put(td.getName(), 1);
             }
-            broadcastTeamBarHealth(td);
+
+            broadcastTeamBarMessage(td, d.getDisplayName() + " a tué " + p.getDisplayName());
 
         }
     }
@@ -168,6 +161,7 @@ public class TeamManager implements Listener {
         Player p = e.getPlayer();
         Team t = SB.getPlayerTeam(p);
         if (t == null) return;
+        if (t.getName().isEmpty()) return;
         FakeDragon.setStatus(p, null, -1);
     }
 }
