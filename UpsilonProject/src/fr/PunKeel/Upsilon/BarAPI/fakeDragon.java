@@ -63,7 +63,7 @@ public class FakeDragon {
             Object mobPacket = dragon.getMobPacket();
             General.sendPacket(player, mobPacket);
 
-            dragon.health = (healthpercent / 100f) * FakeDragon.MAX_HEALTH;
+            dragon.health = (healthpercent / 100) * FakeDragon.MAX_HEALTH;
             Object metaPacket = dragon.getMetadataPacket(dragon.getWatcher());
             Object teleportPacket = dragon.getTeleportPacket(player.getLocation().add(0, -200, 0));
             General.sendPacket(player, metaPacket);

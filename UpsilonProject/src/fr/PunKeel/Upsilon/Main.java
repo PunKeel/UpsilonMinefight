@@ -23,7 +23,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Team;
 import ru.tehkode.permissions.PermissionManager;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
@@ -388,13 +387,6 @@ public class Main extends JavaPlugin {
                 if (i >= messages.length) i = 0;
             }
         }, 20, 20 * 60 * 3);
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (Team team : TM.SB.getTeams())
-                    TM.broadcastTeamBarHealth(team);
-            }
-        }, 20L, 20L);
 
     }
 
