@@ -162,6 +162,7 @@ public class TeamManager implements Listener {
         Team t = SB.getPlayerTeam(p);
         if (t == null) return;
         if (t.getName().isEmpty()) return;
-        FakeDragon.setStatus(p, null, -1);
+        if (FakeDragon.hasBar(p))
+            FakeDragon.setStatus(p, null, -1);
     }
 }
