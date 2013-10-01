@@ -372,5 +372,13 @@ public class Commandes {
         }
         p.setVelocity(p.getVelocity().add(new Vector(x, y, z)));
     }
+
+    @CommandController.CommandHandler(name = "fb", permission = "upsilon.fb")
+    public void onFB(Player cs, String[] args) {
+        boolean open = new Random().nextBoolean();
+        main.moneyListener.setSpawnWall(cs, open);
+        cs.sendMessage(open ? "Open" : "Closed");
+
+    }
 }
 

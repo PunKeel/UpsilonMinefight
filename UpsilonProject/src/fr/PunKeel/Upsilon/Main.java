@@ -57,7 +57,7 @@ public class Main extends JavaPlugin {
     private MainMenu main_menu = new MainMenu(this, menu_manager);
     private EnchantMenu enchant_menu = new EnchantMenu(this, menu_manager);
     private TeleportationMenu teleportation_menu = new TeleportationMenu(this, menu_manager);
-    private MoneyListener moneyListener = new MoneyListener(this);
+    MoneyListener moneyListener = new MoneyListener(this);
     private RoiAuSommet roi = new RoiAuSommet(this);
     private Commandes commandes = new Commandes(this);
     private Chronos chrono = new Chronos(this);

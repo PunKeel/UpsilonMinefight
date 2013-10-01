@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-class General {
+public class General {
     public static void sendPacket(Player p, Object packet) {
         try {
             Object nmsPlayer = getHandle(p);
