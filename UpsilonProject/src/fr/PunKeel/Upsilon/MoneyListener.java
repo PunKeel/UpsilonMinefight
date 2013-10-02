@@ -416,7 +416,7 @@ public class MoneyListener implements Listener {
                 if (killstreaks.containsKey(v.getName()))
                     gain += killstreaks.get(v.getName());
             }
-            gain = Math.min(1, Math.max(gain, 50)); // gain entre 1 et 50 :D
+            gain = Math.max(1, Math.min(gain, 50)); // gain entre 1 et 50 :D
             if (main.isVIP(d))
                 gain = (int) (gain * 1.25);
             d.sendMessage(Main.getTAG() + ChatColor.DARK_GREEN + "+ " + ChatColor.GOLD + gain + ChatColor.RESET + "ƒ pour le kill de " + v.getDisplayName());
