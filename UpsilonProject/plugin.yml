@@ -41,3 +41,5 @@ commands:
      description: Permet de suivre quelqu'un
    vector:
      description: Applique un vecteur <x> <y> <z> au <joueur>
+   fb:
+     description: test :)

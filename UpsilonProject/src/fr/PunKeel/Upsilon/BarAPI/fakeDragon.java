@@ -38,37 +38,57 @@ public class FakeDragon {
 
     public static void setStatus(Player player, String text, int healthpercent) {
         FakeDragon dragon;
-        if (dragonplayers.containsKey(player.getName())) {
+        boolean new_entity = false, update_entity = false, remove_entity = false;
+        if (hasBar(player)) {
             dragon = dragonplayers.get(player.getName());
-            if (text == null)
-                text = dragon.name;
-            else
-                dragon.name = text;
-            if (healthpercent == -1)
-                healthpercent = (int) (dragon.health / FakeDragon.MAX_HEALTH) * 100;
+            if (text != null) {
+                if (!dragon.name.equals(text)) {
+                    dragon.name = text;
+                    update_entity = true;
+                }
+            } else {
+                remove_entity = true;
+            }
+            if (healthpercent != -1) {
+                if (dragon.health != (dragon.health / FakeDragon.MAX_HEALTH) * 100) {
+                    update_entity = true;
+                    dragon.health = (dragon.health / FakeDragon.MAX_HEALTH) * 100;
+                }
+            }
 
         } else {
-            Integer ENTITY_ID = 6000;
-            dragon = new FakeDragon(text, ENTITY_ID, player.getLocation().add(0, -200, 0));
+            dragon = new FakeDragon(text, 6000, player.getLocation().add(0, -200, 0));
+            if (healthpercent != -1) {
 
+                dragon.health = (healthpercent / 100) * FakeDragon.MAX_HEALTH;
+            } else {
+                dragon.health = 0;
+            }
+            new_entity = true;
             dragonplayers.put(player.getName(), dragon);
         }
 
-        if (text.isEmpty() && dragonplayers.containsKey(player.getName())) {
+
+        if (remove_entity && !update_entity) {
             Object destroyPacket = dragon.getDestroyEntityPacket();
             General.sendPacket(player, destroyPacket);
 
             dragonplayers.remove(player.getName());
-        } else {
+            return;
+        }
+        if (new_entity) {
             Object mobPacket = dragon.getMobPacket();
             General.sendPacket(player, mobPacket);
-
-            dragon.health = (healthpercent / 100) * FakeDragon.MAX_HEALTH;
+        } else if (update_entity) {
             Object metaPacket = dragon.getMetadataPacket(dragon.getWatcher());
-            Object teleportPacket = dragon.getTeleportPacket(player.getLocation().add(0, -200, 0));
+            Object teleportPacket = dragon.getTeleportPacket(player.getLocation().subtract(0, 200, 0));
             General.sendPacket(player, metaPacket);
             General.sendPacket(player, teleportPacket);
         }
+    }
+
+    public static boolean hasBar(Player p) {
+        return dragonplayers.containsKey(p.getName());
     }
 
     Object getMobPacket() {
