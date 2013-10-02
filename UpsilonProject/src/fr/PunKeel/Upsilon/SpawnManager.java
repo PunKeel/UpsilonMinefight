@@ -5,7 +5,7 @@ import org.bukkit.Location;
 import java.util.*;
 
 public class SpawnManager {
-    private HashMap<String, ArrayList<SLocation>> respawns = new HashMap<String, ArrayList<SLocation>>();
+    private HashMap<String, ArrayList<SLocation>> respawns = new HashMap<>();
 
     public void addRespawn(String region, Location loc) {
         SLocation l = new SLocation(loc);
