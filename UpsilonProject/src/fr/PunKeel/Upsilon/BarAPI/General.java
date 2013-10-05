@@ -33,7 +33,7 @@ public class General {
         return c;
     }
 
-    private static Object getHandle(Player entity) {
+    public static Object getHandle(Player entity) {
         Object nms_entity = null;
         Method entity_getHandle = getMethod(entity.getClass(), "getHandle");
         try {
@@ -85,4 +85,15 @@ public class General {
         return equal;
     }
 
+    public static void receivePacket(Player player, Object packet) {
+        try {
+            Object nmsPlayer = getHandle(player);
+            Field con_field = nmsPlayer.getClass().getField("netServerHandler");
+            Object con = con_field.get(nmsPlayer);
+            Method packet_method = getMethod(con.getClass(), "a");
+            packet_method.invoke(con, packet);
+        } catch (SecurityException | NoSuchFieldException | InvocationTargetException | IllegalAccessException | IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+    }
 }

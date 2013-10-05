@@ -34,11 +34,7 @@ public class InfiniDisp implements Listener {
     @CommandController.CommandHandler(name = "infinidisp", permission = "upsilon.infinidisp", usage = "/infinidisp")
     public void onInfinidisp(Player p, String[] args) {
         Block b = p.getTargetBlock(null, 50);
-        if (b == null || b.getType().equals(Material.AIR)) {
-            p.sendMessage(Main.getTAG() + "Tu regardes un dispenser ou dropper, au moins ?");
-            return;
-        }
-        if (!(b.getType().equals(Material.DISPENSER) || b.getType().equals(Material.DROPPER))) {
+        if (b == null || !(b.getType().equals(Material.DISPENSER) || b.getType().equals(Material.DROPPER))) {
             p.sendMessage(Main.getTAG() + "Tu regardes un dispenser ou dropper, au moins ?");
             return;
         }

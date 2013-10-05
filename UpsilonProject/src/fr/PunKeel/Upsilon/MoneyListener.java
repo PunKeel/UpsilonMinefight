@@ -362,7 +362,27 @@ public class MoneyListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onDeath(PlayerDeathEvent e) {
-        Player v = e.getEntity();
+        final Player v = e.getEntity();
+        if (v.hasPermission("upsilon.bypass_death_screen")) {
+            Bukkit.getScheduler().scheduleSyncDelayedTask(main, new Runnable() {
+                @Override
+                public void run() {
+                    Class<?> PacketClientCommand = General.getCraftClass("Packet205ClientCommand");
+                    Object packet;
+                    try {
+
+                        packet = PacketClientCommand.newInstance();
+
+                        Field a = General.getField(PacketClientCommand, "a");
+                        a.setAccessible(true);
+                        a.set(packet, 1);
+                        General.receivePacket(v, packet);
+                    } catch (IllegalAccessException | InstantiationException e) {
+
+                    }
+                }
+            }, 0L);
+        }
 
         if (killstreaks.containsKey(v.getName())) killstreaks.remove(v.getName());
 
