@@ -83,7 +83,7 @@ public class Spleef implements Listener {
         for (int X = -radius; X <= radius; X++) {
             for (int Z = -radius; Z <= radius; Z++) {
                 if (Math.sqrt((X * X) + (Z * Z)) > radius) continue;
-                t.add(new Location(Bukkit.getWorld(Main.WORLDNAME), (double) centreX + X, (double) centreY, (double) centreZ + Z));
+                t.add(new Location(Bukkit.getWorld(Main.WORLDGAME), (double) centreX + X, (double) centreY, (double) centreZ + Z));
             }
         }
         return t;
@@ -196,7 +196,7 @@ public class Spleef implements Listener {
         if (event.getAction() != Action.LEFT_CLICK_BLOCK) return;
         Player player = event.getPlayer();
 
-        if (!player.getWorld().getName().equals(Main.WORLDNAME) || !playing) {
+        if (!player.getWorld().getName().equals(Main.WORLDGAME) || !playing) {
             return;
         }
         Block targetBlock = event.getClickedBlock();

@@ -43,7 +43,7 @@ public class AntiCheat implements Listener {
     }
 
     public void testPlayer(final Player p) {
-        CreateEntityContext context = manager.prepareEntity(RemoteEntityType.Human).asStationary(true).withName(new RandomString(16).nextString()).atLocation(Bukkit.getWorld(Main.WORLDNAME).getSpawnLocation());
+        CreateEntityContext context = manager.prepareEntity(RemoteEntityType.Human).asStationary(true).withName(new RandomString(16).nextString()).atLocation(p.getWorld().getSpawnLocation());
         final RemoteEntity x = context.create();
         x.getBukkitEntity().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, false), false);
         honeypots.add(x.getBukkitEntity().getUniqueId());
@@ -82,7 +82,7 @@ public class AntiCheat implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
-        for (Entity x : Bukkit.getWorld(Main.WORLDNAME).getEntities()) {
+        for (Entity x : e.getPlayer().getWorld().getEntities()) {
             if (honeypots.contains(x.getUniqueId()))
                 if (x instanceof Player)
                     e.getPlayer().hidePlayer((Player) x);

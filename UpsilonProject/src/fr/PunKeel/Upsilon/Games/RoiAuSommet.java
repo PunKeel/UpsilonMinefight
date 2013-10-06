@@ -45,7 +45,7 @@ public class RoiAuSommet implements Listener, CommandExecutor {
 
     Location getPortal() {
         if (portail == null) {
-            portail = new Location(Bukkit.getWorld("world"), -274, 100, 341);
+            portail = new Location(Bukkit.getWorld(Main.WORLDGAME), -274, 100, 341);
         }
         return portail;
 
@@ -58,7 +58,7 @@ public class RoiAuSommet implements Listener, CommandExecutor {
         if (x == -245 || x == -295) {
             z = rnd.nextInt(373 - 306) + 306;
         }
-        return new Location(Bukkit.getWorld("world"), x, y, z);
+        return new Location(Bukkit.getWorld(Main.WORLDGAME), x, y, z);
 
     }
 
@@ -209,7 +209,7 @@ public class RoiAuSommet implements Listener, CommandExecutor {
     public void onPortalWin(PlayerPortalEvent e) {
         if (etat != ETAPES.STARTED) return;
         Location loc = e.getFrom();
-        if (!loc.getWorld().getName().equals("world")) return;
+        if (!loc.getWorld().getName().equals(Main.WORLDGAME)) return;
         if (loc.distance(getPortal()) < 4) {
             Player p = e.getPlayer();
             broadcastParticipants(ChatColor.DARK_GREEN + p.getDisplayName() + " a gagné !");

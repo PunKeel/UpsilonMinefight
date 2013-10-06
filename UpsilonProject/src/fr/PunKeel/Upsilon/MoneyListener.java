@@ -5,6 +5,7 @@ import com.earth2me.essentials.utils.DateUtil;
 import com.github.games647.scoreboardstats.pvpstats.Database;
 import com.github.games647.scoreboardstats.pvpstats.PlayerCache;
 import com.google.common.base.Joiner;
+import com.sk89q.worldguard.bukkit.WGBukkit;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -178,7 +179,7 @@ public class MoneyListener implements Listener {
             e.getItemDrop().remove();
             return;
         }
-        ApplicableRegionSet set = main.RM.getApplicableRegions(p.getLocation());
+        ApplicableRegionSet set = WGBukkit.getRegionManager(p.getWorld()).getApplicableRegions(p.getLocation());
         if (set.allows(FLAG_ARENE)) {
             e.setCancelled(true);
             p.sendMessage(Main.getTAG() + "Pour ta sécurité, le drop d'item est interdit");
@@ -188,18 +189,19 @@ public class MoneyListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlaceTNT(BlockPlaceEvent e) {
+        Player p = e.getPlayer();
         Block b = e.getBlock();
         if (!b.getType().equals(Material.TNT))
             return;
 
 
-        ApplicableRegionSet set = main.RM.getApplicableRegions(b.getLocation());
+        ApplicableRegionSet set = WGBukkit.getRegionManager(p.getWorld()).getApplicableRegions(b.getLocation());
         if (set.allows(FLAG_ARENE)) {
             b.setType(Material.AIR);
             b.getWorld().spawn(b.getLocation().add(new Vector(0, 1, 0)), TNTPrimed.class);
         }
         e.setCancelled(true);
-        e.getPlayer().getInventory().removeItem(new ItemStack(Material.TNT, 1));
+        p.getInventory().removeItem(new ItemStack(Material.TNT, 1));
 
     }
 
@@ -212,7 +214,7 @@ public class MoneyListener implements Listener {
         if (ratio <= 0.4) {
             p.addPotionEffect(new PotionEffect(PotionEffectType.getById(22), 20 * 30, 1));
         }
-        ApplicableRegionSet set = main.RM.getApplicableRegions(loc);
+        ApplicableRegionSet set = WGBukkit.getRegionManager(p.getWorld()).getApplicableRegions(loc);
         for (ProtectedRegion PR : set) {
             String name = PR.getId();
             if (main.SM.exists(name)) {
@@ -388,7 +390,7 @@ public class MoneyListener implements Listener {
 
         if (v.hasMetadata("NPC")) return;
         Location loc = v.getLocation();
-        ApplicableRegionSet set = main.RM.getApplicableRegions(loc);
+        ApplicableRegionSet set = WGBukkit.getRegionManager(v.getWorld()).getApplicableRegions(loc);
         if (!set.allows(FLAG_ARENE)) {
             e.setDeathMessage(deathMessage(v));
             return;
@@ -633,8 +635,9 @@ public class MoneyListener implements Listener {
 
     @EventHandler
     public void onMoveDieOnLeave(PlayerMoveEvent e) {
-        ApplicableRegionSet AR_old = main.RM.getApplicableRegions(e.getFrom());
-        ApplicableRegionSet AR_new = main.RM.getApplicableRegions(e.getTo());
+        Player p = e.getPlayer();
+        ApplicableRegionSet AR_old = WGBukkit.getRegionManager(p.getWorld()).getApplicableRegions(e.getFrom());
+        ApplicableRegionSet AR_new = WGBukkit.getRegionManager(p.getWorld()).getApplicableRegions(e.getTo());
         if (AR_old.allows(FLAG_DIE_ON_LEAVE) && !AR_new.allows(FLAG_DIE_ON_LEAVE))
             e.getPlayer().damage(e.getPlayer().getMaxHealth() * 2);
     }

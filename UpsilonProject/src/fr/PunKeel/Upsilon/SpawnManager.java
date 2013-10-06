@@ -35,6 +35,7 @@ public class SpawnManager {
         Collections.sort(sLocations, new Comparator<SLocation>() {
             @Override
             public int compare(SLocation o1, SLocation o2) {
+                if (!o1.getWorld().equals(o2.getWorld())) return 0;
                 return (int) Math.round(o1.toLocation().distanceSquared(loc) - o2.toLocation().distanceSquared(loc));
             }
         }); // Sort by distance to `loc`

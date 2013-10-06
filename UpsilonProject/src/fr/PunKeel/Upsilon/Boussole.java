@@ -42,7 +42,7 @@ class Boussole implements Listener {
         }
         cible = findNearestPlayer(p);
         if (cible == null) {
-            p.setCompassTarget(Bukkit.getWorlds().get(0).getSpawnLocation());
+            p.setCompassTarget(p.getWorld().getSpawnLocation());
         } else {
             p.setCompassTarget(cible.getLocation());
         }

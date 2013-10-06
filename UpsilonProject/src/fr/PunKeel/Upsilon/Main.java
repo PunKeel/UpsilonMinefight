@@ -5,8 +5,6 @@ import com.earth2me.essentials.api.NoLoanPermittedException;
 import com.earth2me.essentials.api.UserDoesNotExistException;
 import com.mewin.WGCustomFlags.WGCustomFlagsPlugin;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.sk89q.worldguard.bukkit.WGBukkit;
-import com.sk89q.worldguard.protection.managers.RegionManager;
 import fr.PunKeel.Upsilon.Games.RoiAuSommet;
 import fr.PunKeel.Upsilon.Games.Spleef;
 import fr.PunKeel.Upsilon.Menus.EnchantMenu;
@@ -42,9 +40,9 @@ import java.util.logging.Logger;
  */
 public class Main extends JavaPlugin {
     public static String WORLDNAME = "world";
+    public static String WORLDGAME = "world_void";
     public WorldEditPlugin WE;
     public Essentials ess;
-    public RegionManager RM;
     // Own classes
     public MenuManager menu_manager = new MenuManager(this);
     public EventMenu event_menu = new EventMenu(this, menu_manager);
@@ -54,10 +52,10 @@ public class Main extends JavaPlugin {
     public AntiCheat AC;
     Boussole B;
     TeamManager TM;
+    MoneyListener moneyListener = new MoneyListener(this);
     private MainMenu main_menu = new MainMenu(this, menu_manager);
     private EnchantMenu enchant_menu = new EnchantMenu(this, menu_manager);
     private TeleportationMenu teleportation_menu = new TeleportationMenu(this, menu_manager);
-    MoneyListener moneyListener = new MoneyListener(this);
     private RoiAuSommet roi = new RoiAuSommet(this);
     private Commandes commandes = new Commandes(this);
     private Chronos chrono = new Chronos(this);
@@ -223,7 +221,6 @@ public class Main extends JavaPlugin {
         world.setGameRuleValue("doMobLoot", "false");
         world.setGameRuleValue("keepInventory", "true");
         world.setGameRuleValue("mobGriefing", "false");
-        RM = WGBukkit.getRegionManager(world);
 
         try {
             WGCF = getPlugin("WGCustomFlags", WGCustomFlagsPlugin.class);
