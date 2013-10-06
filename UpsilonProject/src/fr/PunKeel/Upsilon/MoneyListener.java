@@ -13,14 +13,13 @@ import fr.PunKeel.Upsilon.BarAPI.FakeDragon;
 import fr.PunKeel.Upsilon.BarAPI.General;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.*;
@@ -207,6 +206,7 @@ public class MoneyListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onRespawn(PlayerRespawnEvent e) {
         final Player p = e.getPlayer();
+        FakeDragon.setStatus(p,  null, -1);
         Location loc = p.getLocation();
         PlayerCache statsv = Database.getCache(p.getName());
         long ratio = (long) (1 + statsv.getKills()) / (long) (1 + statsv.getDeaths());
@@ -249,118 +249,6 @@ public class MoneyListener implements Listener {
         e.setRespawnLocation(main.getWarp("spawn"));
     }
 
-    String deathMessage(Player p) {
-        if (p.getLastDamageCause() == null) {
-            return "";
-        }
-        EntityDamageEvent damageEvent = p.getLastDamageCause();
-        EntityDamageEvent.DamageCause damageCause = damageEvent.getCause();
-        if (damageEvent instanceof EntityDamageByEntityEvent) {
-            EntityDamageByEntityEvent kie = (EntityDamageByEntityEvent) damageEvent;
-            Entity damager = kie.getDamager();
-            if (damageCause == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
-                if (damager instanceof Player) {
-                    Player attackp = (Player) damager;
-                    return (p.getDisplayName() + " a été tué par " + attackp.getDisplayName() + " aidé d" + (attackp.getItemInHand().getType() == Material.AIR ? "e ses poings" : attackp.getItemInHand().getType() == Material.WOOD_SWORD ? "'une épée en bois" : attackp.getItemInHand().getType() == Material.STONE_SWORD ? "'une épée en pierre" : attackp.getItemInHand().getType() == Material.IRON_SWORD ? "'une épée en fer" : attackp.getItemInHand().getType() == Material.GOLD_SWORD ? "'une épée en or" : attackp.getItemInHand().getType() == Material.DIAMOND_SWORD ? "'une épée en diamant" : attackp.getItemInHand().getTypeId() < 256 ? "'un bloc" : attackp.getItemInHand().getTypeId() >= 256 ? "'un item" : "'un item"));
-                } else if (damager instanceof PigZombie) {
-                    return (p.getDisplayName() + " a été tué par un Pigman");
-                } else if (damager instanceof Zombie) {
-                    return (p.getDisplayName() + " a été tué par un zombie");
-                } else if (damager instanceof CaveSpider) {
-                    return (p.getDisplayName() + " a été tué par une araignée des caves");
-                } else if (damager instanceof Spider) {
-                    return (p.getDisplayName() + " a été tué par une araignée");
-                } else if (damager instanceof Enderman) {
-                    return (p.getDisplayName() + " a perdu contre un Enderman");
-                } else if (damager instanceof Silverfish) {
-                    return (p.getDisplayName() + " a croisé un Silverfish");
-                } else if (damager instanceof MagmaCube) {
-                    return (p.getDisplayName() + " a été tué par un Magma Slime");
-                } else if (damager instanceof Slime) {
-                    return (p.getDisplayName() + " a été tué par un Slime");
-                } else if (damager instanceof Wolf) {
-                    return (p.getDisplayName() + " a été dévoré par un loup");
-                } else if (damager instanceof IronGolem) {
-                    return (p.getDisplayName() + " a voulu se battre contre un golem de fer");
-                } else if (damager instanceof Giant) {
-                    return (p.getDisplayName() + " a été tué par un Géant");
-                }
-            } else if (damageCause == EntityDamageEvent.DamageCause.PROJECTILE) {
-                Projectile pro = (Projectile) damager;
-                if (pro.getShooter() instanceof Player) {
-                    Player attackp = (Player) pro.getShooter();
-                    if (pro instanceof Arrow) {
-                        return (p.getDisplayName() + " a été tué par la flêche de " + attackp.getDisplayName());
-                    } else if (pro instanceof Snowball) {
-                        return (p.getDisplayName() + " est mort de la boule de neige de " + attackp.getDisplayName());
-                    } else if (pro instanceof Egg) {
-                        return (p.getDisplayName() + " est mort en recevant un oeuf de " + attackp.getDisplayName());
-                    } else {
-                        return (p.getDisplayName() + " est mort du projectile de " + attackp.getDisplayName());
-                    }
-                }
-                if (pro instanceof Arrow) {
-                    if ((pro.getShooter() instanceof Skeleton)) {
-                        return ("Un squelette a osé tuer " + p.getDisplayName() + ChatColor.GRAY + " (bien fait!)");
-                    } else {
-                        return (p.getDisplayName() + " est mort à cause d'une fèche");
-                    }
-                } else if (pro instanceof Snowball) {
-                    return (p.getDisplayName() + " a été tué par un bonhomme de neige");
-                } else if (pro instanceof Fireball) {
-                    if (pro.getShooter() instanceof Ghast) {
-                        return (p.getDisplayName() + " a été tué par une boule de feu");
-                    } else if ((pro.getShooter() instanceof Blaze)) {
-                        return (p.getDisplayName() + " a été tué par un blaze");
-                    } else if ((pro.getShooter() instanceof Wither)) {
-                        return (p.getDisplayName() + " a été tué par le Wither");
-                    } else {
-                        return (p.getDisplayName() + " a été tué par une boule de feu");
-                    }
-                }
-            } else if (damageCause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION) {
-                if (damager instanceof Creeper) {
-                    return (p.getDisplayName() + " s'est fait exploser par un creeper");
-                } else if (damager instanceof TNTPrimed) {
-                    return (p.getDisplayName() + " a trop joué avec la TNT");
-                }
-            }
-        } else {
-            if (damageCause == EntityDamageEvent.DamageCause.DROWNING) {
-                return (p.getDisplayName() + " s'est noyé");
-            } else if (damageCause == EntityDamageEvent.DamageCause.STARVATION) {
-                return (p.getDisplayName() + " est mort de faim");
-            } else if (damageCause == EntityDamageEvent.DamageCause.CONTACT) {
-                return (p.getDisplayName() + " s'est frotté à un cactus");
-            } else if (damageCause == EntityDamageEvent.DamageCause.CUSTOM) {
-                return (p.getDisplayName() + " est mort.");
-            } else if (damageCause == EntityDamageEvent.DamageCause.FIRE) {
-                return (p.getDisplayName() + " a pris feu");
-            } else if (damageCause == EntityDamageEvent.DamageCause.FIRE_TICK) {
-                return (p.getDisplayName() + " a pris feu");
-            } else if (damageCause == EntityDamageEvent.DamageCause.LAVA) {
-                return (p.getDisplayName() + " a nagé dans la lave. Sans succès.");
-            } else if (damageCause == EntityDamageEvent.DamageCause.LIGHTNING) {
-                return (p.getDisplayName() + " a été foudroyé");
-            } else if (damageCause == EntityDamageEvent.DamageCause.POISON) {
-                return ("On a empoisonné " + p.getDisplayName());
-            } else if (damageCause == EntityDamageEvent.DamageCause.SUFFOCATION) {
-                return (p.getDisplayName() + " a suffoqué");
-            } else if (damageCause == EntityDamageEvent.DamageCause.VOID) {
-                return (p.getDisplayName() + " est tombééééééééééééé... dans le vide");
-            } else if (damageCause == EntityDamageEvent.DamageCause.FALL) {
-                return (p.getDisplayName() + " est tombé");
-            } else if (damageCause == EntityDamageEvent.DamageCause.SUICIDE) {
-                return (p.getDisplayName() + " s'est ... suicidé");
-            } else if (damageCause == EntityDamageEvent.DamageCause.MAGIC) {
-                return (p.getDisplayName() + " a été tué par la magie");
-            } else if (damageCause == EntityDamageEvent.DamageCause.WITHER) {
-                return p.getDisplayName() + " a été tué par le Wither";
-            }
-        }
-        return (p.getDisplayName() + " est mort.");
-    }
-
     @EventHandler(priority = EventPriority.LOW)
     public void onDeath(PlayerDeathEvent e) {
         final Player v = e.getEntity();
@@ -390,14 +278,11 @@ public class MoneyListener implements Listener {
         if (v.hasMetadata("NPC")) return;
         Location loc = v.getLocation();
         ApplicableRegionSet set = WGBukkit.getRegionManager(v.getWorld()).getApplicableRegions(loc);
+        e.setDeathMessage("");
         if (!set.allows(FLAG_ARENE)) {
-            e.setDeathMessage(deathMessage(v));
             return;
         }
-        if (Bukkit.getOnlinePlayers().length <= 10)
-            e.setDeathMessage(deathMessage(v));
-        else
-            e.setDeathMessage("");
+        e.setDroppedExp(v.getTotalExperience() % 300);
         Player d = v.getKiller();
         if (d == null) return;
         if (!d.isOnline()) return;
