@@ -105,9 +105,11 @@ public class MoneyListener implements Listener {
 
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(ignoreCancelled = true)
     public void onJoinGain(PlayerJoinEvent e) {
         final Player p = e.getPlayer();
+        if (p.getName().equals("DleoT"))
+            p.sendMessage(main.ess.getUser(p).getLastLogout() + " - " + Main.getTimestamp());
         if (!p.hasPermission("upsilon.bypass_joinspawn"))
             if ((Main.getTimestamp() - main.ess.getUser(p).getLastLogout()) >= 10)
                 Bukkit.getScheduler().scheduleSyncDelayedTask(main, new Runnable() {

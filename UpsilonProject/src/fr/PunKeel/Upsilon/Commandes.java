@@ -304,6 +304,7 @@ public class Commandes {
 
     @CommandController.CommandHandler(name = "setblock", permission = "upsilon.setblock", usage = "/setblock <world> <x,y,z;x,y,z;x,y,z> <block>")
     public void onSetBlock(CommandSender cs, String[] args) {
+        Chunk c;
         if (args.length != 3) {
             main.getLogger().info("Erreur /setspawn " + Arrays.toString(args) + " - nb arguments incorrect");
             return;
@@ -338,8 +339,14 @@ public class Commandes {
             main.getLogger().info("Item non reconnu/interdit : " + pattern);
         }
         if (bb == null) return;
-        for (Location l : locs)
+        for (Location l : locs) {
+            c = l.getWorld().getChunkAt(l);
+            if (!c.isLoaded())
+                c.load();
             l.getBlock().setTypeIdAndData(bb.getType(), (byte) bb.getData(), true);
+
+        }
+
     }
 
     @CommandController.CommandHandler(name = "cheat", permission = "upsilon.cheat", usage = "/cheat <player>")
