@@ -32,9 +32,7 @@ import org.kitteh.tag.PlayerReceiveNameTagEvent;
 import org.kitteh.tag.TagAPI;
 import ru.tehkode.permissions.PermissionUser;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 
@@ -379,7 +377,7 @@ public class MoneyListener implements Listener {
                         a.setAccessible(true);
                         a.set(packet, 1);
                         General.receivePacket(v, packet);
-                    } catch (IllegalAccessException | InstantiationException e) {
+                    } catch (IllegalAccessException | InstantiationException ignored) {
 
                     }
                 }
@@ -591,7 +589,7 @@ public class MoneyListener implements Listener {
                     } else {
                         i.sendMessage(Main.getTAG() + "Usage : !votekick <pseudo>");
                     }
-                }       */
+                } */
                 break;
             case "!classement":
             case "!rank":
@@ -640,26 +638,6 @@ public class MoneyListener implements Listener {
         ApplicableRegionSet AR_new = WGBukkit.getRegionManager(p.getWorld()).getApplicableRegions(e.getTo());
         if (AR_old.allows(FLAG_DIE_ON_LEAVE) && !AR_new.allows(FLAG_DIE_ON_LEAVE))
             e.getPlayer().damage(e.getPlayer().getMaxHealth() * 2);
-    }
-
-    public void setSpawnWall(Player p, boolean open) {
-        int x = -25, y = 11, z = -573;
-        Class<?> packet_class = General.getCraftClass("Packet53BlockChange");
-        Class<?> world_class = General.getCraftClass("CraftWorld");
-        Class<?> WorldServer_class = General.getCraftClass("WorldServer");
-        Object packet;
-        try {
-
-            Constructor<?> constructor = packet_class.getConstructor(int.class, int.class, int.class, WorldServer_class);
-            packet = constructor.newInstance(x, y - 1, z, world_class.getDeclaredMethod("getHandle").invoke(world_class.cast(p.getWorld())));
-
-            Field b = General.getField(packet_class, "type");
-            b.setAccessible(true);
-            b.set(packet, open ? 0 : 1);
-            General.sendPacket(p, packet);
-        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
     }
 }
 

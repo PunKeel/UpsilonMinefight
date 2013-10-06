@@ -8,8 +8,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
 
-import java.util.Random;
-
 /**
  * User: PunKeel
  * Date: 5/5/13
@@ -58,10 +56,9 @@ public class EnchantMenu implements Listener {
         if (MM.current_menu.get(p.getName()) != MenuManager.Menus.ENCHANTING) return;
 
         int[] levels = e.getExpLevelCostsOffered();
-        Random rnd = new Random();
-        levels[0] = Math.min(level_max / 2, rnd.nextInt(2 * (int) Math.sqrt(level_max)) + 1);
-        levels[1] = Math.min(level_max - 1, levels[0] + rnd.nextInt(2 * (int) Math.sqrt(level_max)) + 1);
-        levels[2] = Math.min(level_max - 1, levels[1] + rnd.nextInt(2 * (int) Math.sqrt(level_max)) + 1);
+        levels[0] = Math.min(level_max / 2, Main.rnd.nextInt(2 * (int) Math.sqrt(level_max)) + 1);
+        levels[1] = Math.min(level_max - 1, levels[0] + Main.rnd.nextInt(2 * (int) Math.sqrt(level_max)) + 1);
+        levels[2] = Math.min(level_max - 1, levels[1] + Main.rnd.nextInt(2 * (int) Math.sqrt(level_max)) + 1);
 
     }
 }

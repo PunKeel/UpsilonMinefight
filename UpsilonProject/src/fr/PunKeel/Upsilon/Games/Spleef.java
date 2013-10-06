@@ -14,7 +14,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
 /**
  * User: PunKeel
@@ -29,14 +28,13 @@ public class Spleef implements Listener {
     private List<Material> mats = new ArrayList<>();
     private Boolean playing = false;
     private Boolean single_player = false;
-    private Random random = new Random();
     private long debut_chrono = 0;
     private long record = (long) 0;
     private ArrayList<Location> blocs;
     private int radius = 12;
-    private int centreX = -215;
-    private int centreZ = 311;
-    private int centreY = 61;
+    private int centreX = 1719;
+    private int centreZ = -1198;
+    private int centreY = 69;
     private int loop = 0;
     private int countdown = 15;
     private int task_id = 0;
@@ -64,7 +62,7 @@ public class Spleef implements Listener {
 
     private void startSpleef() {
         blocs = getBlocks();
-        Material mat = mats.get(random.nextInt(mats.size()));
+        Material mat = Main.getRandom(mats);
         for (Location l : blocs)
             l.getBlock().setType(mat);
         for (String joueur : participants.keySet()) {
@@ -130,12 +128,12 @@ public class Spleef implements Listener {
     void start_task() {
         if (task_id != 0) stop_task();
         blocs = getBlocks();
-        task_id = Bukkit.getServer().getScheduler().scheduleAsyncRepeatingTask(main, new Runnable() {
+        task_id = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(main, new Runnable() {
             public void run() {
                 if ((single_player || (Main.getTimestamp() - debut_chrono) > 90) && playing) {
                     for (int i = 0; i < 10; i++)
-                        if (random.nextBoolean() && random.nextBoolean()) {
-                            blocs.get(random.nextInt(blocs.size() - 1)).getBlock().setType(Material.AIR);
+                        if (main.rnd.nextBoolean() && main.rnd.nextBoolean()) {
+                            blocs.get(main.rnd.nextInt(blocs.size() - 1)).getBlock().setType(Material.AIR);
                         }
                 }
                 for (String joueur : ((HashMap<String, Location>) participants.clone()).keySet()) {

@@ -90,9 +90,8 @@ public class General {
             Object nmsPlayer = getHandle(player);
             Field con_field = nmsPlayer.getClass().getField("playerConnection");
             Object con = con_field.get(nmsPlayer);
-            Method packet_method = getMethod(con.getClass(), "a");
-            packet_method.invoke(con, packet);
-        } catch (SecurityException | NoSuchFieldException | InvocationTargetException | IllegalAccessException | IllegalArgumentException e) {
+            packet.getClass().getDeclaredMethod("handle", getCraftClass("Connection")).invoke(packet, con);
+        } catch (NoSuchMethodException | SecurityException | NoSuchFieldException | InvocationTargetException | IllegalAccessException | IllegalArgumentException e) {
             e.printStackTrace();
         }
     }

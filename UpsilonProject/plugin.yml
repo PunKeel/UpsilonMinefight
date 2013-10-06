@@ -41,5 +41,5 @@ commands:
      description: Permet de suivre quelqu'un
    vector:
      description: Applique un vecteur <x> <y> <z> au <joueur>
-   fb:
-     description: test :)
+   fakeblock:
+     description: Envoie des mises à jour de bloc au joueur :D

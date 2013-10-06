@@ -41,6 +41,7 @@ import java.util.logging.Logger;
 public class Main extends JavaPlugin {
     public static String WORLDNAME = "world";
     public static String WORLDGAME = "world_void";
+    public static Random rnd = new Random();
     public WorldEditPlugin WE;
     public Essentials ess;
     // Own classes
@@ -69,8 +70,11 @@ public class Main extends JavaPlugin {
     private int bCasterThread = 0;
 
     public static <T> T getRandom(T[] array) {
-        int rnd = new Random().nextInt(array.length);
-        return array[rnd];
+        return array[rnd.nextInt(array.length)];
+    }
+
+    public static <A> A getRandom(Collection<A> c) {
+        return new ArrayList<>(c).get(rnd.nextInt(c.size()));
     }
 
     public static Main getMain() {
@@ -127,6 +131,19 @@ public class Main extends JavaPlugin {
             throw new UnknownPluginException("Plugin" + name + " didn't return " + classe.getCanonicalName());
         }
         return classe.cast(plugin);
+    }
+
+    public static int getRand(int min, int max) {
+        if (min == max)
+            return min;
+        if (max < min) {
+            // Swap variables ... without using a temp' one. <3
+            min = min + max;
+            max = min - max;
+            min = min - max;
+        }
+        return min + (int) (Math.random() * ((max - min) + 1));
+
     }
 
     @Override()

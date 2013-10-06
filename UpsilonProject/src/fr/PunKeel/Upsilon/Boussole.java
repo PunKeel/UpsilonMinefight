@@ -55,6 +55,7 @@ class Boussole implements Listener {
         double distance = Integer.MAX_VALUE, newd;
         for (Player x : Bukkit.getOnlinePlayers()) {
             if (x.getName().equals(p.getName())) continue;
+            if (!x.getWorld().getName().equals(p.getWorld().getName())) continue;
             newd = ploc.distanceSquared(x.getLocation());
             if (distance > newd) {
                 nearest = x;

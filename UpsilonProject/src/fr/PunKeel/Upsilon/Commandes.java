@@ -12,7 +12,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * User: PunKeel
@@ -183,7 +186,7 @@ public class Commandes {
                 return;
             }
         } else {
-            id = new Random().nextInt(spawns.length) + 1;
+            id = Main.rnd.nextInt(spawns.length) + 1;
         }
         p.sendMessage(Main.getTAG() + "Téléportation à " + region + "#" + id);
         p.teleport(spawns[id - 1].toLocation());
@@ -373,12 +376,51 @@ public class Commandes {
         p.setVelocity(p.getVelocity().add(new Vector(x, y, z)));
     }
 
-    @CommandController.CommandHandler(name = "fb", permission = "upsilon.fb")
-    public void onFB(Player cs, String[] args) {
-        boolean open = new Random().nextBoolean();
-        main.moneyListener.setSpawnWall(cs, open);
-        cs.sendMessage(open ? "Open" : "Closed");
+    @CommandController.CommandHandler(name = "fakeblock", permission = "upsilon.fakeblock", usage = "/fakeblock <world> <x,y,z;x,y,z;x,y,z> <block> <player>")
+    public void onFakeBlock(CommandSender cs, String[] args) {
+        if (args.length != 4) {
 
+            main.getLogger().info("Erreur /fakeblock " + Arrays.toString(args) + " - nb arguments incorrect");
+            return;
+        }
+        String world = args[0];
+        String pos = args[1];
+        String pattern = args[2];
+        String player = args[3];
+        Player p = Bukkit.getPlayer(player);
+        if (p == null)
+            return;
+        if (!p.isOnline())
+            return;
+        World W = Bukkit.getWorld(world);
+        List<Location> locs = new ArrayList<>();
+        if (W == null) {
+            main.getLogger().severe("Monde " + world + " introuvable, commande /fakeblock " + Arrays.toString(args));
+            return;
+        }
+        if (pos.contains(";")) {
+            String[] coord = pos.split(";");
+            for (String o : coord) {
+                String[] t = o.split(",");
+                if (t.length != 3)
+                    continue;
+                locs.add(new Location(W, Integer.valueOf(t[0]), Integer.valueOf(t[1]), Integer.valueOf(t[2])));
+            }
+        } else {
+            String[] t = pos.split(",");
+            if (t.length != 3)
+                return;
+            locs.add(new Location(W, Integer.valueOf(t[0]), Integer.valueOf(t[1]), Integer.valueOf(t[2])));
+        }
+        BaseBlock bb = null;
+        try {
+            bb = main.WE.getWorldEdit().getBlock(new fakeLocalPlayer(main.WE.getServerInterface(), BukkitUtil.getLocalWorld(W)), pattern, true, true);
+        } catch (UnknownItemException | DisallowedItemException e) {
+            main.getLogger().info("Item non reconnu/interdit : " + pattern);
+        }
+        if (bb == null) return;
+        for (Location l : locs)
+            p.sendBlockChange(l, bb.getType(), (byte) bb.getData());
     }
 }
 

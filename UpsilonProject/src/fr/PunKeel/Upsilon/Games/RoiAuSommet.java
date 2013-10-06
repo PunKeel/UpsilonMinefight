@@ -20,7 +20,6 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * User: PunKeel
@@ -36,11 +35,9 @@ public class RoiAuSommet implements Listener, CommandExecutor {
     private Integer joueurs_max = 20;
     private Main main;
     private Location portail = null;
-    private Random rnd;
 
     public RoiAuSommet(Main m) {
         main = m;
-        rnd = new Random();
     }
 
     Location getPortal() {
@@ -52,11 +49,14 @@ public class RoiAuSommet implements Listener, CommandExecutor {
     }
 
     Location getSpawn() {
-        int x = -(rnd.nextInt(50) + 245);
-        int y = 62;
-        int z = 306;
-        if (x == -245 || x == -295) {
-            z = rnd.nextInt(373 - 306) + 306;
+        int x, y = 86, z;
+        int x1 = 1480, x2 = 1530, z1 = -1305, z2 = -1372;
+        if (main.rnd.nextBoolean()) {
+            x = Main.getRand(x1, x2);
+            z = main.rnd.nextBoolean() ? z1 : z2;
+        } else {
+            z = Main.getRand(z1, z2);
+            x = main.rnd.nextBoolean() ? x1 : x2;
         }
         return new Location(Bukkit.getWorld(Main.WORLDGAME), x, y, z);
 
