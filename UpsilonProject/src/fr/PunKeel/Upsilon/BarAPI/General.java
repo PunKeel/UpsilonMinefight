@@ -88,7 +88,7 @@ public class General {
     public static void receivePacket(Player player, Object packet) {
         try {
             Object nmsPlayer = getHandle(player);
-            Field con_field = nmsPlayer.getClass().getField("netServerHandler");
+            Field con_field = nmsPlayer.getClass().getField("playerConnection");
             Object con = con_field.get(nmsPlayer);
             Method packet_method = getMethod(con.getClass(), "a");
             packet_method.invoke(con, packet);

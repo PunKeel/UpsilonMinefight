@@ -79,7 +79,7 @@ public class FakeDragon {
         if (new_entity) {
             Object mobPacket = dragon.getMobPacket();
             General.sendPacket(player, mobPacket);
-        } else if (update_entity) {
+        } else {
             Object metaPacket = dragon.getMetadataPacket(dragon.getWatcher());
             Object teleportPacket = dragon.getTeleportPacket(player.getLocation().subtract(0, 200, 0));
             General.sendPacket(player, metaPacket);
