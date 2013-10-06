@@ -93,15 +93,13 @@ public class Spleef implements Listener {
         Player gagnant = null;
         playing = false;
         loop = 0;
-        if (participants.size() == 1)
-            gagnant = Bukkit.getPlayer((String) participants.keySet().toArray()[0]);
         for (String p : participants.keySet()) {
+            gagnant = Bukkit.getPlayerExact(p);
             if (!single_player)
-                Bukkit.getPlayer(p).sendMessage(TAG + ChatColor.GREEN + "" + ChatColor.BOLD + "Bravo ! Tu as gagné.");
-            Bukkit.getPlayer(p).teleport(participants.get(p));
+                gagnant.sendMessage(TAG + ChatColor.GREEN + "" + ChatColor.BOLD + "Bravo ! Tu as gagné.");
+            PlayerQuit(p);
         }
         if (gagnant != null) {
-            main.broadcastToAdmins(gagnant.getName() + " gagne le spleef", false);
 
             if (single_player) {
                 Long diff = (Main.getTimestamp() - debut_chrono);
@@ -110,6 +108,9 @@ public class Spleef implements Listener {
                     record = diff;
                     recordman = gagnant.getName();
                 }
+
+            } else {
+                main.broadcastToAdmins(gagnant.getName() + " gagne le spleef", false);
 
             }
         }
@@ -179,13 +180,15 @@ public class Spleef implements Listener {
 
         p.teleport(participants.get(p.getName()));
         Main.resetPlayer(p, GameMode.ADVENTURE);
-        if (single_player) {
-            stopSpleef();
-            return;
-        }
-        participants.remove(name);
-        if (participants.size() == 1) {
-            stopSpleef();
+        if (playing) {
+            if (single_player) {
+                stopSpleef();
+                return;
+            }
+            participants.remove(name);
+            if (participants.size() == 1) {
+                stopSpleef();
+            }
         }
     }
 
