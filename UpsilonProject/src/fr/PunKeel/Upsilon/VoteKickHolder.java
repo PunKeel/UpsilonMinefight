@@ -21,7 +21,8 @@ class VoteKickHolder {
     }
 
     public boolean add(String p) {
-        if (last_vote > Main.getTimestamp() + 70) reset();
+        if (last_vote > Main.getTimestamp() + 70)
+            reset();
         if (voters.contains(p)) return false;
         voters.add(p);
         votes++;
@@ -36,5 +37,9 @@ class VoteKickHolder {
         } else {
             return votes >= online / 3;
         }
+    }
+
+    public int getVotes() {
+        return votes;
     }
 }

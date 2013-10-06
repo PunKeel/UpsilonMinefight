@@ -51,6 +51,7 @@ public class Main extends JavaPlugin {
     public SpawnManager SM;
     public PermissionManager PEX;
     public AntiCheat AC;
+    public HashMap<String, VoteKickHolder> votekick = new HashMap<>();
     Boussole B;
     TeamManager TM;
     MoneyListener moneyListener = new MoneyListener(this);
@@ -68,6 +69,7 @@ public class Main extends JavaPlugin {
     private SimpleConfig globalConfig, locationsConfig, amisConfig;
     private WGCustomFlagsPlugin WGCF;
     private int bCasterThread = 0;
+    private String log_date;
 
     public static <T> T getRandom(T[] array) {
         return array[rnd.nextInt(array.length)];
@@ -99,8 +101,8 @@ public class Main extends JavaPlugin {
         return ChatColor.DARK_GREEN + "[" + ChatColor.WHITE + "Minefight" + ChatColor.DARK_GREEN + "] " + ChatColor.RESET;
     }
 
-    public static Integer getTimestamp() {
-        return (int) (System.nanoTime() / 1000000000);
+    public static int getTimestamp() {
+        return (int) (new GregorianCalendar().getTimeInMillis() / 1000);
     }
 
     public static void resetPlayer(HumanEntity p) {
@@ -417,11 +419,13 @@ public class Main extends JavaPlugin {
     }
 
     public Logger getCLogger() {
-        if (CLogger == null) {
-            String timeStamp = new SimpleDateFormat("dd.MM.yyyy").format(new Date());
+        String timestamp = new SimpleDateFormat("dd.MM.yyyy").format(new Date());
+
+        if (CLogger == null || !log_date.equals(timestamp)) {
+            log_date = timestamp;
             Handler handler;
             try {
-                handler = new FileHandler(getDataFolder() + "/upsilon_" + timeStamp + ".log", 30000, 4);
+                handler = new FileHandler(getDataFolder() + "/upsilon_" + timestamp + ".log", true);
             } catch (IOException e) {
                 e.printStackTrace();
                 handler = new ConsoleHandler();

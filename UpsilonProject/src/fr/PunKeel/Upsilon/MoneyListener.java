@@ -109,15 +109,14 @@ public class MoneyListener implements Listener {
     public void onJoinGain(PlayerJoinEvent e) {
         final Player p = e.getPlayer();
         if (p.getName().equals("DleoT"))
-            p.sendMessage(main.ess.getUser(p).getLastLogout() + " - " + Main.getTimestamp());
-        if (!p.hasPermission("upsilon.bypass_joinspawn"))
-            if ((Main.getTimestamp() - main.ess.getUser(p).getLastLogout()) >= 10)
-                Bukkit.getScheduler().scheduleSyncDelayedTask(main, new Runnable() {
-                    @Override
-                    public void run() {
-                        main.teleportToWarp("spawn", p);
-                    }
-                });
+            if (!p.hasPermission("upsilon.bypass_joinspawn"))
+                if ((1000 * Main.getTimestamp() - main.ess.getUser(p).getLastLogout()) >= 10)
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(main, new Runnable() {
+                        @Override
+                        public void run() {
+                            main.teleportToWarp("spawn", p);
+                        }
+                    });
         if (!p.getInventory().containsAtLeast(emerald, 1)) {
             if (!p.getEnderChest().containsAtLeast(emerald, 1)) {
                 if (p.getInventory().firstEmpty() != -1) {
@@ -559,7 +558,7 @@ public class MoneyListener implements Listener {
                 i.sendMessage(Main.getTAG() + "Rejoins la chaine Youtube officielle Minefight : " + ChatColor.DARK_GREEN + " http://bit.ly/YT-MF");
                 e.setCancelled(true);
                 return;
-            case "!votekick":/*
+            case "!votekick":
                 if (i.hasPermission("upsilon.votekick")) {
                     if (mots.length == 2) {
                         Player c = Bukkit.getPlayerExact(mots[1]);
@@ -581,7 +580,7 @@ public class MoneyListener implements Listener {
                                 c.kickPlayer(Main.getTAG() + ChatColor.RED + "Kick par la communauté Minefight");
                                 return;
                             } else {
-                                i.sendMessage(Main.getTAG() + "VoteKick " + mots[1] + " | Y:" + main.votekick.get(mots[1]).votes);
+                                i.sendMessage(Main.getTAG() + "VoteKick " + mots[1] + " | Y:" + main.votekick.get(mots[1]).getVotes());
                             }
                         } else {
                             e.setCancelled(true);
@@ -591,7 +590,7 @@ public class MoneyListener implements Listener {
                     } else {
                         i.sendMessage(Main.getTAG() + "Usage : !votekick <pseudo>");
                     }
-                } */
+                }
                 break;
             case "!classement":
             case "!rank":
@@ -642,4 +641,3 @@ public class MoneyListener implements Listener {
             e.getPlayer().damage(e.getPlayer().getMaxHealth() * 2);
     }
 }
-
