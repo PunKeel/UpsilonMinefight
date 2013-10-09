@@ -1,7 +1,6 @@
 package fr.PunKeel.Upsilon;
 
 import com.sk89q.worldguard.bukkit.WGBukkit;
-import com.sk89q.worldguard.protection.flags.StateFlag;
 import fr.PunKeel.Upsilon.events.MenuChangeEvent;
 import fr.PunKeel.Upsilon.events.MenuClickEvent;
 import fr.PunKeel.Upsilon.events.MenuCloseEvent;
@@ -30,18 +29,12 @@ import java.util.HashMap;
  */
 @SuppressWarnings("ALL")
 public class MenuManager implements Listener {
-
-    public static final StateFlag FLAG_EMERAUDE = new StateFlag("emeraude", true);
     public HashMap<String, Menus> current_menu;
     Main m;
 
     public MenuManager(Main main) {
         m = main;
         current_menu = new HashMap<String, Menus>();
-    }
-
-    public void init() {
-        m.getWGCF().addCustomFlag(FLAG_EMERAUDE);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -53,7 +46,7 @@ public class MenuManager implements Listener {
         if (!e.getAction().equals(Action.RIGHT_CLICK_BLOCK) && !e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
             return;
         }
-        if (!WGBukkit.getRegionManager(p.getWorld()).getApplicableRegions(p.getLocation()).allows(FLAG_EMERAUDE)) {
+        if (!WGBukkit.getRegionManager(p.getWorld()).getApplicableRegions(p.getLocation()).allows(Main.FLAG_EMERAUDE)) {
             p.sendMessage(Main.getTAG() + ChatColor.DARK_RED + "Interdit d'utiliser l'émeraude ici !");
             return;
         }

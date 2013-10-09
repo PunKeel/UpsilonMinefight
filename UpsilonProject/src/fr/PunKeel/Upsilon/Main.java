@@ -5,6 +5,7 @@ import com.earth2me.essentials.api.NoLoanPermittedException;
 import com.earth2me.essentials.api.UserDoesNotExistException;
 import com.mewin.WGCustomFlags.WGCustomFlagsPlugin;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import fr.PunKeel.Upsilon.Games.RoiAuSommet;
 import fr.PunKeel.Upsilon.Games.Spleef;
 import fr.PunKeel.Upsilon.Menus.EnchantMenu;
@@ -39,6 +40,9 @@ import java.util.logging.Logger;
  * May be open-source & be sold (by PunKeel, of course !)
  */
 public class Main extends JavaPlugin {
+    static final StateFlag FLAG_ARENE = new StateFlag("arene", false);
+    static final StateFlag FLAG_DIE_ON_LEAVE = new StateFlag("die_on_leave", false);
+    static final StateFlag FLAG_EMERAUDE = new StateFlag("emeraude", true);
     public static String WORLDNAME = "world";
     public static String WORLDGAME = "world_void";
     public static Random rnd = new Random();
@@ -70,6 +74,7 @@ public class Main extends JavaPlugin {
     private WGCustomFlagsPlugin WGCF;
     private int bCasterThread = 0;
     private String log_date;
+    private DeathManager DM = new DeathManager(this);
 
     public static <T> T getRandom(T[] array) {
         return array[rnd.nextInt(array.length)];
@@ -156,6 +161,7 @@ public class Main extends JavaPlugin {
             return;
         }
         TM = new TeamManager(this);
+        Bukkit.getPluginManager().registerEvents(DM, this);
         Bukkit.getPluginManager().registerEvents(moneyListener, this);
         Bukkit.getPluginManager().registerEvents(chrono, this);
         Bukkit.getPluginManager().registerEvents(enchant_menu, this);
@@ -174,11 +180,14 @@ public class Main extends JavaPlugin {
         getCommand("roi").setExecutor(roi);
         B = new Boussole(this);
         setupDependencies();
+
+        getWGCF().addCustomFlag(FLAG_ARENE);
+        getWGCF().addCustomFlag(FLAG_DIE_ON_LEAVE);
+        getWGCF().addCustomFlag(FLAG_EMERAUDE);
         globalConfig = CM.getNewConfig("config.yml");
         locationsConfig = CM.getNewConfig("locations.yml");
         amisConfig = CM.getNewConfig("amis.yml");
         ConfigReload();
-        menu_manager.init();
         AC = new AntiCheat(this);
         getServer().getPluginManager().registerEvents(AC, this);
 
@@ -188,9 +197,7 @@ public class Main extends JavaPlugin {
     void addToBalance(String username, int amount) {
         try {
             com.earth2me.essentials.api.Economy.add(username, amount);
-        } catch (UserDoesNotExistException e) {
-            e.printStackTrace();
-        } catch (NoLoanPermittedException e) {
+        } catch (UserDoesNotExistException | NoLoanPermittedException e) {
             e.printStackTrace();
         }
     }
@@ -204,22 +211,23 @@ public class Main extends JavaPlugin {
             @Override
             public void run() {
                 int gain;
-                if (players == null) return;
-                for (String k : players) {
-                    Player p = Bukkit.getPlayerExact(k);
-                    if (p == null || !p.isOnline()) continue;
+                if (players != null) {
+                    for (String k : players) {
+                        Player p = Bukkit.getPlayerExact(k);
+                        if (p == null || !p.isOnline()) continue;
 
-                    gain = 10;
-                    if (players_old != null && players_old.contains(k))
-                        gain += 5; // Si présent depuis looongtemps, +5
-                    if (isVIP(k))
-                        gain *= 10; // gain *10 si VIP :D
+                        gain = 10;
+                        if (players_old != null)
+                            if (players_old.contains(k))
+                                gain += 5; // Si présent depuis looongtemps, +5
+                        if (isVIP(k))
+                            gain *= 10; // gain *10 si VIP :D
 
-                    p.sendMessage(getTAG() + ChatColor.RED + "Payday !" + ChatColor.RESET + " Minefight t'offre " + gain + "ƒ pour ta présence ! :)");
-                    addToBalance(k, gain);
+                        p.sendMessage(getTAG() + ChatColor.RED + "Payday !" + ChatColor.RESET + " Minefight t'offre " + gain + "ƒ pour ta présence ! :)");
+                        addToBalance(k, gain);
 
+                    }
                 }
-
                 players_old = players;
                 players = ess.getUserMap().getAllUniqueUsers();
 
@@ -369,8 +377,6 @@ public class Main extends JavaPlugin {
 
         if (globalConfig.contains("events"))
             event_menu.loadWarps();
-
-        moneyListener.loadAmelioration();
 
         enchant_menu.load_config();
         /*try {
