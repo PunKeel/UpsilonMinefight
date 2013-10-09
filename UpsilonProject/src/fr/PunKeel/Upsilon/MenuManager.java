@@ -57,8 +57,8 @@ public class MenuManager implements Listener {
             p.sendMessage(Main.getTAG() + ChatColor.DARK_RED + "Interdit d'utiliser l'émeraude ici !");
             return;
         }
-        e.setCancelled(true);
         openInventory(p, Menus.TELEPORTATION);
+        e.setCancelled(true);
     }
 
     @EventHandler(ignoreCancelled = true)

@@ -206,7 +206,7 @@ public class MoneyListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onRespawn(PlayerRespawnEvent e) {
         final Player p = e.getPlayer();
-        FakeDragon.setStatus(p,  null, -1);
+        FakeDragon.setStatus(p, null, -1);
         Location loc = p.getLocation();
         PlayerCache statsv = Database.getCache(p.getName());
         long ratio = (long) (1 + statsv.getKills()) / (long) (1 + statsv.getDeaths());
