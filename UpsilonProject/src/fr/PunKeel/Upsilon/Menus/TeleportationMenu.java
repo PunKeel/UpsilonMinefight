@@ -71,8 +71,11 @@ public class TeleportationMenu implements Listener {
     public void onMenuClick(MenuClickEvent e) {
         if (!e.getCurrent_menu().equals(getSelfMenuType())) return;
         final HumanEntity p = e.getEvent().getWhoClicked();
+
         final String warp;
         switch (e.getEvent().getSlot()) {
+            case -1:
+                return;
             case 1:
                 warp = "spawn";
                 break;

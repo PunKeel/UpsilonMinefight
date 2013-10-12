@@ -7,6 +7,7 @@ import com.sk89q.worldguard.bukkit.WGBukkit;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.Furnace;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
@@ -16,6 +17,7 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.MaterialData;
 import org.bukkit.util.Vector;
 import org.kitteh.tag.PlayerReceiveNameTagEvent;
 import org.kitteh.tag.TagAPI;
@@ -361,5 +363,24 @@ public class MoneyListener implements Listener {
         ApplicableRegionSet AR_new = WGBukkit.getRegionManager(p.getWorld()).getApplicableRegions(e.getTo());
         if (AR_old.allows(Main.FLAG_DIE_ON_LEAVE) && !AR_new.allows(Main.FLAG_DIE_ON_LEAVE))
             e.getPlayer().damage(e.getPlayer().getMaxHealth() * 2);
+    }
+
+    @EventHandler
+    public void onFuel(PlayerInteractEvent e) {
+        Block b = e.getClickedBlock();
+        if (b == null)
+            return;
+        if (b.getType().equals(Material.FURNACE)) {
+            b.setType(Material.BURNING_FURNACE);
+            Furnace furnace = (Furnace) b.getState();
+            Short time = Short.parseShort("10000");
+            MaterialData tempData = furnace.getData();
+            furnace.setData(tempData);
+            furnace.update(true);
+            furnace.setCookTime(time);
+            furnace.setBurnTime(time);
+            furnace.update(true);
+            b.setData(furnace.getRawData());
+        }
     }
 }
