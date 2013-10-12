@@ -127,7 +127,7 @@ public class DeathManager implements Listener {
         ApplicableRegionSet set = WGBukkit.getRegionManager(v.getWorld()).getApplicableRegions(loc);
         e.setDeathMessage("");
         if (Bukkit.getOnlinePlayers().length <= 25 && getDeathMessage(v) != null)
-            Bukkit.broadcastMessage(getDeathMessage(v));
+            Bukkit.broadcastMessage(ChatColor.GRAY + getDeathMessage(v));
         if (!set.allows(Main.FLAG_ARENE)) {
             return;
         }
@@ -297,11 +297,11 @@ public class DeathManager implements Listener {
     }
 
     String colorVictim(Player p) {
-        return ChatColor.YELLOW + p.getName() + ChatColor.RESET;
+        return ChatColor.YELLOW + p.getName() + ChatColor.RESET + ChatColor.GRAY;
     }
 
     String colorDamager(Player p) {
-        return ChatColor.RED + p.getName() + ChatColor.RESET;
+        return ChatColor.YELLOW + p.getName() + ChatColor.RESET + ChatColor.GRAY;
     }
 
 }

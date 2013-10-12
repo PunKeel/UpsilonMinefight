@@ -6,6 +6,7 @@ import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.bukkit.BukkitUtil;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -24,11 +25,18 @@ import java.util.List;
  * May be open-source & be sold (by PunKeel, of course !)
  */
 public class Commandes {
+    HashMap<String, SLocation> portails = new HashMap<>();
     private Main main;
     private HashMap<String, Integer> demandes_GM = new HashMap<>();
 
     public Commandes(Main main) {
         this.main = main;
+        portails.put("dac", new SLocation(Main.WORLDNAME, 58, 4, -571, 0));
+        portails.put("lune", new SLocation(Main.WORLDNAME, 61, 4, -571, 0));
+        portails.put("color", new SLocation(Main.WORLDNAME, 58, 4, -577, 0));
+        portails.put("saut", new SLocation(Main.WORLDNAME, 61, 4, -577, 0));
+        portails.put("vitesse", new SLocation(Main.WORLDNAME, 64, 4, -571, 0));
+        portails.put("multiple", new SLocation(Main.WORLDNAME, 64, 4, -577, 0));
     }
 
     @CommandController.CommandHandler(name = "upsilon")
@@ -50,18 +58,20 @@ public class Commandes {
         if (args.length != 4) {
             cs.sendMessage("Usage : /ups events <status> <event> <broadcast>");
             cs.sendMessage("Usage : /ups events <on,off> <nom> <on/off>");
-            HashMap<String, Boolean> events = main.event_menu.getWarps();
-            for (String n : events.keySet()) {
-                cs.sendMessage(n + " : " + events.get(n).toString());
+            for (String n : portails.keySet()) {
+                cs.sendMessage(n);
             }
         } else {
-            Boolean enable = args[1].equalsIgnoreCase("on");
+            boolean enable = args[1].equalsIgnoreCase("on");
             String event = args[2];
-            Boolean broadcast = args[3].equalsIgnoreCase("on");
-            Boolean success = main.event_menu.changeState(event, enable);
+            boolean broadcast = args[3].equalsIgnoreCase("on");
+
+            boolean success = portails.containsKey(event);
             if (!success) {
                 cs.sendMessage("Event inexistant, sale noob");
             } else {
+                Block b = portails.get(event).toLocation().getBlock();
+                b.setType(enable ? Material.STONE_PLATE : Material.AIR);
                 main.broadcastToAdmins(ChatColor.GRAY + "<" + cs.getName() + "> Event " + event + " mis " + (enable ? "on" : "off"));
                 cs.sendMessage("État changé :)");
                 if (broadcast) {

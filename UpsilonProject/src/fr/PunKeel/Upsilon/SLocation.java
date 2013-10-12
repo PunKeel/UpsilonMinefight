@@ -20,6 +20,14 @@ public class SLocation {
         yaw = location.getYaw();
     }
 
+    public SLocation(String world, int x, int y, int z, int yaw) {
+        this.world = world;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.yaw = yaw;
+    }
+
     public String getWorld() {
         return world;
     }

@@ -40,7 +40,7 @@ public class SpawnManager {
             }
         }); // Sort by distance to `loc`
         SLocation[] spawns = sLocations.toArray(new SLocation[sLocations.size()]);
-        int id = new Random().nextInt(Math.min(spawns.length, 3)); // Select one of 3 nearest locations
+        int id = new Random().nextInt(Math.min(Math.abs(spawns.length), 3)); // Select one of 3 nearest locations
         return spawns[id];
     }
 

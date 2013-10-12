@@ -279,8 +279,8 @@ public class Main extends JavaPlugin {
     }
 
     public void onDisable() {
-        menu_manager.closeAll();
         ConfigSave();
+        menu_manager.closeAll();
     }
 
     public ItemStack nameItem(ItemStack i, String name, String lore1, String lore2) {
@@ -367,6 +367,7 @@ public class Main extends JavaPlugin {
         locationsConfig.set("spawn_locations", gson.toJson(SM), "- Coords respawns par region");
         locationsConfig.set("infini_locations", gson.toJson(infinidisp.coordonnees), "- Coords infinidispensers");
         amisConfig.set("halloween", gson.toJson(halloween.locations));
+
         amisConfig.saveConfig();
         globalConfig.saveConfig();
         locationsConfig.saveConfig();
@@ -397,6 +398,8 @@ public class Main extends JavaPlugin {
             infinidisp.coordonnees = new HashSet<>();
         if (amisConfig.contains("halloween"))
             halloween.locations = gson.fromJson(amisConfig.getString("halloween"), (new HashSet<String>()).getClass());
+        if (halloween.locations == null)
+            halloween.locations = new HashSet<>();
         final List bCastMessages = globalConfig.getList("broadcast-messages");
         if (bCasterThread != 0)
             Bukkit.getScheduler().cancelTask(bCasterThread);
