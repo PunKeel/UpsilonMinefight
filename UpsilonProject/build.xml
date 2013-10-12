@@ -1,7 +1,12 @@
 <project name="build" default="pre-build">
     <available file=".git" type="dir" property="git.present"/>
     <target name="getgitdetails">
-        <exec executable="git" outputproperty="git.revision">
+        <exec executable="git" outputproperty="git.count">
+            <arg value="rev-list"/>
+            <arg value="--count"/>
+            <arg value="HEAD"/>
+        </exec>
+        <exec executable="git" outputproperty="git.commit">
             <arg value="rev-parse"/>
             <arg value="HEAD"/>
         </exec>
@@ -10,7 +15,8 @@
         <copy file="resources/plugin.template.yml" tofile="resources/generated/plugin.yml" overwrite="yes">
             <filterchain>
                 <replacetokens>
-                    <token key="repository.version" value="${git.revision}"/>
+                    <token key="repository.buildNumber" value="${git.count}"/>
+                    <token key="repository.commit" value="${git.commit}"/>
                 </replacetokens>
             </filterchain>
         </copy>

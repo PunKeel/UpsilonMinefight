@@ -1,5 +1,5 @@
 name: UpsilonProject
-version:  @repository.version@
+version:  git-@repository.buildNumber@_@repository.commit@
 description: Un plugin cool, je te jure.
 author: PunKeel
 main: fr.PunKeel.Upsilon.Main
