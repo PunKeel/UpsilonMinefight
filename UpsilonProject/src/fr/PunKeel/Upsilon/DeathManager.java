@@ -5,7 +5,6 @@ import com.github.games647.scoreboardstats.pvpstats.PlayerCache;
 import com.sk89q.worldguard.bukkit.WGBukkit;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import fr.PunKeel.Upsilon.BarAPI.FakeDragon;
 import fr.PunKeel.Upsilon.BarAPI.General;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -55,7 +54,6 @@ public class DeathManager implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onRespawn(PlayerRespawnEvent e) {
         final Player p = e.getPlayer();
-        FakeDragon.setStatus(p, null, -1);
         Location loc = p.getLocation();
         PlayerCache statsv = Database.getCache(p.getName());
         long ratio = (long) (1 + statsv.getKills()) / (long) (1 + statsv.getDeaths());
@@ -227,7 +225,7 @@ public class DeathManager implements Listener {
                 if (pro.getShooter() instanceof Player) {
                     Player attackp = (Player) pro.getShooter();
                     if (pro instanceof Arrow) {
-                        return (colorVictim(p) + " a été tué par la flêche de " + colorDamager(attackp));
+                        return (colorVictim(p) + " a été tué par la flèche de " + colorDamager(attackp));
                     } else if (pro instanceof Snowball) {
                         return (colorVictim(p) + " est mort de la boule de neige de " + colorDamager(attackp));
                     } else if (pro instanceof Egg) {

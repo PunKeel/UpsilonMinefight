@@ -161,9 +161,11 @@ public class TeamManager implements Listener {
     public void onRespawn(PlayerRespawnEvent e) {
         Player p = e.getPlayer();
         Team t = SB.getPlayerTeam(p);
-        if (t == null) return;
-        if (t.getName().isEmpty()) return;
-        if (FakeDragon.hasBar(p))
-            FakeDragon.setStatus(p, null, -1);
+        if (t == null)
+            return;
+        if (t.getName().isEmpty())
+            return;
+        /*if (FakeDragon.hasBar(p))
+            FakeDragon.setStatus(p, null, -1);*/
     }
 }
