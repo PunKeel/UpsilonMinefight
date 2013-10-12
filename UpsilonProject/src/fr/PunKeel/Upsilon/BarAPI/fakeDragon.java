@@ -57,6 +57,8 @@ public class FakeDragon {
             }
 
         } else {
+            if (text == null)
+                text = "";
             dragon = new FakeDragon(text, 6000, player.getLocation().add(0, -200, 0));
             if (healthpercent != -1) {
 
@@ -89,6 +91,17 @@ public class FakeDragon {
 
     public static boolean hasBar(Player p) {
         return dragonplayers.containsKey(p.getName());
+    }
+
+    public static void resendDragon(Player p) {
+        if (!hasBar(p)) return;
+        FakeDragon dragon = dragonplayers.get(p.getName());
+
+        Object metaPacket = dragon.getMetadataPacket(dragon.getWatcher());
+        Object teleportPacket = dragon.getTeleportPacket(p.getLocation().subtract(0, 200, 0));
+        General.sendPacket(p, metaPacket);
+        General.sendPacket(p, teleportPacket);
+
     }
 
     Object getMobPacket() {
@@ -236,5 +249,4 @@ public class FakeDragon {
 
         return watcher;
     }
-
 }

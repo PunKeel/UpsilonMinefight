@@ -1,5 +1,5 @@
 name: UpsilonProject
-version:  6.6.8
+version:  @repository.version@
 description: Un plugin cool, je te jure.
 author: PunKeel
 main: fr.PunKeel.Upsilon.Main

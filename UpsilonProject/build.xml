@@ -1,0 +1,18 @@
+<project name="build" default="pre-build">
+    <available file=".git" type="dir" property="git.present"/>
+    <target name="getgitdetails">
+        <exec executable="git" outputproperty="git.revision">
+            <arg value="rev-parse"/>
+            <arg value="HEAD"/>
+        </exec>
+    </target>
+    <target name="pre-build" depends="getgitdetails" description="build plugin.yml from template">
+        <copy file="resources/plugin.template.yml" tofile="resources/generated/plugin.yml" overwrite="yes">
+            <filterchain>
+                <replacetokens>
+                    <token key="repository.version" value="${git.revision}"/>
+                </replacetokens>
+            </filterchain>
+        </copy>
+    </target>
+</project>
