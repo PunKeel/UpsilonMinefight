@@ -40,6 +40,7 @@ public class TeamManager implements Listener {
         blacklist.add("minefight");
         blacklist.add("play");
         blacklist.add("www");
+        blacklist.add("lune");
         SB = Bukkit.getScoreboardManager().getNewScoreboard();
 
     }

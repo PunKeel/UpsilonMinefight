@@ -85,19 +85,6 @@ public class MoneyListener implements Listener {
 
     }
 
-    void removeFor(Player p) {
-        if (!already.contains(p.getName())) {
-            if (p.getInventory().contains(Material.SKULL_ITEM) || p.getEnderChest().contains(Material.SKULL_ITEM)) {
-                p.getInventory().remove(Material.SKULL_ITEM);
-                p.getEnderChest().remove(Material.SKULL_ITEM);
-                p.getInventory().addItem(new ItemStack(Material.IRON_INGOT, 2));
-                p.updateInventory();
-                p.sendMessage(Main.getTAG() + ChatColor.BLUE + "Suite au passage en 1.6, l'économie change et nous devons confisquer tes têtes. En échange, tu as eu du fer :)");
-            }
-            already.add(p.getName());
-        }
-    }
-
     @EventHandler
     public void onAnvilChange(EntityChangeBlockEvent e) {
         if (!e.getBlock().getType().equals(Material.ANVIL)) return;
@@ -108,7 +95,6 @@ public class MoneyListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onJoin(PlayerJoinEvent e) {
         final Player p = e.getPlayer();
-        removeFor(p);
         if (p.getHealth() == 0) {
             Main.resetPlayer(p);
         }

@@ -219,7 +219,7 @@ public class Commandes {
         String player = args[0];
         int qty = 1;
         if (args.length == 2) {
-            qty = Integer.parseInt(args[1]);
+            qty = Math.abs(Integer.parseInt(args[1]));
         }
         Player d = Bukkit.getPlayerExact(player);
         if (d == null) {

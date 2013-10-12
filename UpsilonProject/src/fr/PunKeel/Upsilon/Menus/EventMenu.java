@@ -79,13 +79,17 @@ public class EventMenu implements Listener {
         String lore_on = ChatColor.GREEN + "Cliquez pour rejoindre";
 
         dac = m.nameItem(new ItemStack(Material.LADDER), ChatColor.DARK_AQUA + "Event DAC", warps.get("dac") ? lore_on : lore_off);
-        sauta = m.nameItem(jump_potion.clone(), ChatColor.DARK_AQUA + "Event Saut 1", warps.get("saut1") ? lore_on : lore_off);
+        sauta = m.nameItem(new ItemStack(Material.GOLD_INGOT), ChatColor.DARK_AQUA + "Event Saut 1", warps.get("saut1") ? lore_on : lore_off);
         sautb = m.nameItem(new ItemStack(Material.GOLD_INGOT), ChatColor.DARK_AQUA + "Event Saut 2", warps.get("saut2") ? lore_on : lore_off);
         sautc = m.nameItem(new ItemStack(Material.GOLD_INGOT), ChatColor.DARK_AQUA + "Event Saut 3", warps.get("saut3") ? lore_on : lore_off);
         color = m.nameItem(new ItemStack(Material.WOOL, 1, (short) 1), ChatColor.DARK_AQUA + "Event Color", warps.get("color") ? lore_on : lore_off);
         vitesse = m.nameItem(new ItemStack(Material.POTION, 1, (short) 8258), ChatColor.DARK_AQUA + "Event Vitesse", warps.get("vitesse") ? lore_on : lore_off);
         lune = m.nameItem(new ItemStack(Material.ENDER_STONE), ChatColor.DARK_AQUA + "La lune", warps.get("lune") ? lore_on : lore_off);
         event_multiple = m.nameItem(new ItemStack(Material.getMaterial(159)), ChatColor.GOLD + "Event Multiple", warps.get("eventep1") ? lore_on : lore_off);
+        setItems();
+    }
+
+    void setItems() {
         inv.setItem(0, dac);
         inv.setItem(1, sauta);
         inv.setItem(2, sautb);
@@ -156,6 +160,7 @@ public class EventMenu implements Listener {
         final String warp = String.valueOf(slots.get(e.getEvent().getSlot()));
         if (warp == null) return;
         if (warp.isEmpty()) return;
+        setItems();
         final Player p = (Player) e.getEvent().getWhoClicked();
 
         if (p.hasPermission("upsilon.admin.event")) {

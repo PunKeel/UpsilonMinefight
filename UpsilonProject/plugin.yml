@@ -43,3 +43,7 @@ commands:
      description: Applique un vecteur <x> <y> <z> au <joueur>
    fakeblock:
      description: Envoie des mises à jour de bloc au joueur :D
+   citrouille:
+     description: Home-made
+   halloween:
+     description: See citrouille

@@ -26,7 +26,7 @@ public class Chronos implements Listener {
         this.main = main;
         usage_chrono = "Usage : /chrono <start,stop> <name> <player> <tell(y/n)>";
 
-        usage_checkpoint = "Usage : /chrono <set,reset,tp> <name> <player>>";
+        usage_checkpoint = "Usage : /checkpoint <set,reset,tp> <name> <player>>";
     }
 
     @CommandController.CommandHandler(name = "checkpoint", permission = "upsilon.checkpoint")

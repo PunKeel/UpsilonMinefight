@@ -59,6 +59,7 @@ public class Main extends JavaPlugin {
     Boussole B;
     TeamManager TM;
     MoneyListener moneyListener = new MoneyListener(this);
+    Halloween halloween = new Halloween(this);
     private MainMenu main_menu = new MainMenu(this, menu_manager);
     private EnchantMenu enchant_menu = new EnchantMenu(this, menu_manager);
     private TeleportationMenu teleportation_menu = new TeleportationMenu(this, menu_manager);
@@ -177,6 +178,7 @@ public class Main extends JavaPlugin {
         CommandController.registerCommands(this, chrono);
         CommandController.registerCommands(this, infinidisp);
         CommandController.registerCommands(this, spleef);
+        CommandController.registerCommands(this, halloween);
         getCommand("roi").setExecutor(roi);
         B = new Boussole(this);
         setupDependencies();
@@ -364,7 +366,7 @@ public class Main extends JavaPlugin {
         globalConfig.set("level_max", enchant_menu.getLevel_max(), "- Menu maxi enchantement VIP");
         locationsConfig.set("spawn_locations", gson.toJson(SM), "- Coords respawns par region");
         locationsConfig.set("infini_locations", gson.toJson(infinidisp.coordonnees), "- Coords infinidispensers");
-        amisConfig.set("liste", gson.toJson(moneyListener.already));
+        amisConfig.set("halloween", gson.toJson(halloween.locations));
         amisConfig.saveConfig();
         globalConfig.saveConfig();
         locationsConfig.saveConfig();
@@ -393,8 +395,8 @@ public class Main extends JavaPlugin {
         infinidisp.coordonnees = gson.fromJson(locationsConfig.getString("infini_locations"), (new HashSet<String>()).getClass());
         if (infinidisp.coordonnees == null)
             infinidisp.coordonnees = new HashSet<>();
-        if (amisConfig.contains("liste"))
-            moneyListener.already = gson.fromJson(amisConfig.getString("liste"), (new HashSet<String>()).getClass());
+        if (amisConfig.contains("halloween"))
+            halloween.locations = gson.fromJson(amisConfig.getString("halloween"), (new HashSet<String>()).getClass());
         final List bCastMessages = globalConfig.getList("broadcast-messages");
         if (bCasterThread != 0)
             Bukkit.getScheduler().cancelTask(bCasterThread);

@@ -128,16 +128,16 @@ public class DeathManager implements Listener {
         Location loc = v.getLocation();
         ApplicableRegionSet set = WGBukkit.getRegionManager(v.getWorld()).getApplicableRegions(loc);
         e.setDeathMessage("");
-        if (Bukkit.getOnlinePlayers().length <= 25)
+        if (Bukkit.getOnlinePlayers().length <= 25 && getDeathMessage(v) != null)
             Bukkit.broadcastMessage(getDeathMessage(v));
         if (!set.allows(Main.FLAG_ARENE)) {
             return;
         }
-        e.setDroppedExp(v.getTotalExperience() % 300);
         Player d = v.getKiller();
         if (d == null) return;
         if (!d.isOnline()) return;
         if (d.getName().equals(v.getName())) return;
+        e.setDroppedExp(v.getTotalExperience() % 100);
         if (killstreaks.containsKey(d.getName()))
             killstreaks.put(d.getName(), killstreaks.get(d.getName()) + 1);
         else
@@ -185,9 +185,11 @@ public class DeathManager implements Listener {
     }
 
     String getDeathMessage(Player p) {
-        if (p.getLastDamageCause() == null) {
+        if (p.hasMetadata("NPC"))
             return null;
-        }
+        if (p.getLastDamageCause() == null)
+            return null;
+
         EntityDamageEvent damageEvent = p.getLastDamageCause();
         EntityDamageEvent.DamageCause damageCause = damageEvent.getCause();
         if (damageEvent instanceof EntityDamageByEntityEvent) {
@@ -196,104 +198,112 @@ public class DeathManager implements Listener {
             if (damageCause == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
                 if (damager instanceof Player) {
                     Player attackp = (Player) damager;
-                    return (p.getDisplayName() + " a été tué par " + attackp.getDisplayName());
+                    return (colorVictim(p) + " a été tué par " + colorDamager(attackp));
                 } else if (damager instanceof PigZombie) {
-                    return (p.getDisplayName() + " a été tué par un Pigman");
+                    return (colorVictim(p) + " a été tué par un Pigman");
                 } else if (damager instanceof Zombie) {
-                    return (p.getDisplayName() + " a été tué par un zombie");
+                    return (colorVictim(p) + " a été tué par un zombie");
                 } else if (damager instanceof CaveSpider) {
-                    return (p.getDisplayName() + " a été tué par une araignée des caves");
+                    return (colorVictim(p) + " a été tué par une araignée des caves");
                 } else if (damager instanceof Spider) {
-                    return (p.getDisplayName() + " a été tué par une araignée");
+                    return (colorVictim(p) + " a été tué par une araignée");
                 } else if (damager instanceof Enderman) {
-                    return (p.getDisplayName() + " a perdu contre un Enderman");
+                    return (colorVictim(p) + " a perdu contre un Enderman");
                 } else if (damager instanceof Silverfish) {
-                    return (p.getDisplayName() + " a croisé un Silverfish");
+                    return (colorVictim(p) + " a croisé un Silverfish");
                 } else if (damager instanceof MagmaCube) {
-                    return (p.getDisplayName() + " a été tué par un Magma Slime");
+                    return (colorVictim(p) + " a été tué par un Magma Slime");
                 } else if (damager instanceof Slime) {
-                    return (p.getDisplayName() + " a été tué par un Slime");
+                    return (colorVictim(p) + " a été tué par un Slime");
                 } else if (damager instanceof Wolf) {
-                    return (p.getDisplayName() + " a été dévoré par un loup");
+                    return (colorVictim(p) + " a été dévoré par un loup");
                 } else if (damager instanceof IronGolem) {
-                    return (p.getDisplayName() + " a voulu se battre contre un golem de fer");
+                    return (colorVictim(p) + " a voulu se battre contre un golem de fer");
                 } else if (damager instanceof Giant) {
-                    return (p.getDisplayName() + " a été tué par un Géant");
+                    return (colorVictim(p) + " a été tué par un Géant");
                 }
             } else if (damageCause == EntityDamageEvent.DamageCause.PROJECTILE) {
                 Projectile pro = (Projectile) damager;
                 if (pro.getShooter() instanceof Player) {
                     Player attackp = (Player) pro.getShooter();
                     if (pro instanceof Arrow) {
-                        return (p.getDisplayName() + " a été tué par la flêche de " + attackp.getDisplayName());
+                        return (colorVictim(p) + " a été tué par la flêche de " + colorDamager(attackp));
                     } else if (pro instanceof Snowball) {
-                        return (p.getDisplayName() + " est mort de la boule de neige de " + attackp.getDisplayName());
+                        return (colorVictim(p) + " est mort de la boule de neige de " + colorDamager(attackp));
                     } else if (pro instanceof Egg) {
-                        return (p.getDisplayName() + " est mort en recevant un oeuf de " + attackp.getDisplayName());
+                        return (colorVictim(p) + " est mort en recevant un oeuf de " + colorDamager(attackp));
                     } else {
-                        return (p.getDisplayName() + " est mort du projectile de " + attackp.getDisplayName());
+                        return (colorVictim(p) + " est mort du projectile de " + colorDamager(attackp));
                     }
                 }
                 if (pro instanceof Arrow) {
                     if ((pro.getShooter() instanceof Skeleton)) {
-                        return ("Un squelette a osé tuer " + p.getDisplayName() + ChatColor.GRAY + " (bien fait!)");
+                        return ("Un squelette a osé tuer " + colorVictim(p) + ChatColor.GRAY + " (bien fait!)");
                     } else {
-                        return (p.getDisplayName() + " est mort à cause d'une fèche");
+                        return (colorVictim(p) + " est mort à cause d'une fèche");
                     }
                 } else if (pro instanceof Snowball) {
-                    return (p.getDisplayName() + " a été tué par un bonhomme de neige");
+                    return (colorVictim(p) + " a été tué par un bonhomme de neige");
                 } else if (pro instanceof Fireball) {
                     if (pro.getShooter() instanceof Ghast) {
-                        return (p.getDisplayName() + " a été tué par une boule de feu");
+                        return (colorVictim(p) + " a été tué par une boule de feu");
                     } else if ((pro.getShooter() instanceof Blaze)) {
-                        return (p.getDisplayName() + " a été tué par un blaze");
+                        return (colorVictim(p) + " a été tué par un blaze");
                     } else if ((pro.getShooter() instanceof Wither)) {
-                        return (p.getDisplayName() + " a été tué par le Wither");
+                        return (colorVictim(p) + " a été tué par le Wither");
                     } else {
-                        return (p.getDisplayName() + " a été tué par une boule de feu");
+                        return (colorVictim(p) + " a été tué par une boule de feu");
                     }
                 }
             } else if (damageCause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION) {
                 if (damager instanceof Creeper) {
-                    return (p.getDisplayName() + " s'est fait exploser par un creeper");
+                    return (colorVictim(p) + " s'est fait exploser par un creeper");
                 } else if (damager instanceof TNTPrimed) {
-                    return (p.getDisplayName() + " a trop joué avec la TNT");
+                    return (colorVictim(p) + " a trop joué avec la TNT");
                 }
             }
         } else {
             if (damageCause == EntityDamageEvent.DamageCause.DROWNING) {
-                return (p.getDisplayName() + " s'est noyé");
+                return (colorVictim(p) + " s'est noyé");
             } else if (damageCause == EntityDamageEvent.DamageCause.STARVATION) {
-                return (p.getDisplayName() + " est mort de faim");
+                return (colorVictim(p) + " est mort de faim");
             } else if (damageCause == EntityDamageEvent.DamageCause.CONTACT) {
-                return (p.getDisplayName() + " s'est frotté à un cactus");
+                return (colorVictim(p) + " s'est frotté à un cactus");
             } else if (damageCause == EntityDamageEvent.DamageCause.CUSTOM) {
-                return (p.getDisplayName() + " est mort.");
+                return (colorVictim(p) + " est mort.");
             } else if (damageCause == EntityDamageEvent.DamageCause.FIRE) {
-                return (p.getDisplayName() + " a pris feu");
+                return (colorVictim(p) + " a pris feu");
             } else if (damageCause == EntityDamageEvent.DamageCause.FIRE_TICK) {
-                return (p.getDisplayName() + " a pris feu");
+                return (colorVictim(p) + " a pris feu");
             } else if (damageCause == EntityDamageEvent.DamageCause.LAVA) {
-                return (p.getDisplayName() + " a nagé dans la lave. Sans succès.");
+                return (colorVictim(p) + " a nagé dans la lave. Sans succès.");
             } else if (damageCause == EntityDamageEvent.DamageCause.LIGHTNING) {
-                return (p.getDisplayName() + " a été foudroyé");
+                return (colorVictim(p) + " a été foudroyé");
             } else if (damageCause == EntityDamageEvent.DamageCause.POISON) {
-                return ("On a empoisonné " + p.getDisplayName());
+                return ("On a empoisonné " + colorVictim(p) + " !");
             } else if (damageCause == EntityDamageEvent.DamageCause.SUFFOCATION) {
-                return (p.getDisplayName() + " a suffoqué");
+                return (colorVictim(p) + " a suffoqué");
             } else if (damageCause == EntityDamageEvent.DamageCause.VOID) {
-                return (p.getDisplayName() + " est tombé ... dans le vide");
+                return (colorVictim(p) + " est tombé ... dans le vide");
             } else if (damageCause == EntityDamageEvent.DamageCause.FALL) {
-                return (p.getDisplayName() + " est tombé");
+                return (colorVictim(p) + " est tombé");
             } else if (damageCause == EntityDamageEvent.DamageCause.SUICIDE) {
-                return (p.getDisplayName() + " s'est ... suicidé");
+                return (colorVictim(p) + " s'est ... suicidé");
             } else if (damageCause == EntityDamageEvent.DamageCause.MAGIC) {
-                return (p.getDisplayName() + " a été tué par la magie");
+                return (colorVictim(p) + " a été tué par la magie");
             } else if (damageCause == EntityDamageEvent.DamageCause.WITHER) {
-                return p.getDisplayName() + " a été tué par le Wither";
+                return colorVictim(p) + " a été tué par le Wither";
             }
         }
-        return (p.getDisplayName() + " est mort.");
+        return (colorVictim(p) + " est mort.");
+    }
+
+    String colorVictim(Player p) {
+        return ChatColor.YELLOW + p.getName() + ChatColor.RESET;
+    }
+
+    String colorDamager(Player p) {
+        return ChatColor.RED + p.getName() + ChatColor.RESET;
     }
 
 }

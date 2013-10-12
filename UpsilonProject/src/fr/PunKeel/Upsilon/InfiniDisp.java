@@ -1,7 +1,6 @@
 package fr.PunKeel.Upsilon;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Dispenser;
@@ -38,7 +37,8 @@ public class InfiniDisp implements Listener {
             p.sendMessage(Main.getTAG() + "Tu regardes un dispenser ou dropper, au moins ?");
             return;
         }
-        String SL = getLocation(b.getLocation());
+        System.out.println("#DEBUG_PK_" + b.getWorld());
+        String SL = getLocation(b);
         if (coordonnees.contains(SL)) {
             p.sendMessage(Main.getTAG() + "InfiniDisp : " + ChatColor.DARK_RED + "OFF");
             coordonnees.remove(SL);
@@ -59,7 +59,7 @@ public class InfiniDisp implements Listener {
                 return;
             }
             if (b.getType().equals(Material.DISPENSER) || b.getType().equals(Material.DROPPER)) {
-                if (coordonnees.contains(getLocation(b.getLocation()))) {
+                if (coordonnees.contains(getLocation(b))) {
                     e.setCancelled(true);
                 }
             }
@@ -69,7 +69,7 @@ public class InfiniDisp implements Listener {
     @EventHandler
     public void onDispense(BlockDispenseEvent e) {
         Block b = e.getBlock();
-        String SL = getLocation(b.getLocation());
+        String SL = getLocation(b);
         if (!coordonnees.contains(SL)) return;
         Inventory i;
         if (b.getType().equals(Material.DISPENSER)) {
@@ -85,11 +85,11 @@ public class InfiniDisp implements Listener {
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e) {
         Block b = e.getBlock();
-        coordonnees.remove(getLocation(b.getLocation()));
+        coordonnees.remove(getLocation(b));
     }
 
-    String getLocation(Location l) {
-        return l.getWorld().getName() + "_" + l.getBlockX() + "_" + l.getBlockY() + "_" + l.getBlockZ();
+    String getLocation(Block b) {
+        return b.getWorld().getName() + "_" + b.getX() + "_" + b.getY() + "_" + b.getZ();
     }
 
 }
