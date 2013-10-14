@@ -32,7 +32,7 @@ public class Commandes {
     public Commandes(Main main) {
         this.main = main;
         portails.put("dac", new SLocation(Main.WORLDNAME, 58, 4, -571, 0));
-        portails.put("lune", new SLocation(Main.WORLDNAME, 61, 4, -571, 0));
+        portails.put("lune", new SLocation(Main.WORLDNAME, 58, 4, -577, 0));
         portails.put("color", new SLocation(Main.WORLDNAME, 58, 4, -577, 0));
         portails.put("saut", new SLocation(Main.WORLDNAME, 61, 4, -577, 0));
         portails.put("vitesse", new SLocation(Main.WORLDNAME, 64, 4, -571, 0));

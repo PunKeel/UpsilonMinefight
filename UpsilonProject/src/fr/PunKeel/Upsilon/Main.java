@@ -3,6 +3,7 @@ package fr.PunKeel.Upsilon;
 import com.earth2me.essentials.Essentials;
 import com.earth2me.essentials.api.NoLoanPermittedException;
 import com.earth2me.essentials.api.UserDoesNotExistException;
+import com.google.common.base.Joiner;
 import com.mewin.WGCustomFlags.WGCustomFlagsPlugin;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.protection.flags.StateFlag;
@@ -22,6 +23,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.StringUtil;
 import ru.tehkode.permissions.PermissionManager;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
@@ -366,7 +368,7 @@ public class Main extends JavaPlugin {
         globalConfig.set("level_max", enchant_menu.getLevel_max(), "- Menu maxi enchantement VIP");
         locationsConfig.set("spawn_locations", gson.toJson(SM), "- Coords respawns par region");
         locationsConfig.set("infini_locations", gson.toJson(infinidisp.coordonnees), "- Coords infinidispensers");
-        amisConfig.set("halloween", gson.toJson(halloween.locations));
+        amisConfig.set("halloween", Joiner.on("|").join(halloween.locations));
 
         amisConfig.saveConfig();
         globalConfig.saveConfig();
@@ -397,7 +399,7 @@ public class Main extends JavaPlugin {
         if (infinidisp.coordonnees == null)
             infinidisp.coordonnees = new HashSet<>();
         if (amisConfig.contains("halloween"))
-            halloween.locations = gson.fromJson(amisConfig.getString("halloween"), (new HashSet<String>()).getClass());
+            Collections.addAll(halloween.locations, amisConfig.getString("halloween").split("|"));
         if (halloween.locations == null)
             halloween.locations = new HashSet<>();
         final List bCastMessages = globalConfig.getList("broadcast-messages");
