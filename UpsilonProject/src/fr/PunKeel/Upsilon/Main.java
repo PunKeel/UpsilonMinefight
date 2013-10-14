@@ -24,7 +24,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.StringUtil;
 import ru.tehkode.permissions.PermissionManager;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
@@ -66,7 +65,7 @@ public class Main extends JavaPlugin {
     private MainMenu main_menu = new MainMenu(this, menu_manager);
     private EnchantMenu enchant_menu = new EnchantMenu(this, menu_manager);
     private TeleportationMenu teleportation_menu = new TeleportationMenu(this, menu_manager);
-    private RoiAuSommet roi = new RoiAuSommet(this);
+    private RoiAuSommet roi = new RoiAuSommet(this); // @TDOO: convert to use Command manager + special inventory
     private Commandes commandes = new Commandes(this);
     private Chronos chrono = new Chronos(this);
     private InfiniDisp infinidisp = new InfiniDisp(this);
@@ -130,7 +129,7 @@ public class Main extends JavaPlugin {
         if (!p.getGameMode().equals(GM)) p.setGameMode(GM);
     }
 
-    public static void print(String o) {
+    public static void print(String o) { // isn't this useless ?
         System.out.println(o);
     }
 
