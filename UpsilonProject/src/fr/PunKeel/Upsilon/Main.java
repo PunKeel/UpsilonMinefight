@@ -80,7 +80,7 @@ public class Main extends JavaPlugin {
     private String log_date;
     private DeathManager DM = new DeathManager(this);
 
-    public static <T> T getRandom(T[] array) {
+    public static <T> T getRandom(T[] array) { // a
         return array[rnd.nextInt(array.length)];
     }
 
