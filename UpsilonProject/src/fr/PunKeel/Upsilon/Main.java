@@ -15,6 +15,7 @@ import fr.PunKeel.Upsilon.Menus.MainMenu;
 import fr.PunKeel.Upsilon.Menus.TeleportationMenu;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.libs.com.google.gson.Gson;
+import org.bukkit.craftbukkit.libs.com.google.gson.GsonBuilder;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -70,7 +71,8 @@ public class Main extends JavaPlugin {
     private Chronos chrono = new Chronos(this);
     private InfiniDisp infinidisp = new InfiniDisp(this);
     private Spleef spleef = new Spleef(this);
-    private Gson gson = new Gson();
+    private Gson gson = new GsonBuilder().registerTypeAdapter(SLocation.class,
+            new SLocationSerialiser()).create();
     private Logger CLogger;
     private ConfigManager CM = new ConfigManager(this);
     private SimpleConfig globalConfig, locationsConfig, amisConfig;
