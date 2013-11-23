@@ -28,7 +28,7 @@ class Boussole implements Listener {
                     }
                 }
             }
-        }, 20L, 20 * 20L);
+        }, 20L, 2 * 20L);
     }
 
     void updateCompass(Player p) {

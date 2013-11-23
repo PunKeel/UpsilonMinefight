@@ -3,7 +3,7 @@ package fr.PunKeel.Upsilon;
 import com.earth2me.essentials.api.Economy;
 import com.earth2me.essentials.api.NoLoanPermittedException;
 import com.earth2me.essentials.api.UserDoesNotExistException;
-import fr.PunKeel.Upsilon.BarAPI.FakeDragon;
+import me.confuser.barapi.BarAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -30,7 +30,7 @@ import java.util.Random;
 public class TeamManager implements Listener {
     HashSet<String> blacklist = new HashSet<>();
     Scoreboard SB;
-    HashMap<String, Integer> scores = new HashMap<>();
+    HashMap<String, Float> scores = new HashMap<>();
     Main main;
     HashMap<String, String> team_joueur = new HashMap<>();
 
@@ -49,7 +49,7 @@ public class TeamManager implements Listener {
         if (team == null) return;
         for (OfflinePlayer p : team.getPlayers())
             if (p.isOnline())
-                FakeDragon.setStatus((Player) p, "[" + ChatColor.GREEN + team.getDisplayName() + ChatColor.RESET + "] " + message, scores.get(team.getName()));
+                BarAPI.setMessage((Player) p, "[" + ChatColor.GREEN + team.getDisplayName() + ChatColor.RESET + "] " + message, scores.get(team.getName()));
     }
 
     void quit(Player p) {
@@ -111,8 +111,8 @@ public class TeamManager implements Listener {
             t.setCanSeeFriendlyInvisibles(true);
         }
         if (!scores.containsKey(t.getName()))
-            scores.put(t.getName(), 1);
-        FakeDragon.setStatus(p, "[" + ChatColor.GREEN + subdomain + ChatColor.RESET + "] Vous avez rejoint la team", scores.get(subdomain));
+            scores.put(t.getName(), .1f);
+        BarAPI.setMessage(p, "[" + ChatColor.GREEN + subdomain + ChatColor.RESET + "] Vous avez rejoint la team", scores.get(subdomain));
         broadcastTeamBarMessage(t, ChatColor.GOLD + p.getDisplayName() + ChatColor.RESET + " vous rejoint !");
         t.addPlayer(p);
     }
@@ -140,7 +140,7 @@ public class TeamManager implements Listener {
         Team td = SB.getPlayerTeam(d);
         if (tp == td) return;
         if (td != null) {
-            int bonus = new Random().nextInt(1) + 1;
+            float bonus = new Random().nextFloat() / 10;
             if (!scores.containsKey(td.getName()))
                 scores.put(td.getName(), bonus);
             else
@@ -149,7 +149,7 @@ public class TeamManager implements Listener {
                 int gain = Math.round((float) 2000 / td.getPlayers().size());
                 shareMoney(td, gain);
                 broadcastTeamMessage(td, Main.getTAG() + ChatColor.DARK_GREEN + "+ " + ChatColor.GOLD + "2000" + ChatColor.DARK_GREEN + "ƒ" + ChatColor.RESET + " à partager avec ta team !");
-                scores.put(td.getName(), 1);
+                scores.put(td.getName(), .1f);
             }
 
             broadcastTeamBarMessage(td, d.getDisplayName() + " a tué " + p.getDisplayName());
@@ -165,7 +165,5 @@ public class TeamManager implements Listener {
             return;
         if (t.getName().isEmpty())
             return;
-        if (FakeDragon.hasBar(p))
-            FakeDragon.resendDragon(p);
     }
 }

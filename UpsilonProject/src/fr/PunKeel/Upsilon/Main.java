@@ -3,7 +3,6 @@ package fr.PunKeel.Upsilon;
 import com.earth2me.essentials.Essentials;
 import com.earth2me.essentials.api.NoLoanPermittedException;
 import com.earth2me.essentials.api.UserDoesNotExistException;
-import com.google.common.base.Joiner;
 import com.mewin.WGCustomFlags.WGCustomFlagsPlugin;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.protection.flags.StateFlag;
@@ -61,7 +60,6 @@ public class Main extends JavaPlugin {
     Boussole B;
     TeamManager TM;
     MoneyListener moneyListener = new MoneyListener(this);
-    Halloween halloween = new Halloween(this);
     private MainMenu main_menu = new MainMenu(this, menu_manager);
     private EnchantMenu enchant_menu = new EnchantMenu(this, menu_manager);
     private TeleportationMenu teleportation_menu = new TeleportationMenu(this, menu_manager);
@@ -181,7 +179,6 @@ public class Main extends JavaPlugin {
         CommandController.registerCommands(this, chrono);
         CommandController.registerCommands(this, infinidisp);
         CommandController.registerCommands(this, spleef);
-        CommandController.registerCommands(this, halloween);
         getCommand("roi").setExecutor(roi);
         B = new Boussole(this);
         setupDependencies();
@@ -209,9 +206,9 @@ public class Main extends JavaPlugin {
 
     private void setupPayhour() {
         Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, new BukkitRunnable() {
-            Set<String> players
+            Set<String> players = null
                     ,
-                    players_old;
+                    players_old = null;
 
             @Override
             public void run() {
@@ -220,17 +217,15 @@ public class Main extends JavaPlugin {
                     for (String k : players) {
                         Player p = Bukkit.getPlayerExact(k);
                         if (p == null || !p.isOnline()) continue;
-
                         gain = 10;
                         if (players_old != null)
                             if (players_old.contains(k))
                                 gain += 5; // Si présent depuis looongtemps, +5
                         if (isVIP(k))
-                            gain *= 10; // gain *10 si VIP :D
+                            gain *= 3; // gain *10 si VIP :D
 
                         p.sendMessage(getTAG() + ChatColor.RED + "Payday !" + ChatColor.RESET + " Minefight t'offre " + gain + "ƒ pour ta présence ! :)");
                         addToBalance(k, gain);
-
                     }
                 }
                 players_old = players;
@@ -238,7 +233,7 @@ public class Main extends JavaPlugin {
 
 
             }
-        }, 10, 60 * 30 * 20); // 60 * 29 * 20 = 29 minutes
+        }, 60 * 20 * 30, 60 * 30 * 20); // 60 * 30 * 20 = 30 minutes
     }
 
     void setupDependencies() {
@@ -369,7 +364,6 @@ public class Main extends JavaPlugin {
         globalConfig.set("level_max", enchant_menu.getLevel_max(), "- Menu maxi enchantement VIP");
         locationsConfig.set("spawn_locations", gson.toJson(SM), "- Coords respawns par region");
         locationsConfig.set("infini_locations", gson.toJson(infinidisp.coordonnees), "- Coords infinidispensers");
-        amisConfig.set("halloween", Joiner.on("|").join(halloween.locations));
 
         amisConfig.saveConfig();
         globalConfig.saveConfig();
@@ -399,10 +393,6 @@ public class Main extends JavaPlugin {
         infinidisp.coordonnees = gson.fromJson(locationsConfig.getString("infini_locations"), (new HashSet<String>()).getClass());
         if (infinidisp.coordonnees == null)
             infinidisp.coordonnees = new HashSet<>();
-        if (amisConfig.contains("halloween"))
-            Collections.addAll(halloween.locations, amisConfig.getString("halloween").split("|"));
-        if (halloween.locations == null)
-            halloween.locations = new HashSet<>();
         final List bCastMessages = globalConfig.getList("broadcast-messages");
         if (bCasterThread != 0)
             Bukkit.getScheduler().cancelTask(bCasterThread);
@@ -446,6 +436,9 @@ public class Main extends JavaPlugin {
             }
             CLogger = Logger.getLogger(this.getClass().getName());
             CLogger.setUseParentHandlers(false);
+
+            for (Handler H : CLogger.getHandlers())
+                CLogger.removeHandler(H);
 
             LogFormatter formatter = new LogFormatter();
             handler.setFormatter(formatter);

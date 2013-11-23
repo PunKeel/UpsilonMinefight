@@ -97,7 +97,7 @@ public class MoneyListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onJoin(PlayerJoinEvent e) {
         final Player p = e.getPlayer();
-        if (p.getHealth() == 0) {
+        if (p.isDead()) {
             Main.resetPlayer(p);
         }
         if (!p.getGameMode().equals(GameMode.SURVIVAL) && !p.hasPermission("upsilon.admin"))
@@ -108,15 +108,16 @@ public class MoneyListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onJoinGain(PlayerJoinEvent e) {
         final Player p = e.getPlayer();
-        if (p.getName().equals("DleoT"))
+        if ((1000 * Main.getTimestamp() - main.ess.getUser(p).getLastLogout()) >= 10) {
             if (!p.hasPermission("upsilon.bypass_joinspawn"))
-                if ((1000 * Main.getTimestamp() - main.ess.getUser(p).getLastLogout()) >= 10)
-                    Bukkit.getScheduler().scheduleSyncDelayedTask(main, new Runnable() {
-                        @Override
-                        public void run() {
-                            main.teleportToWarp("spawn", p);
-                        }
-                    });
+                Bukkit.getScheduler().scheduleSyncDelayedTask(main, new Runnable() {
+                    @Override
+                    public void run() {
+                        main.teleportToWarp("spawn", p);
+                    }
+                });
+            Main.resetPlayer(p, GameMode.ADVENTURE);
+        }
         if (!p.getInventory().containsAtLeast(emerald, 1)) {
             if (!p.getEnderChest().containsAtLeast(emerald, 1)) {
                 if (p.getInventory().firstEmpty() != -1) {
@@ -285,7 +286,7 @@ public class MoneyListener implements Listener {
             case "!votekick":
                 if (i.hasPermission("upsilon.votekick")) {
                     if (mots.length == 2) {
-                        Player c = Bukkit.getPlayerExact(mots[1]);
+                        final Player c = Bukkit.getPlayerExact(mots[1]);
                         if (c == null) {
                             i.sendMessage(Main.getTAG() + "Ce joueur n'est pas en ligne");
                             e.setCancelled(true);
@@ -301,7 +302,12 @@ public class MoneyListener implements Listener {
                         }
                         if (main.votekick.get(mots[1]).add(i.getName())) {
                             if (main.votekick.get(mots[1]).shouldKick()) {
-                                c.kickPlayer(Main.getTAG() + ChatColor.RED + "Kick par la communauté Minefight");
+                                Bukkit.getScheduler().runTask(main, new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        c.kickPlayer(Main.getTAG() + ChatColor.RED + "Kick par la communauté Minefight");
+                                    }
+                                });
                                 return;
                             } else {
                                 i.sendMessage(Main.getTAG() + "VoteKick " + mots[1] + " | Y:" + main.votekick.get(mots[1]).getVotes());
@@ -337,7 +343,7 @@ public class MoneyListener implements Listener {
         String[] insultes = new String[]{"gueule", "tg", "connard", "salop", "pute", "enfoiré", "salope", "connasse", "asshole", "nique", "faire foutre", "bâtard", "batard", "bite", "encul", "salaud"};
         for (String insulte : insultes) {
             if (e.getMessage().contains(insulte))
-                e.getPlayer().damage(2);
+                e.getPlayer().damage(2d);
         }
     }
 
@@ -362,7 +368,7 @@ public class MoneyListener implements Listener {
         ApplicableRegionSet AR_old = WGBukkit.getRegionManager(p.getWorld()).getApplicableRegions(e.getFrom());
         ApplicableRegionSet AR_new = WGBukkit.getRegionManager(p.getWorld()).getApplicableRegions(e.getTo());
         if (AR_old.allows(Main.FLAG_DIE_ON_LEAVE) && !AR_new.allows(Main.FLAG_DIE_ON_LEAVE))
-            e.getPlayer().damage(e.getPlayer().getMaxHealth() * 2);
+            e.getPlayer().damage(2000d);
     }
 
     @EventHandler

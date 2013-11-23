@@ -5,7 +5,6 @@ import com.github.games647.scoreboardstats.pvpstats.PlayerCache;
 import com.sk89q.worldguard.bukkit.WGBukkit;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import fr.PunKeel.Upsilon.BarAPI.General;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -20,7 +19,6 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.lang.reflect.Field;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -99,28 +97,6 @@ public class DeathManager implements Listener {
     @EventHandler(priority = EventPriority.LOW)
     public void onDeath(PlayerDeathEvent e) {
         final Player v = e.getEntity();
-        if (v.hasPermission("upsilon.bypass_death_screen")) {
-            Bukkit.getScheduler().scheduleSyncDelayedTask(main, new Runnable() {
-                @Override
-                public void run() {
-                    Class<?> PacketClientCommand = General.getCraftClass("Packet205ClientCommand");
-                    Object packet;
-                    try {
-
-                        packet = PacketClientCommand.newInstance();
-
-                        Field a = General.getField(PacketClientCommand, "a");
-                        a.setAccessible(true);
-                        a.set(packet, 1);
-                        General.receivePacket(v, packet);
-                    } catch (IllegalAccessException | InstantiationException ignored) {
-
-                    }
-                }
-            }, 0L);
-        }
-
-        if (killstreaks.containsKey(v.getName())) killstreaks.remove(v.getName());
 
         if (v.hasMetadata("NPC")) return;
         Location loc = v.getLocation();
@@ -166,8 +142,10 @@ public class DeathManager implements Listener {
             } else {
                 // Victime plus forte qu'attaquant
                 gain += (int) (Math.sqrt(statsv.getKills() ^ 2 / (statsv.getDeaths() + 1)) / 2) + 1;
-                if (killstreaks.containsKey(v.getName()))
+                if (killstreaks.containsKey(v.getName())) {
                     gain += killstreaks.get(v.getName());
+                    killstreaks.remove(v.getName());
+                }
             }
             gain = Math.max(1, Math.min(gain, 50)); // gain entre 1 et 50 :D
             if (main.isVIP(d))
