@@ -2,9 +2,8 @@
 
 Le plugin Upsilon est le plugin qui gérait une bonne partie des commandes et events de Minefight.
 
-### What is this repository for? ###
+# Contenu
 
-* Ce repository contient: ModeraChat, Suggestions, NonPremiumLogin et UpsilonProject
 
 ### ModeraChat ###
 C'est un plugin d'administration automatisé: il permet de détecter le spam, le flood, la répétition de lettres, les insultes [...]
@@ -15,4 +14,3 @@ Séparé du plugin principal à cause de la dépendance mysql, et du fait que je
 
 ## UpsilonMinefight ##
 Contient le reste, c'est à dire les commandes, la gestion des morts, respawns ...
-
